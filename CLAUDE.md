@@ -1110,6 +1110,37 @@ Referencias:
 - https://www.aepd.es/derechos-y-deberes/cumple-tus-deberes/medidas-de-cumplimiento/seguridad-de-los-tratamientos
 - https://www.aepd.es/derechos-y-deberes/cumple-tus-deberes/medidas-de-cumplimiento/proteccion-de-datos-por-defecto
 
+## PRIVACY RULE — minimizar transmisión, no concluir legalidad
+
+**Minimize transmission of facial data.**
+
+Client-side processing is preferred for:
+
+- face landmarks;
+- quality checks;
+- non-identifying measurements.
+
+**Do not assume that derived facial measurements are outside privacy / biometric-data regulation.**
+
+**Legal classification must be reviewed before production.**
+
+### Por qué esta regla existe
+
+Procesar los landmarks en el navegador y enviar al servidor solo un `FaceProfile` de ~20 números es una **buena decisión de arquitectura**: reduce superficie de exposición, coste y latencia.
+
+Pero es exactamente eso, una decisión de arquitectura. **No es un argumento jurídico.** No convierte automáticamente el tratamiento en «no biométrico» ni lo saca del ámbito del RGPD: el tratamiento de información derivada del rostro puede tener implicaciones de protección de datos según qué se procese, para qué y cómo se utilice.
+
+Nunca escribir en el producto, en la documentación ni en textos legales que «esto no es dato biométrico» apoyándose en que el cálculo ocurre en cliente. La clasificación jurídica la determina un asesor antes de producción, no la topología del sistema.
+
+### Nota sobre proveedores
+
+Este punto juega al revés de lo que parece intuitivo, y conviene tenerlo presente al elegir proveedor de try-on:
+
+- un proveedor **3D/AR** puede procesar la imagen **en el navegador del usuario** y no enviarla a ningún servidor;
+- un proveedor **generativo** exige, por construcción, **enviar la cara del usuario a un servidor de terceros** en cada try-on, con tratamiento internacional si está fuera de la UE.
+
+La opción «con proveedor externo» no es necesariamente la peor en privacidad. Verificarlo caso por caso en `research/b1-tryon-benchmark/`.
+
 ## Regla técnica
 
 **No guardar la foto indefinidamente.**

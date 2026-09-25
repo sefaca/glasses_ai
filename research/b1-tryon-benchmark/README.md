@@ -1,75 +1,91 @@
 # B1 — Benchmark de virtual try-on de gafas
 
-**Pregunta que responde este benchmark:**
+B1 responde a **tres preguntas independientes**, y cada una tiene su propio GO/NO-GO. Se puede pasar una y fallar otra, y esa combinación es información, no un empate.
 
-> ¿Existe una tecnología que represente una **montura real e identificable** sobre la fotografía real de una persona, con fidelidad suficiente para sostener un producto afiliado?
+| | Pregunta | Gates | Track |
+|---|---|---|---|
+| **T · Tecnología** | ¿Puede representarse una **montura real e identificable** sobre la foto de una persona? | GT-1…GT-6 | A, B |
+| **C · Comercial** | ¿Alguna tecnología nos permite montar un **agregador multi-marca afiliado** a coste razonable y con licencia válida? | GC-1…GC-6 | 0, C |
+| **P · Producto** | ¿Existe una razón real para que alguien **use nuestro agregador** en vez de ir a la marca? | GP-1…GP-4 | D |
 
-No «¿queda bonito?». No «¿funciona la IA?». **¿Es identificable ese modelo concreto?**
-
-Si la respuesta es no, el proyecto no continúa en esta forma. Nada de lo que hay aguas abajo —catálogo, afiliación, SEO, marca— importa hasta que esto esté contestado.
+Un ★★★★★ técnico con un ❌ de licencia no es nuestro proveedor, por muy bueno que sea. Y un GO técnico con un NO-GO de producto significa que hemos construido una demo, no un negocio.
 
 | Documento | Contenido |
 |---|---|
-| [providers.md](providers.md) | **A** — Tabla comparativa de proveedores investigados y fuentes |
-| Este archivo, §2–§3 | **B** — Protocolo e inputs exactos |
+| [providers.md](providers.md) | **A** — Proveedores en las dos dimensiones, con niveles de evidencia |
+| Este archivo, §2–§4 | **B** — Protocolo e inputs exactos |
 | [rubric.md](rubric.md) | **C** — Rúbrica 0–3 y test ciego |
-| Este archivo, §5 | **D** — Coste estimado |
-| Este archivo, §6 | **E** — Criterio GO / NO-GO |
-| Este archivo, §7 | **F** — Instrucciones exactas de ejecución |
+| [multi-brand-test.md](multi-brand-test.md) | Track D — validación de producto |
+| Este archivo, §6 | **D** — Coste estimado |
+| Este archivo, §7 | **E** — Criterios GO / NO-GO, los tres bloques |
+| Este archivo, §8 | **F** — Instrucciones exactas de ejecución |
 
 ---
 
 ## 1. Lo que hay que entender antes de ejecutar
 
-La investigación de proveedores ([providers.md](providers.md)) obliga a un cambio en el diseño original. Hay **dos clases de tecnología con riesgos opuestos**, y el benchmark tiene que atacar las dos:
+**No hay «varios proveedores de lo mismo». Hay dos tecnologías con riesgos opuestos** (detalle en [providers.md](providers.md)):
 
-- **Clase A (3D/AR — Fittingbox, Jeeliz, Banuba):** la montura es un modelo 3D real. La fidelidad geométrica está garantizada por construcción; el coste es una suscripción y el coste marginal por try-on tiende a cero. **Su riesgo no es la imagen: es la licencia.** Su precio y sus condiciones están diseñadas para un retailer que vende su propio catálogo, no para un agregador independiente multi-marca.
-- **Clase B (generativo — Gemini, FLUX, Qwen):** la montura son píxeles dibujados a partir de una referencia. Libertad total de catálogo y coste variable por generación, pero **la fidelidad es el riesgo entero**, y la limitación documentada de estos modelos (pérdida de nitidez en accesorios y detalle fino) cae exactamente sobre lo que nos importa: puente, patillas, grosor.
+- **Clase A (3D/AR — Fittingbox, Jeeliz, Banuba):** la montura es un modelo 3D real. Fidelidad garantizada por construcción, coste marginal ≈ 0 **a escala**, y la imagen se procesa en el navegador. Su riesgo no es la imagen: **es la licencia**.
+- **Clase B (generativo — Gemini, FLUX, Qwen):** libertad total de catálogo y coste variable, pero **la fidelidad es el riesgo entero** y hay que enviar la cara del usuario a un servidor de terceros.
 
-Por eso el benchmark tiene **tres tracks** y el primero no genera ni una sola imagen.
+Tres cosas que la investigación ya ha establecido y que condicionan el protocolo:
+
+1. **Las condiciones comerciales de Fittingbox y Jeeliz no son públicas.** La página «Terms» de Fittingbox es solo privacidad; Jeeliz no publica ninguna página legal. El bloque C **no se puede resolver leyendo webs**: requiere hablar con ellos, y esa latencia (2–5 días) es el camino crítico real del sprint.
+2. **La Clase A es carísima al arrancar y baratísima a escala; la Clase B, al revés.** El punto de cruce está en ~1.800 usuarios activos/mes. Eso hace que el gate de coste haya que evaluarlo **al volumen del mes 1–3**, no en régimen.
+3. **La privacidad juega al revés de lo que suponíamos.** Fittingbox procesa la imagen en el navegador; la Clase B exige mandarla fuera.
 
 ---
 
-## 2. Protocolo
+## 2. Protocolo — cinco tracks
 
-### Track 0 — Viabilidad comercial y legal (se lanza primero, día 1 hora 0)
+### Track 0 — Licencia y viabilidad comercial · **camino crítico, día 1 hora 0**
 
-Siete preguntas que ninguna web contesta y que invalidan cualquier resultado visual si salen mal. Se envían por email **antes de empezar a generar nada**, porque la latencia de respuesta comercial (2–5 días) es el verdadero camino crítico.
+Diez preguntas que ninguna web contesta y que invalidan cualquier resultado visual si salen mal. Emails en [templates/outreach.md](templates/outreach.md).
 
-Las preguntas y los borradores están en [templates/outreach.md](templates/outreach.md). La que decide:
+1. ¿Podemos usarlo **comercialmente**?
+2. ¿Podemos mostrar productos de **múltiples marcas**?
+3. ¿Podemos mostrar productos que **no vendemos nosotros**?
+4. ¿Podemos usar **sus assets 3D** de terceros? *(la pregunta de las 200.000 monturas)*
+5. ¿Podemos **enviar tráfico fuera** con enlaces externos?
+6. ¿Podemos usarlo para **afiliación**?
+7. ¿Hay **restricciones de marca / trademark**? **¿Quién responde si una marca reclama?**
+8. ¿Límites por **usuario / producto / sesión**? ¿Qué eje escala el precio?
+9. ¿Podemos construir **nuestra propia UI**? ¿API o solo widget?
+10. **Términos de prueba y contratación**: ¿trial real para alguien que no es marca establecida?
 
-> ¿Su licencia permite que **un tercero independiente** muestre monturas de marcas con las que no tiene relación comercial?
-
-Si la respuesta de todos es no, la Clase A entera desaparece y B1 se juega por completo a la Clase B.
+> La 7 es la que más importa y la menos evidente. Banuba, que sí publica sus términos, **no prohíbe** mostrar marcas de terceros: lo que hace es trasladarnos toda la responsabilidad por contrato. Lo más probable no es que nos digan que no, sino que nos digan **«adelante, y si Luxottica reclama, es asunto tuyo»**. Preguntar por el sí/no no basta.
 
 ### Track A — Proveedores especializados (3D/AR)
 
-Aquí no se mide si las gafas están bien colocadas: **están bien colocadas, es un modelo 3D**. Se mide:
+No se mide si las gafas están bien colocadas: lo están, es un modelo 3D. Se mide:
 
-1. **Calidad de la digitalización automática.** Jeeliz genera el 3D desde las fotos de la ficha de producto. Esa conversión es donde puede perderse la fidelidad → se evalúa con la misma rúbrica.
-2. **¿Existe modo foto?** Nuestro flujo es «sube una foto». Fittingbox declara modo foto; Jeeliz parece solo cámara en vivo. **Si solo hay cámara en vivo, cambia el producto**, no solo el proveedor (ver §8).
-3. **Latencia de carga y fluidez en móvil real**, no en portátil.
+1. **Calidad de la digitalización automática.** Jeeliz genera el 3D desde fotos de ficha de producto: ahí es donde puede perderse fidelidad → rúbrica completa.
+2. **¿Existe modo foto?** Fittingbox lo confirma por escrito; en Jeeliz es desconocido.
+3. **Fluidez en móvil real**, no en portátil.
 
-Captura manual por screenshot: son widgets, no APIs de generación. ~8–16 capturas bastan.
+Captura manual por screenshot: son widgets, no APIs de generación. 8–16 capturas bastan.
 
-### Track B — Modelos generativos
+### Track B — Modelos generativos · dos rondas
 
-Aquí sí: 40 casos por modelo, vía API, reproducible.
-
-**Ejecución en dos rondas, para no gastar de más:**
-
-- **Ronda 1 — criba (8 casos por modelo).** 2 personas × 2 fotos × 2 monturas (la más fácil: wayfarer de acetato grueso; la más difícil: aviador metálico de doble puente). Coste ≈ 2 €. Descarta a cualquiera que no llegue a 4/8 casos válidos.
+- **Ronda 1 — criba (8 casos/modelo).** 2 personas × 2 fotos × 2 monturas: la más fácil (wayfarer de acetato) y la más difícil (aviador metálico de doble puente). ≈2 €. Se descarta quien no llegue a 4/8 válidos.
 - **Ronda 2 — completa (40 casos), solo supervivientes.** 5 personas × 2 fotos × 4 monturas.
 
-Si un modelo no supera la ronda 1, no se le dedican 40 casos. La mayoría del presupuesto debe ir al ganador, no a repartirse por igual.
+El presupuesto debe concentrarse en el ganador, no repartirse por igual.
 
-### Track C — Coste real de la ruta autoconstruida
+### Track C — Coste de la ruta autoconstruida
 
-No se implementa nada. Se responde a una sola pregunta con una hora de lectura:
+No se implementa nada. Una hora de lectura para responder:
 
-> El tracking facial (MediaPipe) es gratis y está resuelto. **El cuello de botella es tener un modelo 3D fiel por montura.** ¿Cuánto cuesta conseguir o generar 30 modelos 3D?
+> El tracking facial es gratis y está resuelto (MediaPipe). **El cuello de botella es tener un 3D fiel por montura.** ¿Cuánto cuesta conseguir o generar 30 modelos 3D?
 
-Es la respuesta que determina si existe una salida a medio plazo con coste marginal cero, en caso de que la Clase A no nos deje entrar y la Clase B no dé la talla.
+Es la única ruta que elimina la dependencia de un proveedor único, así que su coste es un dato del bloque C, no una curiosidad técnica.
+
+### Track D — Multi-brand test · [multi-brand-test.md](multi-brand-test.md)
+
+5 participantes × 6 monturas × 4–6 marcas. Valida el **producto**: ¿aporta valor RECOMENDACIÓN + MULTI-MARCA + TRY-ON frente a probarse una marca en su propia web? Métrica principal: **tasa de descubrimiento cruzado**.
+
+Depende del Track B: sin try-ons válidos no hay láminas que enseñar.
 
 ---
 
@@ -82,47 +98,50 @@ Por persona, **2 fotos**:
 | | Foto 1 | Foto 2 |
 |---|---|---|
 | Ángulo | Frontal | Girada 15–30° |
-| Luz | Buena, difusa | Distinta a la foto 1 (más dura, lateral, o interior) |
+| Luz | Buena, difusa | Distinta: más dura, lateral o interior |
 
-Reparto de condiciones a lo largo de las 5 personas — **no buscamos diversidad demográfica artificial, buscamos el tipo de input real que va a llegar**:
+Reparto de condiciones entre las 5 personas — **no buscamos diversidad demográfica artificial, buscamos el input real que va a llegar**:
 
-- al menos 1 persona con **pelo cubriendo parcialmente** la cara o las sienes;
-- al menos 1 persona con **barba**;
-- proporciones faciales visiblemente distintas entre sí (cara ancha / cara alargada);
-- fotos hechas **con móvil**, no de estudio. Si todas las fotos son perfectas, el benchmark miente.
+- al menos 1 con **pelo cubriendo** parcialmente la cara o las sienes;
+- al menos 1 con **barba**;
+- proporciones faciales visiblemente distintas (cara ancha / cara alargada);
+- fotos **hechas con móvil**. Si todas son de estudio, el benchmark miente.
 
-**Requisitos técnicos:** ≥1024 px de lado menor, sin filtros, sin gafas puestas, una sola persona, JPG o PNG.
+**Técnico:** ≥1024 px de lado menor, sin filtros, sin gafas puestas, una sola persona, JPG o PNG.
 
-**Consentimiento:** las 5 personas deben dar consentimiento explícito por escrito para procesar su imagen en proveedores externos de IA para una prueba técnica interna. Plantilla en [templates/outreach.md](templates/outreach.md#consentimiento). Las fotos **no se versionan** (`.gitignore` excluye `research/**/faces/`) y se borran al cerrar B1.
+**Consentimiento por escrito** antes de la primera foto — plantilla en [templates/outreach.md](templates/outreach.md#consentimiento). Las fotos no se versionan (`.gitignore` excluye `research/**/faces/`) y se borran al cerrar B1.
 
-### 3.2. Monturas (4)
+### 3.2. Monturas (6)
 
-Elegidas por **máximo contraste geométrico**, para detectar si el proveedor respeta la arquitectura de la montura o simplemente dibuja «unas gafas»:
+Un solo set sirve a los dos tracks, si se elige bien: **6 monturas, 6 marcas distintas, 6 formas, rango de precio amplio.**
 
-| # | Tipo | Qué pone a prueba | Modelo sugerido |
-|---|---|---|---|
-| **M1** | **Aviador metálica** | Doble puente, varilla fina, lente en gota, reflejo metálico | Ray-Ban Aviator RB3025 |
-| **M2** | **Wayfarer, acetato grueso** | Grosor, bisel, inclinación característica de las patillas | Ray-Ban Wayfarer RB2140 |
-| **M3** | **Redonda metálica** | Círculo perfecto (se deforma con facilidad), puente de llave, aro fino | Ray-Ban Round Metal RB3447 |
-| **M4** | **Cat-eye** | Vértice superior externo, asimetría de la lente | Cualquier cat-eye de acetato de otra marca (Meller / Hawkers) |
+| # | Tipo | Qué pone a prueba | Marca sugerida | Track B | Track D |
+|---|---|---|---|:-:|:-:|
+| **M1** | Aviador metálica | Doble puente, varilla fina, lente en gota, reflejo | Ray-Ban | ✅ **difícil** | ✅ |
+| **M2** | Wayfarer, acetato grueso | Grosor, bisel, inclinación de patillas | Persol | ✅ **fácil** | ✅ |
+| **M3** | Redonda metálica | Círculo perfecto, puente de llave, aro fino | Meller | ✅ **difícil** | ✅ |
+| **M4** | Cat-eye acetato | Vértice superior externo, asimetría de lente | Hawkers | ✅ | ✅ |
+| **M5** | Deportiva envolvente | — | Oakley | — | ✅ |
+| **M6** | Cuadrada asequible | — | Polaroid | — | ✅ |
 
-M1 y M3 son los **casos duros**: geometrías que los modelos generativos tienden a «redondear» hacia una montura genérica. M4 en una marca distinta evita que todo el test dependa de lo bien que un modelo conozca Ray-Ban de memoria.
+- **M1 y M3 son los casos duros:** geometrías que los modelos generativos tienden a «redondear» hacia una montura genérica.
+- **Una marca por montura**, para que el test no dependa de lo bien que un modelo se sepa el catálogo de Ray-Ban de memoria, y para que Track D tenga las 4–6 marcas que necesita.
+- **Rango de precio ≈40 € a ≈220 €.** Parte del valor de un agregador es enseñar la alternativa barata al lado de la cara: sin rango, Track D no puede detectarlo.
 
-De cada montura hace falta: **foto de producto de frente sobre fondo limpio** (la que se envía como referencia) + **foto en 3/4** si existe (ayuda a los modelos que aceptan varias referencias) + URL de la ficha + marca y modelo exactos.
+Por montura hacen falta: foto de producto de frente sobre fondo limpio (la referencia), foto en 3/4 si existe, URL de ficha, marca y modelo exactos, precio. Y para M1–M4, **2 distractores** para el test ciego — reglas en [frames/README.md](frames/README.md).
 
 ### 3.3. Matriz
 
 ```
-Track B, ronda 2:  5 personas × 2 fotos × 4 monturas = 40 casos por modelo
-Con 3 modelos supervivientes:                          120 generaciones
-Track A:           4 monturas × 2 fotos × 1-2 proveedores ≈ 8-16 capturas
+Track B ronda 2:  5 personas × 2 fotos × 4 monturas  =  40 casos/modelo
+  con 3 supervivientes                               = 120 generaciones
+Track A:          4 monturas × 2 fotos × 1-2 provs.  ≈  8-16 capturas
+Track D:          5 personas × 6 monturas            =  30 try-ons (reutiliza B)
 ```
 
-### 3.4. Prompt para la Clase B
+### 3.4. Prompt de la Clase B
 
-Mismo prompt literal para todos los modelos, sin ajustarlo a favor de ninguno. Se guarda en `prompts/v1.txt` junto a los resultados; si se cambia, se versiona a `v2` y se re-ejecuta todo. **Un benchmark con prompts distintos por proveedor no compara proveedores, compara prompts.**
-
-Punto de partida:
+Mismo prompt literal para todos, sin ajustarlo a favor de ninguno. Se guarda en `prompts/v1.txt`; si cambia, se versiona y se re-ejecuta todo. **Un benchmark con prompts distintos por proveedor no compara proveedores, compara prompts.**
 
 ```
 Place the exact eyeglasses shown in the reference product image onto the
@@ -144,28 +163,24 @@ Absolute requirements:
 
 ```
 research/b1-tryon-benchmark/
-├── README.md              ← este archivo: protocolo, coste, GO/NO-GO, ejecución
-├── providers.md           ← A: tabla comparativa + fuentes
+├── README.md              ← protocolo, coste, GO/NO-GO, ejecución
+├── providers.md           ← A: proveedores en dos dimensiones + evidencia
 ├── rubric.md              ← C: rúbrica 0-3 + test ciego
-├── frames/                ← fotos de producto de M1-M4 (versionadas)
-│   └── README.md
-├── faces/                 ← fotos de las 5 personas    [NO versionado]
-│   └── p1/{frontal.jpg, angulo.jpg} ...
-├── outputs/                                            [NO versionado]
-│   └── {proveedor}/{persona}_{foto}_{montura}.png
-├── prompts/
-│   └── v1.txt
+├── multi-brand-test.md    ← Track D: validación de producto
+├── frames/                ← fotos de producto M1-M6 + distractores (versionado)
+├── faces/                 ← fotos de las 5 personas          [NO versionado]
+├── outputs/               ← {proveedor}/{persona}_{foto}_{montura}.png  [NO versionado]
+├── prompts/v1.txt
 ├── templates/
-│   ├── scoring.csv        ← una fila por caso
-│   ├── blind-test.csv     ← una fila por lámina
-│   └── outreach.md        ← emails del Track 0 + consentimiento
+│   ├── scoring.csv · blind-test.csv · multi-brand-test.csv
+│   └── outreach.md        ← Track 0 + consentimiento
 └── results/
-    ├── scoring.csv        ← copia de la plantilla, rellenada
-    ├── blind-test.csv
-    └── findings.md        ← conclusión y decisión GO/NO-GO firmada
+    ├── scoring.csv · blind-test.csv · multi-brand-test.csv
+    ├── licence-matrix.md  ← respuestas del Track 0, una fila por proveedor
+    └── findings.md        ← las TRES decisiones, firmadas
 ```
 
-**Convención de nombre, obligatoria:** `{proveedor}_{persona}_{foto}_{montura}.png` → `gemini31flash_p3_angulo_M1.png`. Sin esto, 120 imágenes son inanalizables a las dos horas.
+**Convención obligatoria:** `{proveedor}_{persona}_{foto}_{montura}.png` → `gemini31flash_p3_angulo_M1.png`. Sin esto, 120 imágenes son inanalizables a las dos horas.
 
 ---
 
@@ -173,73 +188,91 @@ research/b1-tryon-benchmark/
 
 ### Track B — generativo
 
-Precios oficiales por imagen a 2026-09-25 (ver [providers.md §2](providers.md)):
-
-| Modelo | €/img aprox. | Ronda 1 (8) | Ronda 2 (40) |
+| Modelo | €/img | Ronda 1 (8) | Ronda 2 (40) |
 |---|---:|---:|---:|
 | Gemini 3.1 Flash Lite Image (1K) | 0,029 € | 0,23 € | 1,15 € |
 | Gemini 3.1 Flash Image (1K) | 0,057 € | 0,46 € | 2,29 € |
 | Gemini 3 Pro Image (1K/2K) | 0,114 € | 0,92 € | 4,57 € |
-| FLUX.1 Kontext [pro] (fal) | 0,034 € | 0,27 € | 1,36 € |
-| Qwen Image Edit (fal) | 0,018 € | 0,14 € | 0,72 € |
-
-*Conversión a 1 $ ≈ 0,85 €, a verificar el día de la compra de créditos.*
+| FLUX.1 Kontext [pro] | 0,034 € | 0,27 € | 1,36 € |
+| Qwen Image Edit | 0,018 € | 0,14 € | 0,72 € |
 
 ```
 Ronda 1, los 5 modelos ..................  2,02 €
 Ronda 2, 3 supervivientes (caso peor) ...  8,22 €
-Reintentos y fallos (+30 %) .............  3,07 €
+Track D, 30 try-ons con el ganador ......  1,71 €
+Reintentos y fallos (+30 %) .............  3,58 €
                                           ────────
-Track B total ...........................  ~13,50 €
+Track B + D .............................  ~15,50 €
 ```
 
-### Track A — especializado
+### Track A — especializado: **presupuesto 0 €**
 
-| Proveedor | Coste del benchmark |
-|---|---|
-| Jeeliz | **0 €** — plan Discovery gratuito, 3 productos |
-| Fittingbox | 0 € si el free trial cubre la prueba; si no, 59 $/mes (~50 €) |
-| Banuba / Perfect Corp | 0 € vía demo |
+Corrección importante sobre la estimación anterior. Los precios de las apps de Shopify (39–199 $/mes) **no son los precios directos**: la web de Jeeliz publica Starter **299 $/mes** y Advanced 499 $/mes, y su mes gratuito es «para marcas establecidas», que no somos.
 
-### Total
+**Decisión: no se paga ninguna suscripción de Clase A durante B1.** Si un proveedor exige pagar para evaluar, eso es una respuesta del Track 0 —dice mucho sobre lo accesibles que son— y no un gasto de benchmark. Se usa lo que haya de trial, demo o plan gratuito; si no hay nada, se evalúa su demo pública y se anota como `[?]`.
 
-**15 € – 65 €**, según haga falta pagar un mes de Fittingbox.
+### Total autorizado
 
-> **Nada de anuncios, dominio, logo, Framer, Supabase, Stripe ni plantillas.** No se gasta un euro fuera de esta tabla hasta que B1 esté cerrado.
+**~15,50 €.** Nada más. Ni anuncios, ni dominio, ni logo, ni Framer, ni Supabase, ni Stripe, ni plantillas, ni suscripciones.
 
 ---
 
-## 6. Criterio GO / NO-GO (E)
+## 6. Criterios GO / NO-GO (E)
 
-Se evalúa **el mejor proveedor**, no la media del mercado. Basta uno que pase.
+Se evalúa **el mejor proveedor de cada clase**, no la media del mercado.
 
-### Puertas eliminatorias — las cuatro
+### Bloque T — Tecnología
 
 | Gate | Métrica | GO | NO-GO |
 |---|---|---|---|
-| **G1 · Identidad** | Acierto en el test ciego de 3 opciones (azar = 33 %) | **≥70 %** | <50 % |
-| **G2 · Validez** | `TASA_VALIDOS` — casos con C1 ≥ 2 y sin flags | **≥70 %** | <50 % |
-| **G3 · Coste** | `COSTE_EFECTIVO` por try-on válido, o coste/usuario activo proyectado en suscripción | **≤0,10 €** | >0,25 € |
-| **G4 · Licencia** | ¿Puede un tercero independiente mostrar marcas ajenas? | **Sí, por escrito** | No, en todos |
+| **GT-1 · Identidad** | Acierto en el test ciego de 3 opciones (azar = 33 %) | **≥70 %** | <50 % |
+| **GT-2 · Validez** | `TASA_VALIDOS` — casos con C1 ≥ 2 y sin flags | **≥70 %** | <50 % |
+| **GT-3 · Fidelidad** | `FIDELIDAD_MED` sobre casos válidos | ≥17 / 24 | |
+| **GT-4 · Latencia** | Clase B p50/p95 · Clase A carga del widget | ≤12 s / ≤25 s · <3 s | |
+| **GT-5 · Calidad comercial** | % de casos con C8 = 3 | ≥30 % | |
+| **GT-6 · Integridad facial** | % de casos con `F_CARA` | **≤5 %** | >5 % |
 
-`F_CARA` en más del 5 % de los casos es **NO-GO por sí solo**, con independencia de todo lo demás: si el sistema retoca la cara del usuario, el try-on no es informativo.
+**GO técnico:** GT-1, GT-2 y GT-6 ✅ y ≥2 de {GT-3, GT-4, GT-5}.
+GT-6 es eliminatorio por sí solo: si el sistema retoca la cara del usuario, el try-on no es informativo — le estás enseñando a otra persona con esas gafas.
 
-### Puertas de calidad — al menos 2 de 3
+### Bloque C — Modelo de agregador
+
+Todas se responden en el Track 0, **por escrito**. Una respuesta ambigua cuenta como no.
+
+| Gate | Pregunta | GO |
+|---|---|---|
+| **GC-1 · Multi-marca** | ¿Podemos mostrar varias marcas? | Sí por escrito |
+| **GC-2 · Productos ajenos** | ¿Podemos mostrar lo que no vendemos? | Sí por escrito |
+| **GC-3 · Tráfico saliente** | ¿Enlaces externos y afiliación permitidos? | Sí por escrito |
+| **GC-4 · Riesgo IP** | ¿Quién responde si una marca reclama? | Riesgo acotado **o** asumible conscientemente |
+| **GC-5 · Coste al arranque** | Coste/usuario activo **al volumen del mes 1–3**, no en régimen | ≤0,10 € |
+| **GC-6 · Límites** | Topes de usuarios/productos/sesiones compatibles con tráfico social | Sí |
+
+**GO comercial:** GC-1, GC-2 y GC-3 ✅ y ≥2 de {GC-4, GC-5, GC-6}.
+Si los tres primeros fallan en **todos** los proveedores de Clase A, la Clase A desaparece y el bloque T se juega por completo a la Clase B.
+
+### Bloque P — Producto · [multi-brand-test.md](multi-brand-test.md)
 
 | Gate | Métrica | GO |
 |---|---|---|
-| **G5 · Fidelidad** | `FIDELIDAD_MED` sobre casos válidos | ≥17 / 24 |
-| **G6 · Latencia** | Clase B: p50 / p95 · Clase A: carga del widget | ≤12 s / ≤25 s · <3 s |
-| **G7 · Calidad comercial** | % de casos con C8 = 3 | ≥30 % |
+| **GP-1 · Descubrimiento cruzado** | Eligen una marca que no habían nombrado antes | ≥3 de 5 |
+| **GP-2 · Utilidad espontánea** | Dicen que les es útil sin que haya que explicarlo | ≥3 de 5 |
+| **GP-3 · Momento identificado** | Saben decir en qué punto de su compra les serviría | ≥3 de 5 |
+| **GP-4 · Comparación valorada** | Mencionan espontáneamente comparar marcas/precios | ≥3 de 5 |
 
-### Reglas de decisión
+**GO de producto:** 3 de 4.
 
-- **GO →** pasar a afiliación (B3). G1–G4 ✅ y ≥2 de {G5, G6, G7}.
-- **GO condicional →** G1 y G2 en 50–70 %. Se sigue, pero con el try-on de pago desde el primer uso y sin free tier. Revisar la economía unitaria antes de escribir código.
-- **NO-GO →** G1 <50 % en todos los proveedores. **Parar.** No hay producto afiliado que construir sobre esto. Volver a evaluar en 3–6 meses: es un campo que se mueve rápido.
-- **Bifurcación de licencia →** la Clase A pasa G1–G3 con holgura pero falla G4. Entonces el problema no es técnico sino de modelo de negocio, y las opciones son: negociar, ser retailer en vez de agregador (contradice CLAUDE.md §0), o volver a la Clase B / ruta autoconstruida.
+### Cómo se combinan
 
-La decisión se escribe en `results/findings.md` con los números delante. **Si no hay números, no hay decisión.**
+| T | C | P | Decisión |
+|:-:|:-:|:-:|---|
+| ✅ | ✅ | ✅ | **GO.** Pasar a afiliación (B3) |
+| ✅ | ✅ | ❌ | **Parar y repetir P con n=15.** La tecnología está, el producto no se ha demostrado. Es el desenlace más probable e incómodo |
+| ✅ | ❌ | ✅ | Clase A cerrada. **Seguir con Clase B**, revisando GC-5 con sus números |
+| ❌ | ✅ | — | Clase B insuficiente. Depende por completo de que la Clase A nos deje entrar |
+| ❌ | ❌ | — | **NO-GO.** Reevaluar en 3–6 meses: el campo se mueve rápido |
+
+Las tres decisiones se escriben por separado en `results/findings.md`, con los números delante. **Sin números no hay decisión.**
 
 ---
 
@@ -248,67 +281,68 @@ La decisión se escribe en `results/findings.md` con los números delante. **Si 
 ### Día 1
 
 **Hora 0 — Track 0 (30 min). Primero esto, antes que nada.**
-1. Enviar los 4 emails de [templates/outreach.md](templates/outreach.md) a Fittingbox, Jeeliz, Banuba y Perfect Corp.
-2. Crear cuenta gratuita en Jeeliz (plan Discovery, 3 productos) y solicitar el free trial de Fittingbox.
+1. Enviar los emails de [templates/outreach.md](templates/outreach.md) a Fittingbox, Jeeliz, Banuba y Perfect Corp con las 10 preguntas.
+2. Solicitar trial/demo donde exista. **No contratar nada de pago.**
 
 **Hora 0:30 — Inputs (2 h).**
-3. Pedir consentimiento por escrito a las 5 personas y recoger las 10 fotos según §3.1.
-4. Guardarlas en `faces/p1..p5/` con los nombres `frontal.jpg` y `angulo.jpg`. Verificar que `git status` **no** las muestra.
-5. Descargar las fotos de producto de M1–M4 a `frames/` y anotar marca, modelo y URL en `frames/README.md`.
-6. Elegir los **2 distractores por montura** según la regla de §1 de [rubric.md](rubric.md) y guardarlos como `frames/M1_distractor_a.jpg`, etc.
+3. Consentimiento por escrito de las 5 personas y recogida de las 10 fotos (§3.1) en `faces/p1..p5/`. Verificar que `git status` **no** las muestra.
+4. Descargar las fotos de producto de M1–M6 a `frames/` y rellenar la tabla de [frames/README.md](frames/README.md).
+5. Elegir los 2 distractores de M1–M4 según la regla de [frames/README.md](frames/README.md).
 
 **Hora 2:30 — Track B ronda 1 (1,5 h).**
-7. Dar de alta claves de Gemini API y fal. Cargar ~10 € de crédito en cada una.
-8. Generar los 8 casos de criba × 5 modelos con el prompt `prompts/v1.txt` **sin modificar**. Registrar latencia y coste real de cada llamada en `results/scoring.csv`.
-9. Puntuar solo C1 en los 40 outputs. Descartar los modelos con <4/8 válidos.
+6. Claves de Gemini API y fal, ~10 € de crédito en cada una.
+7. Generar los 8 casos de criba × 5 modelos con `prompts/v1.txt` **sin modificar**. Registrar latencia y coste real por llamada.
+8. Puntuar solo C1. Descartar los modelos con <4/8 válidos.
 
 **Hora 4 — Track A (2 h).**
-10. Subir M1–M3 a Jeeliz (Discovery permite 3) y probar el try-on en **móvil real**.
-11. Comprobar si existe modo foto. Capturar pantalla de los casos y guardarlos en `outputs/jeeliz/`.
-12. Repetir con Fittingbox si el trial está activo.
+9. Probar lo que haya disponible sin pagar. Comprobar **si existe modo foto** y capturar pantallas en `outputs/{proveedor}/`.
+10. Probar en **móvil real**, no en portátil.
 
 **Hora 6 — Track B ronda 2 (2 h).**
-13. Generar los 40 casos completos con los supervivientes. Guardar con la convención de nombre de §4.
+11. Generar los 40 casos con los supervivientes, más los 30 de Track D con el ganador.
 
 ### Día 2
 
 **Hora 0 — Puntuación (2 h).**
-14. Calibrar con 5 casos de referencia (§4 de [rubric.md](rubric.md)).
-15. Puntuar los 8 criterios y los flags de todos los casos en `results/scoring.csv`.
+12. Calibrar con 5 casos de referencia ([rubric.md §4](rubric.md)).
+13. Puntuar los 8 criterios y los flags en `results/scoring.csv`.
 
 **Hora 2 — Test ciego (1,5 h).**
-16. Montar las láminas (resultado + 3 fotos de producto en orden aleatorio).
-17. Pasarlo a **2 personas que no hayan participado** en la generación. Registrar en `results/blind-test.csv`.
+14. Montar láminas (resultado + 3 fotos de producto en orden aleatorio).
+15. Pasarlo a **2 personas que no hayan participado** en la generación.
 
-**Hora 3:30 — Track C (1 h).**
-18. Investigar el coste de conseguir o generar 30 modelos 3D de monturas. Anotar en `results/findings.md`.
+**Hora 3:30 — Track D (2,5 h).**
+16. Montar las 5 láminas de 6 monturas y ejecutar las entrevistas según [multi-brand-test.md](multi-brand-test.md). 30 min por participante.
 
-**Hora 4:30 — Decisión (1 h).**
-19. Calcular las métricas de §3 de [rubric.md](rubric.md), rellenar la tabla de gates de §6 y escribir la decisión en `results/findings.md`.
-20. Borrar `faces/` y `outputs/` si la decisión es NO-GO, o archivarlos con fecha de caducidad si es GO.
+**Hora 6 — Track C (45 min).**
+17. Investigar el coste de conseguir o generar 30 modelos 3D. Anotar en `results/findings.md`.
+
+**Hora 6:45 — Decisión (1 h).**
+18. Rellenar los tres bloques de gates y escribir las **tres decisiones por separado**.
+19. Volcar las respuestas del Track 0 que hayan llegado en `results/licence-matrix.md`. Las que falten quedan como `[?]` abiertas — **y el bloque C no se cierra hasta que lleguen.**
+20. Borrar `faces/` y `outputs/` si hay NO-GO; archivarlos con fecha de caducidad si hay GO.
 
 ---
 
-## 8. El hallazgo que puede cambiar el producto, no solo el proveedor
+## 8. Foto vs cámara: no decidir todavía
 
-Si la Clase A gana (probable en fidelidad) y resulta que **solo funciona con cámara en vivo**, el producto deja de ser:
-
-```
-sube una foto → analizamos → te enseñamos 6 → te pruebas
-```
-
-y pasa a ser:
+Fittingbox confirma por escrito que soporta **ambos** modos [D], así que la disyuntiva no es real mientras siga en la mesa:
 
 ```
-enciende la cámara → te ves en un espejo → te enseñamos 6 → cambias entre ellas en vivo
+Modo A — Foto            Modo B — Cámara
+subes foto               das permiso de cámara
+analizamos               te ves en vivo
+recomendamos             vas cambiando de montura
+try-on                   try-on instantáneo
+comparas y compartes
 ```
 
-No es peor. En varios aspectos es mejor: sin subida, sin espera, sin foto almacenada, **sin problema de RGPD** y con coste marginal cero. Pero rompe cosas que CLAUDE.md da por sentadas: el quality check de imagen, la comparación lado a lado con la misma foto, la share card para redes y buena parte del funnel instrumentado en §17.
+Podrían convivir: **«Pruébatelas ahora»** → cámara · **«Ver cómo me quedan en una foto»** → foto.
 
-**Es una decisión de producto, no de infraestructura, y hay que tomarla explícitamente al cerrar B1.** Si sale por aquí, la vía intermedia es: cámara en vivo para probar + captura de fotograma para comparar y compartir.
+**No se decide la UX antes de saber qué nos deja hacer cada proveedor bajo qué licencia.** Lo único que hay que registrar en B1 es qué modos soporta cada candidato y a qué precio, porque si el ganador solo hace cámara en vivo, eso cambia el quality check, la comparación sobre la misma foto y la share card — es decir, cambia el producto, no la infraestructura.
 
 ---
 
 ## 9. Lo que este benchmark NO hace
 
-No se desarrolla MVP, no se crea frontend, no se conecta Supabase, no se implementa ninguna funcionalidad de producto y no se compra dominio, marca ni infraestructura. El único gasto autorizado es el de §5.
+No se desarrolla MVP, no se crea frontend, no se conecta Supabase, no se implementa ninguna funcionalidad de producto, no se compra dominio ni marca, no se lanzan anuncios y no se contrata ninguna suscripción. El único gasto autorizado son los ~15,50 € de §5.

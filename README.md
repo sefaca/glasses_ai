@@ -28,37 +28,41 @@ El contexto completo de producto, negocio, arquitectura y reglas está en [CLAUD
 
 ---
 
-## Fase 0 — Sprint 0 de validación (2 días)
+## Fase 0 — validación
 
-El objetivo no es construir, es matar o confirmar el proyecto rápido y barato.
+El objetivo no es construir: es matar o confirmar el proyecto rápido y barato, en este orden.
 
-| # | Bloque | Salida |
+```
+B1  Benchmark técnico + licencia      ← AQUÍ ESTAMOS
+      ↓  ¿try-on fiel y licencia válida?
+B3  Afiliación y catálogo real
+      ↓  ¿podemos monetizar la intención de compra?
+B4  Competidores y entrevistas
+      ↓  ¿la comparación multi-marca aporta valor?
+B5  Keyword research y social
+      ↓
+MVP
+```
+
+Nada de dominio, marca, anuncios ni infraestructura hasta que B1 esté cerrado.
+
+### B1 — el paso actual
+
+Protocolo completo en [research/b1-tryon-benchmark/](research/b1-tryon-benchmark/). Responde a **tres preguntas independientes**, cada una con su propio GO/NO-GO:
+
+| | Pregunta | Gates |
 |---|---|---|
-| 1 | Benchmark de proveedores de try-on | Fidelidad, latencia y €/try-on medidos sobre monturas reales |
-| 2 | Keyword research real (no Google Trends) | Volumen, CPC y dificultad por cluster, ES + MX |
-| 3 | Programas de afiliación de eyewear | Retailers con programa activo, comisión y cookie verificadas |
-| 4 | Benchmark de competidores | Tabla comparativa de flujo, precio y privacidad |
-| 5 | Smoke test de demanda | CTR y coste por email de lista de espera |
-| 6 | Test cualitativo (5 personas) | ¿Subirían su foto? ¿El resultado les ayuda a decidir? |
-| 7 | Unit economics | Contribución por usuario activo en 3 escenarios |
-| 8 | Dominio y marca | 3 finalistas verificados, 1 dominio comprado |
+| **T · Tecnología** | ¿Puede representarse una montura real e **identificable** sobre la foto de una persona? | GT-1…GT-6 |
+| **C · Comercial** | ¿Alguna tecnología permite un **agregador multi-marca afiliado** con licencia válida y coste razonable? | GC-1…GC-6 |
+| **P · Producto** | ¿Hay razón real para usar **nuestro agregador** en vez de ir a la marca? | GP-1…GP-4 |
 
-### Criterios GO / NO-GO
+Los tres umbrales que más deciden:
 
-**Puertas técnicas — las tres deben pasar:**
+- **GT-1 · Identidad:** ≥70 % de acierto en un test ciego de 3 opciones (azar = 33 %).
+- **GC-4 · Riesgo de marca:** los proveedores no prohíben mostrar marcas ajenas — **nos trasladan el riesgo**. Hay que saber quién responde si una marca reclama.
+- **GP-1 · Descubrimiento cruzado:** ≥3 de 5 participantes eligen una marca que no habían nombrado antes. Si no, somos una interfaz bonita sobre una decisión ya tomada.
 
-- **Fidelidad:** ≥70 % de las combinaciones con la montura real reconocible.
-- **Coste:** ≤0,10 € por try-on a precio de lista.
-- **Latencia:** p50 ≤12 s, p95 ≤25 s.
-
-**Puertas de negocio — al menos 3 de 4:**
-
-- **Afiliación:** ≥3 retailers con programa activo que acepten sitio nuevo, comisión ≥5 %, cookie ≥7 días.
-- **Demanda:** ≥15 % de clic en el CTA principal del smoke test y coste por email <3 €.
-- **Credibilidad:** ≥3 de 5 personas subirían su foto y dirían que el resultado les ayuda a decidir.
-- **Economía unitaria:** contribución por usuario activo positiva en escenario base.
-
-Si falla cualquiera de las tres puertas técnicas, el proyecto no arranca en esta forma.
+Presupuesto autorizado de B1: **~15,50 €**. Ninguna suscripción.
 
 ---
 
@@ -66,15 +70,23 @@ Si falla cualquiera de las tres puertas técnicas, el proyecto no arranca en est
 
 Next.js (App Router) · TypeScript · Tailwind · Supabase (Postgres + Storage privado) · Vercel · Stripe cuando haya monetización · proveedor de try-on detrás de un adapter intercambiable.
 
-Decisión de privacidad que condiciona la arquitectura: **los landmarks faciales se calculan en el navegador**. La foto solo sale del dispositivo si el usuario pide un try-on, va a un bucket privado con TTL corto y se borra después.
+Decisión de privacidad que condiciona la arquitectura: **los landmarks faciales se calculan en el navegador**. La foto solo sale del dispositivo si el usuario pide un try-on, va a un bucket privado con TTL corto y se borra después. Es una decisión de arquitectura, **no una conclusión jurídica** — ver PRIVACY RULE en [CLAUDE.md §14](CLAUDE.md).
 
 ## Estructura actual
 
 ```
 .
-├── CLAUDE.md     # documento maestro de producto y arquitectura
-├── README.md     # este archivo
-└── .gitignore
+├── CLAUDE.md                      # documento maestro de producto y arquitectura
+├── README.md                      # este archivo
+├── .gitignore
+└── research/
+    └── b1-tryon-benchmark/        # protocolo de B1, sin ejecutar
+        ├── README.md              # protocolo, coste, gates, ejecución
+        ├── providers.md           # proveedores en 2 dimensiones, con evidencia
+        ├── rubric.md              # rúbrica 0-3 + test ciego
+        ├── multi-brand-test.md    # validación de producto
+        ├── frames/ · templates/
+        └── faces/ · outputs/      # no versionados
 ```
 
 ---
@@ -83,7 +95,7 @@ Decisión de privacidad que condiciona la arquitectura: **los landmarks faciales
 
 Se manejan fotografías faciales. Reglas no negociables desde el día 1: bucket privado, signed URLs con expiración, borrado duro por TTL, sin reconocimiento de identidad, sin inferencia de atributos sensibles, sin entrenar modelos con las fotos, y sin fotos ni contenido facial en logs ni en analytics.
 
-Antes de producción hay que revisar el flujo con asesoramiento legal, especialmente por la combinación de foto facial + proveedor de IA de terceros.
+**No asumir que unas medidas faciales derivadas quedan fuera de la normativa de protección de datos por el hecho de calcularse en cliente.** La clasificación jurídica se revisa con asesoramiento profesional antes de producción, especialmente por la combinación de foto facial + proveedor de IA de terceros.
 
 ## Licencia
 
