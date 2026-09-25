@@ -54,9 +54,9 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Datos de validación con material sensible
-# Fotos de test del benchmark de try-on: NO deben versionarse.
-/research/faces/
-/research/**/output/
+# Fotos de personas y outputs generados: NO deben versionarse nunca.
+/research/**/faces/
+/research/**/outputs/
 *.heic
 
 # Sistema operativo y editores

@@ -34,6 +34,33 @@ La experiencia central es:
 - NO generar páginas SEO vacías o programáticas sin contenido/valor real.
 - NO bloquear la primera experiencia detrás de registro obligatorio.
 
+### RULE #1 — Fidelidad de montura por encima de realismo de imagen
+
+> **Nunca mostramos como «try-on de un producto» una generación que no represente razonablemente la montura real de ese producto.**
+
+Es la única línea roja absoluta del proyecto. El motivo no es estético:
+
+```
+Ray-Ban Aviator 180 €
+        ↓
+resultado IA que no es esa montura
+        ↓
+el usuario compra
+        ↓
+recibe algo visualmente distinto
+```
+
+Eso es una experiencia engañosa, destruye la confianza en toda la plataforma y pone en riesgo la relación con cualquier retailer afiliado.
+
+Consecuencias operativas:
+
+- ante la duda entre una imagen bonita y una montura fiel, **siempre la montura fiel**;
+- si la fidelidad de un modelo concreto no alcanza el umbral, ese modelo **no se ofrece para try-on**, aunque esté en catálogo;
+- si ningún proveedor alcanza el umbral, no se lanza el try-on de producto. No se sustituye por «algo parecido»;
+- todo resultado de try-on lleva indicación visible de que es una **simulación**.
+
+El umbral se define y se mide en `research/b1-tryon-benchmark/`.
+
 ### Principio rector
 
 El producto no debe venderse mentalmente como «una IA que analiza caras».
@@ -2060,6 +2087,7 @@ E2E para:
 
 Cuando implementes una feature:
 
+0. **RULE #1 (§0) prevalece sobre todo lo demás.** Nunca presentar como try-on de un producto una generación que no represente razonablemente esa montura real.
 1. Comprueba primero si ya existe una abstracción/utility que pueda reutilizarse.
 2. No introduzcas una dependencia nueva si puede resolverse con el stack existente.
 3. No implementes funcionalidades fuera del alcance del MVP salvo que sean necesarias para la arquitectura.

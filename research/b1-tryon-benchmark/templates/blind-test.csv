@@ -1,0 +1,2 @@
+plate_id,case_id,provider_hidden,target_frame,option_A,option_B,option_C,correct_option,evaluator,answer,confidence,is_correct
+plate_001,gemini31flash_p1_frontal_M1,,M1,M1_distractor_a,M1,M1_distractor_b,B,,,,

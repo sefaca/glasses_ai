@@ -1,0 +1,2 @@
+case_id,provider,model_version,round,person,photo,frame,prompt_version,latency_s,cost_usd,C1_identidad,C2_geometria,C3_escala,C4_puente,C5_patillas,C6_color_material,C7_posicion,C8_calidad,F_IDENTIDAD,F_CARA,F_EXTRA,F_VACIO,F_RECHAZO,caso_valido,fidelidad_bruta,notas
+gemini31flash_p1_frontal_M1,gemini-3.1-flash-image,2026-09,1,p1,frontal,M1,v1,,,,,,,,,,,FALSE,FALSE,FALSE,FALSE,FALSE,,,
