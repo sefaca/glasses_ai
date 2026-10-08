@@ -255,18 +255,41 @@ export function recommend(
       return a.frame.id.localeCompare(b.frame.id);
     });
 
-  const perShape = new Map<string, number>();
-  const picked: Recommendation[] = [];
-
+  // Selección por rondas entre formas, no por orden de score a secas.
+  //
+  // Por qué: con perfil neutro y sin preferencias declaradas, el único
+  // componente con datos es la geometría, que para una forma desconocida es
+  // plana. Todas las monturas empatan, y un simple «coge las 6 mejores»
+  // devuelve las primeras por desempate alfabético — tres formas repetidas.
+  // Para un producto cuya promesa es reducir la elección enseñando opciones
+  // distintas, eso es justo lo contrario de lo que hace falta.
+  //
+  // Las formas se visitan en orden de su mejor montura, así que cuando los
+  // scores sí difieren la mejor sigue saliendo primera; lo que cambia es que
+  // la segunda de una forma espera a que todas las demás hayan tenido turno.
+  const byShape = new Map<string, typeof scored>();
   for (const candidate of scored) {
-    if (picked.length >= limit) break;
-    const used = perShape.get(candidate.frame.shape) ?? 0;
-    if (used >= maxPerShape) continue;
-    perShape.set(candidate.frame.shape, used + 1);
-    picked.push({ ...candidate, position: picked.length + 1 });
+    const group = byShape.get(candidate.frame.shape);
+    if (group) group.push(candidate);
+    else byShape.set(candidate.frame.shape, [candidate]);
   }
 
-  // Si la diversidad por forma nos deja cortos, se completa con los mejores.
+  const shapesByBest = [...byShape.values()].sort((a, b) => {
+    const diff = b[0]!.score.total - a[0]!.score.total;
+    return diff !== 0 ? diff : a[0]!.frame.id.localeCompare(b[0]!.frame.id);
+  });
+
+  const picked: Recommendation[] = [];
+  for (let round = 0; round < maxPerShape && picked.length < limit; round++) {
+    for (const group of shapesByBest) {
+      if (picked.length >= limit) break;
+      const candidate = group[round];
+      if (!candidate) continue;
+      picked.push({ ...candidate, position: picked.length + 1 });
+    }
+  }
+
+  // Si el tope por forma nos deja cortos, se completa con los mejores.
   if (picked.length < limit) {
     const already = new Set(picked.map((p) => p.frame.id));
     for (const candidate of scored) {

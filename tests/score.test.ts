@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { classifyFace, SHAPE_CENTROIDS } from "../lib/face/classify";
+import { NEUTRAL_FACE } from "../lib/face/neutral";
 import { EMPTY_PREFERENCES, type FaceProfile } from "../lib/face/types";
 import { DEV_FRAMES } from "../lib/catalog/seed";
 import type { FrameProfile } from "../lib/catalog/types";
@@ -136,6 +137,30 @@ describe("recommend", () => {
     for (const count of perShape.values()) {
       expect(count).toBeLessThanOrEqual(2);
     }
+  });
+
+  it("con todo empatado devuelve 6 formas distintas, no las 6 primeras", () => {
+    // Perfil neutro: el único componente con datos es la geometría, que para
+    // una forma desconocida es plana, así que todas las monturas empatan. En
+    // ese caso la variedad es lo único que aporta valor — enseñar dos Amplia
+    // y dos Bloque por orden alfabético sería lo contrario de reducir la
+    // elección.
+    const recs = recommend(NEUTRAL_FACE, EMPTY_PREFERENCES, DEV_FRAMES);
+    const totals = new Set(recs.map((r) => r.score.total));
+    expect(totals.size).toBe(1); // efectivamente, todo empatado
+
+    const shapes = recs.map((r) => r.frame.shape);
+    expect(new Set(shapes).size).toBe(6);
+  });
+
+  it("cuando los scores difieren, la mejor montura sigue siendo la primera", () => {
+    // La diversificación no puede costar la posición 1: ordena las formas por
+    // su mejor montura, así que la ganadora absoluta abre la lista.
+    const recs = recommend(face, EMPTY_PREFERENCES, DEV_FRAMES);
+    const best = [...DEV_FRAMES]
+      .map((frame) => ({ frame, total: scoreFrame(face, EMPTY_PREFERENCES, frame).total }))
+      .sort((a, b) => b.total - a.total)[0]!;
+    expect(recs[0]!.frame.id).toBe(best.frame.id);
   });
 
   it("es determinista, incluso con empates", () => {
