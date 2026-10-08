@@ -42,6 +42,7 @@
 | [D-014](#d-014) | 2026-09-25 | Tres capas de documentación; `research/` es la evidencia | DECISIÓN | OPEN |
 | [D-015](#d-015) | 2026-09-25 | El try-on crea una obra derivada de la imagen oficial | HIPÓTESIS | **VALIDATED** |
 | [D-016](#d-016) | 2026-10-08 | Corrección: el riesgo de licencia es de la Clase B, no de la Clase A | HIPÓTESIS | VALIDATED |
+| [D-017](#d-017) | 2026-10-08 | Construir la plataforma antes de cerrar B1, con muro de gates | DECISIÓN | OPEN |
 
 ---
 
@@ -227,6 +228,29 @@
 - **Límite, y es importante** Esto **no** da por limpia la Clase A. Si usamos Jeeliz para digitalizar una montura a partir de una foto de producto que **nosotros** aportamos sin derechos, el problema no se resuelve: se mueve un eslabón. De ahí que **GC-4** siga siendo la pregunta correcta, ampliada con *«¿de dónde salen los derechos de las monturas de su base?»*.
 - **Consecuencia sobre el plan — DECISIÓN PENDIENTE, no tomada** Esto apunta a reordenar B1 dando prioridad a la Clase A y degradando la ruta generativa sobre imagen oficial a plan B. **No se reordena sin ratificación del fundador**, porque invierte D-004 en su tramo técnico y porque la Clase A es más lenta, más cara y con dependencia de proveedor único.
 - **Status note** VALIDATED sobre evidencia documental de las redes, no sobre asesoramiento jurídico ni sobre respuesta de un programa concreto. Igual que [D-013](#d-013).
+
+<a id="d-017"></a>
+## D-017 · Construir la plataforma antes de cerrar B1, con muro de gates
+
+- **Date** 2026-10-08 · **Type** DECISIÓN · **Status** OPEN
+- **Context** Decisión del fundador: empezar a construir. Contradice [D-004](#d-004) (B1 → B3 → B4 → B5 → MVP) y el «no se escribe una línea hasta cerrar B1» del README.
+- **Evidence** Ninguna externa. Decisión de alcance del fundador, 2026-10-08.
+- **Alternatives** (a) Esperar al cierre de B1, como dictaba D-004; (b) construir el producto completo incluyendo integración real de proveedor y catálogo de marca; (c) **construir todo excepto lo que depende de un gate sin resolver** ← elegida.
+- **Reason** Los gates abiertos de B1 y B3 condicionan **dos** piezas, no el producto entero. El upload, el quality check, los landmarks en cliente, el `FaceProfile`, el `ScoringEngine`, el catálogo como datos, la UI de recomendaciones, la comparación, la instrumentación y las páginas legales **no dependen de ningún gate**. Construirlas ahora no compromete ninguna decisión y produce la capacidad de ejecutar B1 y Track D con el producto real en vez de con láminas montadas a mano.
+- **El muro de gates — qué queda deliberadamente sin construir**
+
+  | Pieza | Bloqueada por | Qué se construye en su lugar |
+  |---|---|---|
+  | Integración de un proveedor real de try-on | [D-016](#d-016) sin ratificar, GC-1…GC-4 | `TryOnProvider` + `MockTryOnProvider` con resultado marcado como simulación |
+  | Mostrar imágenes oficiales de producto de marca | GA-1 sin resolver | Catálogo con `rights.displayImage` y nada publicable sin `cleared` |
+  | Try-on generativo sobre imagen oficial | **[D-015](#d-015) VALIDATED en contra** | `rights.deriveImage`, que por defecto es `denied` |
+  | URLs de afiliado | GA-3 sin resolver | `outbound` registra el click y enlaza a la ficha pública sin tag |
+  | Stripe y créditos | Fase 2, [CLAUDE.md §16](../CLAUDE.md) | nada |
+
+- **Cómo se hace cumplir el muro, y esto es lo importante** No con una nota en un documento, sino **en el sistema de tipos**: `FrameProfile.rights` obliga a declarar el estado de derechos de cada montura, y `isPubliclyListable()` y `canTryOn()` niegan por defecto. Una montura sin derechos verificados **no se puede listar ni probar aunque esté en el catálogo**, y eso es exactamente [D-002](#d-002) (RULE #1) y [D-015](#d-015) convertidos en código en vez de en buenas intenciones.
+- **Impact** El repo pasa de solo documentación a aplicación. Aparecen `npm run check` y el checklist de [CLAUDE.md §35](../CLAUDE.md) como puerta real. El presupuesto de [D-005](#d-005) sigue intacto: el stack elegido no cuesta nada hasta que se despliega.
+- **Riesgo asumido, explícito** Si B1 sale NO-GO técnico, se habrá construido un producto sin su pieza central. Mitigación: lo que se construye primero es precisamente lo que **sobrevive a un NO-GO de try-on** — discovery, recomendación, comparación y catálogo —, y el proveedor queda detrás de un adaptador sustituible.
+- **Status note** No invalida D-004: lo reordena. B1, B3, B4 y B5 siguen pendientes y sus gates siguen vigentes. Construir no es validar.
 
 ---
 

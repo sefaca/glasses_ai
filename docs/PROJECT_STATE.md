@@ -31,9 +31,31 @@ La tesis explícitamente descartada: «existe gran demanda de gente buscando qu�
 
 ## Current Product
 
-**No existe. Cero líneas de código, y es intencionado.** Fase 0 — validación.
+**En construcción desde el 2026-10-08** → [D-017](DECISION_LOG.md#d-017). Se construye todo **excepto** lo que depende de un gate sin resolver.
 
-Flujo que define el producto cuando exista: foto → análisis → 6 recomendaciones explicadas → try-on → comparar → click al retailer.
+Flujo que define el producto: foto → análisis → 6 recomendaciones explicadas → try-on → comparar → click al retailer.
+
+| Pieza | Estado |
+|---|---|
+| Esqueleto Next.js 16 + React 19 + Tailwind 4 + TS estricto | **HECHO** |
+| Design system (tokens, claro/oscuro, grano, tipografía) | **HECHO** |
+| Landing mobile-first `/` | **HECHO** |
+| Base de i18n `es` + `en`, textos fuera de componentes | **HECHO** |
+| `FaceProfile` + clasificación de forma por pertenencia difusa | **HECHO** |
+| `ScoringEngine` determinista con pesos en configuración | **HECHO** |
+| Explicaciones por plantilla, sin afirmar medidas | **HECHO** |
+| Catálogo con derechos en el tipo + 17 monturas sintéticas propias | **HECHO** |
+| `TryOnProvider` + `MockTryOnProvider` | **HECHO** |
+| Selector `/probar` con las 6 recomendaciones en perfil neutro | **HECHO** |
+| Páginas legales honestas, sin texto de plantilla | **HECHO** |
+| 39 tests · build, typecheck y lint en verde | **HECHO** |
+| Upload + quality check + landmarks reales (MediaPipe) | pendiente |
+| Comparación 2–4 resultados | pendiente |
+| Analítica del embudo y outbound clicks | pendiente |
+| Supabase, rate limiting, deploy | pendiente |
+| **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |
+| **Imágenes y marcas de terceros** | **bloqueado** — GA-1, [D-015](DECISION_LOG.md#d-015) |
+| **URLs de afiliado** | **bloqueado** — GA-3 |
 
 Restricciones en vigor: B2C, web-first, multi-marca, sin app nativa, sin B2B, sin suscripción obligatoria → [D-001](DECISION_LOG.md#d-001). Gafas de sol primero → [D-003](DECISION_LOG.md#d-003).
 
@@ -116,15 +138,17 @@ Solo hechos documentales. **Del producto y del negocio, nada.**
 
 ## Active Experiments
 
-**Ninguno en ejecución.**
+**Ninguno en ejecución.** Construir no es validar → [D-017](DECISION_LOG.md#d-017).
 
 B1 está **escrito y sin ejecutar**: protocolo completo, cinco tracks, gates y presupuesto en [b1-tryon-benchmark](../research/b1-tryon-benchmark/). B3, B4 y B5 tienen la estructura y los gates propuestos, sin datos.
 
-Distinguir siempre: **PROPOSAL ≠ IMPLEMENTED ≠ TESTED ≠ VERIFIED.** Hoy todo está en PROPOSAL.
+Distinguir siempre: **PROPOSAL ≠ IMPLEMENTED ≠ TESTED ≠ VERIFIED.** El código está IMPLEMENTED y TESTED; ninguna **hipótesis de producto o de negocio** ha pasado de PROPOSAL. Tener la plataforma no aporta una sola cifra de mercado.
+
+Nota de método: cuando el upload esté hecho, la plataforma pasa a ser el instrumento con el que se ejecuta el Track D de B1 — con producto real en vez de láminas montadas a mano.
 
 ## Current Decisions
 
-16 entradas en [DECISION_LOG.md](DECISION_LOG.md). En vigor y sin validar: D-001 a D-007, D-011, D-014. Aplazadas: D-010 (dominio y marca), D-012 (foto vs cámara). Descartadas: D-009 (nombres). Validadas: D-013, **D-015**, **D-016**.
+17 entradas en [DECISION_LOG.md](DECISION_LOG.md). En vigor y sin validar: D-001 a D-007, D-011, D-014, **D-017**. Aplazadas: D-010 (dominio y marca), D-012 (foto vs cámara). Descartadas: D-009 (nombres). Validadas: D-013, D-015, D-016.
 
 **D-001 a D-014 están transcritas del repositorio, pendientes de ratificación del fundador.** D-016 además contiene una **decisión pendiente** sobre el orden de B1.
 
@@ -150,11 +174,27 @@ Tres tipos, y el tercero es el que decide → [competitors](../research/market/c
 
 ## Current Architecture
 
-**No instalada.** Previsto: Next.js App Router · TypeScript · Tailwind · Supabase (Postgres + Storage privado) · Vercel · Stripe cuando haya monetización.
+**Instalada:** Next.js 16.4 (App Router, Turbopack, cacheComponents) · React 19.3 · TypeScript estricto · Tailwind 4 · Vitest. Pendientes: Supabase, Vercel, Stripe.
 
-Abstracciones que deben existir desde el primer día: `FaceProfile` · `FrameProfile` · `ScoringEngine` · `TryOnProvider` · `CatalogSource` · `ImageStore` · `Analytics` · `Outbound/affiliate`.
+```
+app/          rutas: / · /probar · /legal/{privacidad,terminos,cookies}
+components/   ui/FrameGlyph · recommendations/FrameCard
+lib/face/     types · classify · neutral
+lib/catalog/  types · rights ← el muro de gates · seed · index
+lib/recommendations/  weights · score · explain
+lib/tryon/    provider · mock
+lib/i18n/     types · es · en
+tests/        rights · classify · score · tryon-mock
+```
 
-`TryOnProvider` no es opcional: el riesgo de cambiar de proveedor es alto y el dominio no puede diseñarse alrededor de uno → [CLAUDE.md §10.1](../CLAUDE.md).
+Abstracciones ya existentes: `FaceProfile` · `FrameProfile` · `ScoringEngine` · `TryOnProvider`. Pendientes: `ImageStore` · `Analytics` · `Outbound`.
+
+Dos propiedades del diseño que conviene no perder:
+
+- **Los derechos son una precondición, no un campo informativo.** `FrameProfile.rights` obliga a declararlos y `isPubliclyListable()` / `canTryOn()` niegan por defecto. Una montura sin derechos verificados no se lista ni se prueba aunque esté en el catálogo. Es [D-002](DECISION_LOG.md#d-002) y [D-015](DECISION_LOG.md#d-015) en el sistema de tipos, con tests que lo custodian.
+- **El scoring degrada con honestidad.** Un componente sin datos se marca `available: false` y reparte su peso, en vez de inventarse un 0,5. Y lo que se calcula con una aproximación se marca `estimated`, lo que impide que la explicación afirme medidas → [CLAUDE.md §9.4](../CLAUDE.md).
+
+`TryOnProvider` no es opcional: las dos clases de tecnología se cruzan en coste alrededor de los ~1.800 usuarios activos/mes, así que cambiar de proveedor es un cuándo, no un si → [D-016](DECISION_LOG.md#d-016).
 
 ## Current Metrics
 
@@ -187,6 +227,8 @@ No: dominio, marca, logo, anuncios, Supabase, Next.js, herramientas de SEO ni su
 **Blocker resuelto:** [D-015](DECISION_LOG.md#d-015) ya no espera respuesta. Se contestó con términos publicados, sin preguntar a nadie y sin coste.
 
 ## Last Updated
+
+**2026-10-08 (2)** — arranca la construcción con muro de gates → [D-017](DECISION_LOG.md#d-017). Esqueleto, design system, landing, i18n, clasificación facial, motor de recomendación, catálogo con derechos en el tipo, adaptador de try-on y 39 tests. Seis rutas. Ninguna hipótesis de negocio validada: el Track 0 sigue sin enviar.
 
 **2026-10-08** — GA-2 respondido con términos publicados: los términos estándar de afiliación **no autorizan** el try-on generativo sobre la imagen oficial ([D-015](DECISION_LOG.md#d-015)), y el riesgo de licencia resulta ser de la Clase B, no de la Clase A ([D-016](DECISION_LOG.md#d-016)). Primer programa de afiliación localizado. Sin cambios en producto: sigue sin ejecutarse ningún experimento y el Track 0 sigue sin enviar.
 
