@@ -74,20 +74,31 @@ Decisión de privacidad que condiciona la arquitectura: **los landmarks faciales
 
 ## Estructura actual
 
+Cuatro capas de documentación, y no deben mezclarse: **cómo** se trabaja, **dónde** estamos, **qué** decidimos y **por qué**.
+
 ```
 .
-├── CLAUDE.md                      # documento maestro de producto y arquitectura
+├── CLAUDE.md                      # CÓMO: documento maestro de producto y arquitectura
 ├── README.md                      # este archivo
-├── .gitignore
-└── research/
-    └── b1-tryon-benchmark/        # protocolo de B1, sin ejecutar
-        ├── README.md              # protocolo, coste, gates, ejecución
-        ├── providers.md           # proveedores en 2 dimensiones, con evidencia
-        ├── rubric.md              # rúbrica 0-3 + test ciego
-        ├── multi-brand-test.md    # validación de producto
-        ├── frames/ · templates/
-        └── faces/ · outputs/      # no versionados
+├── .claude/agents/
+│   └── project-brain.md           # subagente de estrategia (piensa; no implementa)
+├── docs/
+│   ├── PROJECT_STATE.md           # DÓNDE: estado vivo del proyecto
+│   └── DECISION_LOG.md            # QUÉ: decisiones con evidencia y estado
+└── research/                      # POR QUÉ: la evidencia
+    ├── README.md                  # convenciones: dónde va cada cosa, niveles de evidencia
+    ├── b1-tryon-benchmark/        # protocolo de B1, sin ejecutar
+    │   ├── README.md              # protocolo, coste, gates, ejecución
+    │   ├── providers.md           # proveedores en 2 dimensiones, con evidencia
+    │   ├── rubric.md              # rúbrica 0-3 + test ciego
+    │   ├── multi-brand-test.md    # validación de producto
+    │   ├── frames/ · templates/
+    │   └── faces/ · outputs/      # no versionados
+    ├── market/                    # B5 keywords · B4 competidores
+    └── monetization/              # B3 afiliación · unit economics
 ```
+
+Reglas de la estructura: `PROJECT_STATE.md` es estado, **no un diario** — se toca solo cuando hay evidencia o decisión real. Todo dato externo lleva nivel de evidencia `[D][M][T][?][X]`. Fotos, grabaciones, consentimientos y material bajo NDA van a `faces/`, `outputs/` y `raw/`, fuera de git. Detalle en [research/README.md](research/README.md).
 
 ---
 

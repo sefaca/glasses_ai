@@ -2139,6 +2139,7 @@ Cuando implementes una feature:
 18. No crear app nativa.
 19. No convertir la aplicación en un generador de imágenes genérico.
 20. Cada feature debe relacionarse con uno de estos objetivos: discovery, recommendation, try-on, compare, purchase o validation.
+21. Todo documento que generes va donde dice §40. Si tu trabajo produce una decisión o una evidencia nueva, **la escribes en `docs/DECISION_LOG.md`** y, si cambia el estado del proyecto, en `docs/PROJECT_STATE.md`. Un hallazgo que solo existe en la conversación se pierde.
 
 ---
 
@@ -2459,3 +2460,26 @@ El producto debe estar diseñado desde el día 1 para:
 - catálogo creciente.
 
 **No sobreconstruir. Validar con datos reales.**
+
+---
+
+# 40. DÓNDE VAN LOS DOCUMENTOS
+
+Cuatro capas. Cada una responde a una pregunta distinta y **no deben mezclarse**:
+
+| Documento | Responde | Quién escribe |
+|---|---|---|
+| `CLAUDE.md` | **Cómo** debe trabajar el agente | El fundador |
+| `docs/PROJECT_STATE.md` | **Dónde** estamos ahora | Claude Code, cuando hay evidencia o decisión |
+| `docs/DECISION_LOG.md` | **Qué** decidimos, con qué evidencia y en qué estado | Claude Code, una entrada por decisión |
+| `research/**` | **Por qué** hemos llegado hasta aquí | Claude Code |
+
+Reglas:
+
+- **`PROJECT_STATE.md` es estado, no diario.** Se actualiza solo cuando hay evidencia nueva o una decisión real que cambia el proyecto. Nunca se apuntan intenciones ni conversaciones, y representa exclusivamente el presente.
+- **`DECISION_LOG.md` no se reescribe.** Los IDs no se reutilizan ni se renumeran, y una entrada invalidada pasa a `INVALIDATED` pero **se queda escrita**. Es la trazabilidad de «por qué descartamos el proveedor X» dentro de seis meses.
+- **Todo dato externo lleva nivel de evidencia**: `[D]` oficial · `[M]` marketing · `[T]` tercero · `[?]` no publicado · `[X]` medido por nosotros. **No inventar cifras**; un `[?]` es un resultado legítimo y dice qué hay que ir a preguntar.
+- **Nunca versionar** fotos de personas, grabaciones, transcripciones literales, consentimientos firmados ni material de terceros bajo NDA. Van a `faces/`, `outputs/` y `raw/`, excluidos en `.gitignore`. Al repo llega la versión anonimizada o el dato resumido.
+- Convenciones completas (dónde va cada tipo de material, nombres de archivo, cabeceras): `research/README.md`.
+
+El reparto de roles: **Project Brain decide qué construir** (subagente en `.claude/agents/project-brain.md`, o el Proyecto de chat del fundador). **Claude Code construye y escribe el resultado en el repositorio.** El bucle se cierra por los archivos, no por la conversación.

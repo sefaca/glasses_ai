@@ -59,6 +59,12 @@ pnpm-debug.log*
 /research/**/outputs/
 *.heic
 
+# Material en bruto: datos personales (grabaciones, transcripciones literales,
+# consentimientos firmados), material de terceros bajo NDA (propuestas,
+# presupuestos) y originales binarios pesados. Al repo solo llega la versión
+# anonimizada o el dato resumido. Ver research/README.md §2.
+/research/**/raw/
+
 # Sistema operativo y editores
 .DS_Store
 Thumbs.db
