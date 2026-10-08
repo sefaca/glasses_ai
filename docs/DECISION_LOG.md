@@ -40,7 +40,8 @@
 | [D-012](#d-012) | 2026-09-25 | Foto vs cámara: no decidir todavía | DECISIÓN | DEFERRED |
 | [D-013](#d-013) | 2026-09-25 | Corrección: la Clase A tiene **mejor** postura de privacidad | HIPÓTESIS | VALIDATED |
 | [D-014](#d-014) | 2026-09-25 | Tres capas de documentación; `research/` es la evidencia | DECISIÓN | OPEN |
-| [D-015](#d-015) | 2026-09-25 | El try-on crea una obra derivada de la imagen oficial | HIPÓTESIS | OPEN |
+| [D-015](#d-015) | 2026-09-25 | El try-on crea una obra derivada de la imagen oficial | HIPÓTESIS | **VALIDATED** |
+| [D-016](#d-016) | 2026-10-08 | Corrección: el riesgo de licencia es de la Clase B, no de la Clase A | HIPÓTESIS | VALIDATED |
 
 ---
 
@@ -198,15 +199,34 @@
 <a id="d-015"></a>
 ## D-015 · El try-on crea una obra derivada de la imagen oficial
 
-- **Date** 2026-09-25 · **Type** HIPÓTESIS · **Status** OPEN
+- **Date** 2026-09-25 · **Status original** OPEN · **Status** **VALIDATED** el 2026-10-08 · **Type** HIPÓTESIS
 - **Context** Nueva, detectada al estructurar B3. Hasta ahora el proyecto trataba «derecho a mostrar la imagen del producto» como el único permiso necesario.
-- **Evidence** Ninguna todavía. Riesgo identificado por razonamiento, **no asesoramiento jurídico**.
+- **Evidence original (2026-09-25)** Ninguna. Riesgo identificado por razonamiento, **no asesoramiento jurídico**.
+- **Evidence (2026-10-08) — [D], términos publicados** Los términos estándar de publisher de las dos vías principales autorizan **mostrar sin modificar**, y además exigen reproducción fiel:
+  - **Awin** cl. 10.1: sublicencia «to publish Advertiser Materials, **without modification**, on the Publisher Service». cl. 9.2.10/9.2.11: el publisher garantiza que «all Advertiser Materials will be **accurately and faithfully reproduced**». cl. 9.3: indemnidad a cargo del publisher por incumplir esas garantías. Misma redacción en ShareASale.
+  - **Amazon Associates** §6(a): «You will not add to, delete from, or **otherwise alter any Program Content in any way**», con la única excepción de redimensionar manteniendo proporciones. Y §3: si modificas Program Content, la modificación es «Your Submission» y **«you assign to us all right, title, and interest»** — es decir, la imagen derivada, que contiene **la cara de un usuario nuestro**, quedaría cedida a Amazon.
+  - Detalle completo y fuentes en [affiliate-programs §5.1](../research/monetization/affiliate-programs.md).
+- **Qué queda validado exactamente** Que un try-on generativo sobre la imagen oficial **no está autorizado por los términos por defecto**. No está validado que ningún programa lo autorice nunca: una excepción escrita por anunciante sigue siendo posible y es lo que hay que ir a pedir.
 - **Hipótesis** Una licencia de feed de afiliación típica autoriza **mostrar** la imagen de producto para promocionarlo. Nuestro try-on no la muestra: **crea una imagen nueva** a partir de ella y de la cara de un usuario. Que eso quede fuera de la autorización es un riesgo real y no contemplado en ningún documento del proyecto.
 - **Alternatives si se confirma** (a) Clase A 3D, donde el activo es un modelo licenciado por el proveedor y no una imagen del retailer; (b) negociar marca por marca; (c) catálogo propio fotografiado por nosotros; (d) no mostrar marca ni modelo, lo que **contradice** [D-002](#d-002) y el modelo de afiliación.
 - **Impact** Si la respuesta es no en todos los programas, la ruta generativa sobre imagen oficial no es defendible y **B1 se reordena entero a favor de la Clase A**. Es el tipo de hallazgo que cambia el orden del plan, no un detalle legal.
 - **Validates if** GA-2: al menos un programa lo autoriza por escrito, o no lo prohíbe y el riesgo queda acotado → [affiliate-programs](../research/monetization/affiliate-programs.md).
 - **Falsified if** Los programas lo prohíben expresamente o remiten a la marca, y ninguna marca lo autoriza.
-- **Relación** Amplía GC-4 de B1 (¿quién responde si una marca reclama?) al derecho de imagen del producto. Consecuencia directa de [D-002](#d-002).
+- **Relación** Amplía GC-4 de B1 (¿quién responde si una marca reclama?) al derecho de imagen del producto. Consecuencia directa de [D-002](#d-002). Su consecuencia sobre el orden del plan está en [D-016](#d-016).
+
+<a id="d-016"></a>
+## D-016 · Corrección: el riesgo de licencia es de la Clase B, no de la Clase A
+
+- **Date** 2026-10-08 · **Type** HIPÓTESIS · **Status** VALIDATED
+- **Context** Todo el análisis de B1 asumía que el riesgo de licencia era de la Clase A (3D/AR), porque implica contratar a un proveedor con condiciones no públicas, y que la Clase B (generativa) era «libre: sin licencia de por medio» — así está escrito en [providers.md §6](../research/b1-tryon-benchmark/providers.md). Es al revés.
+- **Evidence** **[D]** Los mismos términos de [D-015](#d-015). La licencia de afiliación cubre publicar la imagen del anunciante sin modificarla.
+- **Reason** Lo que cada clase pone delante del usuario es un activo distinto:
+  - **Clase B** muestra una imagen **derivada de la foto oficial del retailer** → modifica «Advertiser Materials» → incumple la licencia y arrastra indemnidad.
+  - **Clase A** muestra un **modelo 3D licenciado por el proveedor de try-on** → no reproduce ni altera la imagen del anunciante. Lo único que toca al anunciante es el enlace de afiliado, que es exactamente lo que la licencia sí cubre.
+- **Impact — reencuadre del catálogo de Fittingbox** Sus ~200.000 monturas de 1.200 marcas [D] no son un atajo cómodo de catálogo: son la única vía localizada donde **los derechos de derivación ya están resueltos aguas arriba**, por quien digitalizó la montura teniendo relación con la marca. Ese es su valor real, y no lo habíamos visto. Convierte la pregunta 4 del Track 0 en la más valiosa del bloque.
+- **Límite, y es importante** Esto **no** da por limpia la Clase A. Si usamos Jeeliz para digitalizar una montura a partir de una foto de producto que **nosotros** aportamos sin derechos, el problema no se resuelve: se mueve un eslabón. De ahí que **GC-4** siga siendo la pregunta correcta, ampliada con *«¿de dónde salen los derechos de las monturas de su base?»*.
+- **Consecuencia sobre el plan — DECISIÓN PENDIENTE, no tomada** Esto apunta a reordenar B1 dando prioridad a la Clase A y degradando la ruta generativa sobre imagen oficial a plan B. **No se reordena sin ratificación del fundador**, porque invierte D-004 en su tramo técnico y porque la Clase A es más lenta, más cara y con dependencia de proveedor único.
+- **Status note** VALIDATED sobre evidencia documental de las redes, no sobre asesoramiento jurídico ni sobre respuesta de un programa concreto. Igual que [D-013](#d-013).
 
 ---
 

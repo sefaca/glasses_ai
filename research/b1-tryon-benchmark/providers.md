@@ -34,7 +34,7 @@ Ninguna afirmación de este documento se da por buena sin etiqueta. El marketing
 | Coste | Suscripción mensual con topes | Por generación |
 | Coste marginal | ≈ 0 | Lineal |
 | Barato cuando | **Hay volumen** | **Hay poco volumen** |
-| Riesgo principal | **Licencia** | **Fidelidad** |
+| Riesgo principal | ~~Licencia~~ → **Dependencia de proveedor** | **Fidelidad** + **licencia** → [D-016](../../docs/DECISION_LOG.md#d-016) |
 | Privacidad | Procesado en el navegador [D] | **La foto va a un servidor de terceros** |
 
 > **Corrección a una suposición previa:** dimos por hecho que la Clase A era peor en privacidad porque implica a un proveedor externo. Es al revés. Fittingbox documenta que la imagen se procesa **en el navegador del usuario** y solo vive en la caché del navegador mientras dura el try-on [D]. La Clase B, en cambio, **exige enviar la cara del usuario a un servidor de terceros** en cada try-on. En RGPD, la Clase A tiene mejor postura de partida.
@@ -173,7 +173,7 @@ Por eso el Track C del protocolo no implementa nada: solo responde a **cuánto c
 | Jeeliz | Prometedora, sin verificar. Modo foto [?] | **Desconocida.** Sin página legal |
 | Banuba | Correcta [M] | **Permisiva pero con el riesgo IP de nuestro lado** [D] |
 | Perfect Corp | Sin investigar a fondo | Sin investigar |
-| Clase B | **Todo el riesgo**, pendiente de medir [X] | Libre: sin licencia de por medio |
+| Clase B | **Todo el riesgo**, pendiente de medir [X] | ~~Libre: sin licencia de por medio~~ **FALSO.** Los términos estándar de afiliación la prohíben: modifica la imagen del anunciante → [D-016](../../docs/DECISION_LOG.md#d-016) |
 
 **Ninguna casilla de la Dimensión B está resuelta para los dos proveedores más interesantes.** Ese es el estado real, y por eso el Track 0 se ejecuta antes que ninguna imagen.
 

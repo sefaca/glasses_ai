@@ -93,4 +93,78 @@ Desenlaces:
 
 ## 5. Resultados
 
-Vacío. Al cerrar: una fila por programa con las 10 respuestas, los cinco gates con cifras, y la respuesta por escrito a §1.
+### 5.1. GA-2 · Obra derivada — **respondido, y es NO** [D] · 2026-10-08
+
+La pregunta de §1 ya no es una hipótesis abierta. Los términos estándar de publisher de las dos vías principales **prohíben expresamente modificar la imagen del anunciante**, y no hace falta preguntar a nadie para saberlo: están publicados.
+
+**Awin** (y ShareASale, con la misma redacción):
+
+| Cláusula | Texto |
+|---|---|
+| 2.1 · definición | «Advertiser Materials» = «any trade marks, advertising content, images, text, video, data or other material provided by or on behalf of an Advertiser» |
+| 10.1 · licencia | sublicencia revocable y no exclusiva «to publish Advertiser Materials, **without modification**, on the Publisher Service» |
+| 9.2.10 / 9.2.11 · garantía | el publisher garantiza que «all Advertiser Materials will be **accurately and faithfully reproduced**» |
+| 9.3 · indemnidad | el publisher «will indemnify, defend and hold harmless AWIN» por cualquier incumplimiento de esas garantías |
+
+*(La numeración de la garantía cambia según versión: 9.2.10 en 2017 y en el tripartito US de 2019; 9.2.11 en ENG 2019 y UK 2020. Awin además declina revisar los materiales: el riesgo de exactitud es del publisher, no de la red.)*
+
+**Amazon Associates:**
+
+| Cláusula | Texto |
+|---|---|
+| §6(a) | «You will not add to, delete from, or **otherwise alter any Program Content in any way**» |
+| §6(a) · única excepción | redimensionar una imagen «in a manner that maintains the original proportions» |
+| §3 · reserva | «Other than the limited licenses expressly set forth herein, we reserve all right, title and interest» |
+| §3 · consecuencia inesperada | si modificas Program Content, esa modificación es «Your Submission» y **«you assign to us all right, title, and interest in and to Your Submission»** |
+
+**Lectura.** Un try-on generativo no es una reproducción fiel de la imagen de producto: **es una imagen nueva** construida a partir de ella. Eso choca de frente con la licencia «without modification» y con la garantía de reproducción fiel, y en Awin el incumplimiento viene con indemnidad a cargo nuestro. En Amazon es peor que una prohibición: la imagen derivada —que contiene **la cara de un usuario nuestro**— quedaría cedida a Amazon por el §3.
+
+> **GA-2 falla sobre los términos estándar.** No es `[?]`, es `[D]`. Lo que queda abierto es si **algún programa concreto lo autoriza por excepción escrita**, no si los términos por defecto lo permiten: no lo permiten.
+
+### 5.2. La consecuencia que reordena el plan
+
+El riesgo de licencia estaba mal atribuido. Lo habíamos puesto en la Clase A; **es de la Clase B**:
+
+| | Qué asset se muestra | ¿Modifica «Advertiser Materials»? |
+|---|---|---|
+| **Clase B · generativo** | Imagen nueva derivada de la foto oficial del retailer | **Sí. Es el problema** |
+| **Clase A · 3D/AR** | Modelo 3D licenciado por el proveedor de try-on | **No.** No reproduce ni altera la imagen del anunciante |
+
+En Clase A el enlace de afiliado vuelve a ser lo único que toca al anunciante: un enlace, que es exactamente lo que la licencia sí cubre.
+
+Y esto **reencuadra el catálogo de Fittingbox**: sus ~200.000 monturas de 1.200 marcas [D] no son un atajo cómodo de catálogo, son la única vía donde **los derechos de derivación ya están resueltos aguas arriba** por quien digitalizó la montura con una relación con la marca. Ese es su valor real, y no lo habíamos visto.
+
+**El reverso, y hay que decirlo:** si usamos Jeeliz para digitalizar una montura a partir de una foto de producto que **nosotros** aportamos sin derechos, no hemos resuelto el problema — lo hemos movido un eslabón. Por eso **GC-4** («¿quién responde si una marca reclama?») sigue siendo la pregunta correcta del Track 0, y hay que añadir: *¿de dónde salen los derechos de las monturas de su base?*
+
+### 5.3. GA-3 · Aprobación como agregador — abierto, con señal negativa [T]
+
+El modelo comparador/agregador **no está garantizado** como método promocional: CJ se reserva aprobar toda actividad promocional «in its sole discretion», y Rakuten remite a «Affiliate Link Policies» fijadas por anunciante. Las plantillas del sector listan habitualmente como restringidas las páginas de comparación y los agregadores. Hay que preguntarlo, programa por programa.
+
+### 5.4. Primer programa real localizado [T]
+
+**Hawkers tiene programa de afiliación activo en Awin España** (perfil de anunciante 19686): feed de productos en varios idiomas, generador de enlaces a modelos concretos y, según la ficha, más de 400 modelos por temporada.
+
+Dos cautelas: la fuente es nota de prensa y ficha de 2020–2021, así que comisión, catálogo y países **hay que reverificarlos**; y un feed con imágenes no resuelve GA-2 — resuelve GA-1 y, si trae medidas, GA-4.
+
+### 5.5. Estado de los gates
+
+| Gate | Estado | Evidencia |
+|---|---|---|
+| **GA-1** · derecho a mostrar | PARCIAL — 1 programa localizado con feed | [T] Hawkers en Awin ES |
+| **GA-2** · obra derivada | **NO sobre términos estándar** | **[D]** Awin 10.1 y 9.2.10 · Amazon §6(a) y §3 |
+| **GA-3** · aprobación sin tráfico | ABIERTO, señal negativa | [T] CJ discrecional, agregadores restringidos |
+| **GA-4** · datos de montura | ABIERTO | Hawkers tiene feed; falta saber si trae calibre, puente y varilla |
+| **GA-5** · economía | ABIERTO | sin comisión ni ticket medio verificados |
+
+### 5.6. Fuentes
+
+- Awin · términos de publisher 2017 (HTML, cláusulas citadas): https://www.awin.com/us/terms-and-conditions/publisher-terms-and-conditions-2017
+- Awin · términos de publisher UK 2020 (PDF): https://s3.amazonaws.com/docs.awin.com/Legal/Publisher+Terms/2020/UK_EN_Awin+Ltd+Publisher+terms.pdf
+- Awin · términos 2019 ENG (PDF): https://s3.amazonaws.com/docs.awin.com/Legal/Publisher+terms+and+conditions+2019+ENG.pdf
+- Amazon Associates · Operating Agreement y políticas: https://affiliate-program.amazon.com/help/operating/policies
+- Rakuten Advertising · Publisher Membership Agreement: https://rakutenadvertising.com/legal-notices/publisher-membership-agreement/
+- CJ · Publisher Service Agreement (SEC, 2007 — antiguo): https://www.sec.gov/Archives/edgar/data/1408690/000104746907006278/a2179190zex-10_32.htm
+- Hawkers en Awin ES · perfil de anunciante: https://ui.awin.com/merchant-profile/19686
+- Hawkers y Awin · nota de prensa 2021: https://www.awin.com/es/noticias-y-eventos/noticias/programa-hawkers-afiliacion
+
+Pendiente al cerrar B3: una fila por programa con las 10 respuestas de §2 y los cinco gates con cifras.
