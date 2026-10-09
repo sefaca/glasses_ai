@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   ColorFamily,
   FrameMaterial,
   FrameProfile,
@@ -7,18 +7,18 @@
 import { unverifiedRights } from "./types";
 
 /**
- * CatÃ¡logo semilla de desarrollo.
+ * Catálogo semilla de desarrollo.
  *
- * Son monturas **sintÃ©ticas, nuestras**: especificaciones inventadas y un glifo
- * SVG propio en vez de foto. Por eso sus derechos son `cleared` â€” el activo lo
+ * Son monturas **sintéticas, nuestras**: especificaciones inventadas y un glifo
+ * SVG propio en vez de foto. Por eso sus derechos son `cleared` — el activo lo
  * hemos hecho nosotros, no hay anunciante al que pedir permiso.
  *
- * Existen para desarrollar y testear el motor de recomendaciÃ³n sin tocar
+ * Existen para desarrollar y testear el motor de recomendación sin tocar
  * material de marca mientras GA-1, GA-2 y GA-7 siguen sin resolver.
  *
  * Al final del archivo hay dos monturas de marca real con derechos `pending`.
  * No son un descuido: son el fixture que demuestra que el muro funciona. Si
- * algÃºn dÃ­a aparecen en una lista pÃºblica, hay un bug.
+ * algún día aparecen en una lista pública, hay un bug.
  */
 
 interface DevFrameInput {
@@ -57,7 +57,7 @@ function dev(input: DevFrameInput): FrameProfile {
       templeMm: 145,
     },
     priceCents: input.priceCents,
-    // Estas monturas no existen, asÃ­ que su precio no es un precio: es
+    // Estas monturas no existen, así que su precio no es un precio: es
     // andamiaje para poder ejercitar el filtro de presupuesto. Se marca
     // `indicative` y la UI lo muestra siempre como aproximado.
     priceStatus: "indicative",
@@ -73,7 +73,7 @@ function dev(input: DevFrameInput): FrameProfile {
       useTrademark: "cleared",
       source: "synthetic-dev",
       verifiedAt: "2026-10-08",
-      note: "Montura sintÃ©tica propia. Sin material de marca.",
+      note: "Montura sintética propia. Sin material de marca.",
     },
     active: true,
     updatedAt: "2026-10-08",
@@ -83,7 +83,7 @@ function dev(input: DevFrameInput): FrameProfile {
 export const DEV_FRAMES: FrameProfile[] = [
   dev({
     slug: "linea-01",
-    model: "LÃ­nea 01",
+    model: "Línea 01",
     shape: "rectangular",
     material: "acetate",
     colorFamily: "black",
@@ -97,7 +97,7 @@ export const DEV_FRAMES: FrameProfile[] = [
   }),
   dev({
     slug: "linea-02",
-    model: "LÃ­nea 02",
+    model: "Línea 02",
     shape: "rectangular",
     material: "metal",
     colorFamily: "silver",
@@ -139,7 +139,7 @@ export const DEV_FRAMES: FrameProfile[] = [
   }),
   dev({
     slug: "circulo-01",
-    model: "CÃ­rculo 01",
+    model: "Círculo 01",
     shape: "round",
     material: "metal",
     colorFamily: "gold",
@@ -153,7 +153,7 @@ export const DEV_FRAMES: FrameProfile[] = [
   }),
   dev({
     slug: "circulo-02",
-    model: "CÃ­rculo 02",
+    model: "Círculo 02",
     shape: "round",
     material: "acetate",
     colorFamily: "brown",
@@ -237,7 +237,7 @@ export const DEV_FRAMES: FrameProfile[] = [
   }),
   dev({
     slug: "clasica-01",
-    model: "ClÃ¡sica 01",
+    model: "Clásica 01",
     shape: "wayfarer",
     material: "acetate",
     colorFamily: "black",
@@ -251,7 +251,7 @@ export const DEV_FRAMES: FrameProfile[] = [
   }),
   dev({
     slug: "clasica-02",
-    model: "ClÃ¡sica 02",
+    model: "Clásica 02",
     shape: "wayfarer",
     material: "acetate",
     colorFamily: "tortoise",
@@ -354,7 +354,7 @@ export const BLOCKED_FRAMES: FrameProfile[] = [
     imageUrl: null,
     rights: unverifiedRights(
       "placeholder",
-      "Sin programa de afiliaciÃ³n ni autorizaciÃ³n. D-015: la derivaciÃ³n estÃ¡ denegada por los tÃ©rminos estÃ¡ndar.",
+      "Sin programa de afiliación ni autorización. D-015: la derivación está denegada por los términos estándar.",
     ),
     active: true,
     updatedAt: "2026-10-08",
@@ -386,12 +386,12 @@ export const BLOCKED_FRAMES: FrameProfile[] = [
     imageUrl: null,
     rights: unverifiedRights(
       "awin-merchant-19686",
-      "Programa localizado en Awin ES [T], sin reverificar. Nada autorizado todavÃ­a.",
+      "Programa localizado en Awin ES [T], sin reverificar. Nada autorizado todavía.",
     ),
     active: true,
     updatedAt: "2026-10-08",
   },
 ];
 
-/** Todo lo que hay en el catÃ¡logo, listable o no. */
+/** Todo lo que hay en el catálogo, listable o no. */
 export const ALL_FRAMES: FrameProfile[] = [...DEV_FRAMES, ...BLOCKED_FRAMES];

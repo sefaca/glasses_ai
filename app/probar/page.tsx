@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FrameCard } from "@/components/recommendations/FrameCard";
+import { PhotoAnalyzer } from "@/components/upload/PhotoAnalyzer";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { listableFrames } from "@/lib/catalog";
 import type { FrameShape } from "@/lib/catalog/types";
 import { NEUTRAL_FACE } from "@/lib/face/neutral";
-import type { UserPreferences } from "@/lib/face/types";
+import type { FaceProfile, UserPreferences } from "@/lib/face/types";
 import { getDictionary } from "@/lib/i18n";
 import { recommend } from "@/lib/recommendations/score";
 
@@ -36,27 +37,34 @@ const STYLE_OPTIONS = [
   { id: "deportivas", label: "Deportivas" },
 ] as const;
 
-const BUDGET_OPTIONS = [
-  { id: 5000, label: "Menos de 50 €" },
-  { id: 10000, label: "50 – 100 €" },
-  { id: 20000, label: "100 – 200 €" },
-  { id: null, label: "Sin límite" },
-] as const;
-
 export default function ProbarPage() {
   const [styles, setStyles] = useState<string[]>([]);
-  const [budgetMaxCents, setBudget] = useState<number | null>(null);
+  const [profile, setProfile] = useState<FaceProfile | null>(null);
 
   const prefs: UserPreferences = useMemo(
-    () => ({ category: "sunglasses", styles, budgetMaxCents }),
-    [styles, budgetMaxCents],
+    () => ({ category: "sunglasses", styles, budgetMaxCents: null }),
+    [styles],
   );
 
   const frames = useMemo(() => listableFrames(), []);
+  // Sin foto se usa el perfil neutro, que puntúa la geometría plana: la lista
+  // se ordena solo por lo que el usuario ha declarado. Al llegar el perfil
+  // real, la geometría entra con su 35 % y la lista cambia — y ese cambio es
+  // justo el argumento para subir la foto.
   const recommendations = useMemo(
-    () => recommend(NEUTRAL_FACE, prefs, frames),
-    [prefs, frames],
+    () => recommend(profile ?? NEUTRAL_FACE, prefs, frames),
+    [profile, prefs, frames],
   );
+
+  // Las recomendaciones están por encima del formulario de foto, porque
+  // enseñar el valor antes de pedir la cara es deliberado. La contrapartida es
+  // que al analizar, el cambio ocurre fuera de pantalla: por eso se devuelve
+  // al usuario a la lista cuando hay perfil.
+  const resultsRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!profile) return;
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [profile]);
 
   function toggleStyle(id: string) {
     setStyles((current) =>
@@ -118,48 +126,27 @@ export default function ProbarPage() {
           </div>
         </fieldset>
 
-        {/* ---------- Presupuesto ---------- */}
-        <fieldset className="mt-10 border-t border-line pt-6">
-          <legend className="rule-label text-[0.7rem] text-muted">
-            Cuánto quieres gastar
-          </legend>
-          <p className="mt-3 text-sm text-muted">
-            Lo usamos solo para filtrar. Nosotros no vendemos gafas: el precio y
-            la compra son de la tienda a la que te llevemos.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2.5">
-            {BUDGET_OPTIONS.map((option) => {
-              const active = budgetMaxCents === option.id;
-              return (
-                <button
-                  key={String(option.id)}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => setBudget(option.id)}
-                  className={[
-                    "rounded-full border px-5 py-2.5 text-sm transition-all active:translate-y-px",
-                    active
-                      ? "border-accent bg-accent text-on-accent"
-                      : "border-line hover:border-ink",
-                  ].join(" ")}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
+        {/*
+          Aquí había un selector de presupuesto. Retirado: con un catálogo de
+          muestra y sin precios a la vista (D-019) no aportaba nada.
+          La capacidad sigue en el dominio —`budgetMaxCents` y el filtro duro,
+          con tests— y vuelve cuando haya catálogo real con precios del feed.
+        */}
 
         {/* ---------- Resultados ---------- */}
-        <section className="mt-16" aria-live="polite">
+        <section ref={resultsRef} className="mt-16" aria-live="polite">
           <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-4">
             <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
               {recommendations.length === 0
                 ? "Nada encaja con ese filtro"
-                : "Empezaría por estas"}
+                : profile
+                  ? "Tus seis"
+                  : "Empezaría por estas"}
             </h2>
             <p className="text-xs text-muted">
-              Selección orientativa, sin tu foto todavía
+              {profile
+                ? "Afinadas con tus proporciones"
+                : "Selección orientativa, sin tu foto todavía"}
             </p>
           </div>
 
@@ -194,19 +181,24 @@ export default function ProbarPage() {
           )}
         </section>
 
-        {/* ---------- Siguiente paso ---------- */}
-        <section className="mt-20 rounded-2xl border border-line bg-surface p-7 sm:p-10">
+        {/* ---------- Foto ---------- */}
+        <section
+          id="foto"
+          className="mt-20 rounded-2xl border border-line bg-surface p-7 sm:p-10"
+        >
           <p className="rule-label text-[0.7rem] text-accent">Paso 2 de 2</p>
           <h2 className="mt-4 max-w-lg font-display text-2xl leading-tight tracking-tight sm:text-3xl">
-            Sube una foto y afinamos la selección con tus proporciones.
+            {profile
+              ? "Selección afinada con tus proporciones."
+              : "Sube una foto y afinamos la selección con tus proporciones."}
           </h2>
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
-            El análisis se ejecuta en tu navegador: para ese paso la foto no sale
-            de tu dispositivo. {dict.privacy.link.toLowerCase()}.
+            El análisis se ejecuta en tu navegador: la foto no sale de tu
+            dispositivo.
           </p>
-          <p className="mt-6 inline-block rounded-full border border-dashed border-line px-6 py-3 text-sm text-muted">
-            Subida de foto — en construcción
-          </p>
+          <div className="mt-7">
+            <PhotoAnalyzer onProfile={setProfile} />
+          </div>
         </section>
       </main>
     </div>

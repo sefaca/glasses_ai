@@ -32,6 +32,10 @@ supabase/.temp/
 # Vercel
 .vercel
 
+# Binarios de MediaPipe: artefactos derivados, los prepara scripts/vision-assets.mjs
+# en predev y prebuild. ~25 MB de wasm + modelo que no tienen que vivir en git.
+/public/mediapipe/
+
 # Testing / cobertura
 coverage/
 .nyc_output/

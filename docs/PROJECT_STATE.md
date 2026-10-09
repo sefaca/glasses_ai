@@ -48,8 +48,11 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | `TryOnProvider` + `MockTryOnProvider` | **HECHO** |
 | Selector `/probar` con las 6 recomendaciones en perfil neutro | **HECHO** |
 | Páginas legales honestas, sin texto de plantilla | **HECHO** |
-| 39 tests · build, typecheck y lint en verde | **HECHO** |
-| Upload + quality check + landmarks reales (MediaPipe) | pendiente |
+| Upload con validación de tipo, peso, dimensiones y megapíxeles | **HECHO** |
+| Quality check: cara única, giro, inclinación, apertura ocular, encuadre | **HECHO** |
+| Landmarks reales con MediaPipe **en el navegador** (478 puntos, con iris) | **HECHO** — sin verificar en navegador real |
+| Perfil facial personalizado que reordena las 6 recomendaciones | **HECHO** |
+| 91 tests · build, typecheck y lint en verde | **HECHO** |
 | Comparación 2–4 resultados | pendiente |
 | Analítica del embudo y outbound clicks | pendiente |
 | Supabase, rate limiting, deploy | pendiente |
@@ -228,7 +231,17 @@ No: dominio, marca, logo, anuncios, Supabase, Next.js, herramientas de SEO ni su
 
 **Blocker resuelto:** [D-015](DECISION_LOG.md#d-015) ya no espera respuesta. Se contestó con términos publicados, sin preguntar a nadie y sin coste.
 
+### Deuda técnica conocida
+
+| | Estado |
+|---|---|
+| **MediaPipe sin verificar en un navegador real.** Toda la geometría está testeada con mallas sintéticas (91 tests), pero **que el modelo detecte una cara en una foto de verdad no lo ha comprobado nadie.** Es lo primero que hay que probar a mano | abierto |
+| **8 vulnerabilidades de npm, todas en devDependencies** (vitest/tinypool y eslint-config-next→micromatch). Ninguna en `dependencies` ni en nada que llegue al navegador. El arreglo es vitest 5, que **exige Node ≥20.19 y aquí hay 20.14**, así que su binario nativo no instala. Subir a Node 20.19+ o 22 LTS las reduciría a las de eslint | requiere acción del fundador |
+| **Oclusión fuerte no se detecta.** CLAUDE.md §8.4 la pide; MediaPipe no da confianza por landmark y detectarla de verdad necesitaría otro modelo. Declarado en `KNOWN_GAPS` para que nadie asuma cobertura que no existe | aceptado |
+
 ## Last Updated
+
+**2026-10-09 (2)** — Sprint 2: análisis facial real. Upload validado, quality check, landmarks de MediaPipe **en el navegador** (478 puntos con iris) y perfil facial que reordena las recomendaciones. 91 tests. Retirado el selector de presupuesto de la UI (la capacidad sigue en el dominio). Pendiente de verificar en un navegador real que el modelo detecta caras en fotos de verdad.
 
 **2026-10-09** — paleta investigada y fijada como guía vinculante ([D-018](DECISION_LOG.md#d-018), [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)): escenario neutro cálido más un acento coñac derivado del núcleo comercial de la categoría, con contrastes AA calculados en ambos temas. Y se retiran los precios de la interfaz ([D-019](DECISION_LOG.md#d-019)): parecían nuestros, y no vendemos nosotros. 50 tests. Sin cambios en validación: el Track 0 sigue sin enviar.
 

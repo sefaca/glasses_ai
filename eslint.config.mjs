@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Binarios de MediaPipe: código generado por emscripten que prepara
+    // scripts/vision-assets.mjs. No es nuestro y no se corrige.
+    "public/mediapipe/**",
   ]),
 ]);
 
