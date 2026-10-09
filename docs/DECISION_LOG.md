@@ -46,6 +46,8 @@
 | [D-018](#d-018) | 2026-10-09 | Paleta: escenario neutro cálido + un acento coñac del producto | DECISIÓN | OPEN |
 | [D-019](#d-019) | 2026-10-09 | No mostramos precios en nuestra interfaz | DECISIÓN | OPEN |
 | [D-020](#d-020) | 2026-10-09 | Previsualización de proporción: esquema a escala, **no** try-on | DECISIÓN | OPEN |
+| [D-021](#d-021) | 2026-10-09 | Corrección: nombrar no requiere permiso. Tres permisos, no uno | DECISIÓN | OPEN |
+| [D-022](#d-022) | 2026-10-09 | Generar desde el conocimiento del modelo: tercera vía | HIPÓTESIS | OPEN |
 
 ---
 
@@ -299,6 +301,34 @@
 - **Por qué es compatible con RULE #1** [D-002](#d-002) prohíbe presentar como try-on de un producto una generación que no represente esa montura. Un dibujo de línea **no se confunde con una foto**, así que no puede inducir a creer que el producto se ve como no se ve. La UI lo declara: «esquema a escala estimada, no una simulación fotorrealista».
 - **Límite declarado** La escala absoluta usa la DIP media de población (63 mm), no una medición de esta persona: el error entre individuos ronda el ±8 %. Por eso las etiquetas de ajuste son **cualitativas** —«puede quedarte ancha»— y nunca afirman milímetros → [CLAUDE.md §9.4](../CLAUDE.md). Hay un test que falla si alguna etiqueta contiene un dígito.
 - **Impact** Coste cero, proveedor ninguno, problema de licencia ninguno: el glifo es nuestro, la foto es del usuario y todo ocurre en su navegador. Permite ejecutar el Track D de B1 con producto real en vez de láminas montadas a mano, con la advertencia de que lo que se estaría validando es el valor de **comparar**, no la fidelidad del try-on.
+
+<a id="d-021"></a>
+## D-021 · Corrección: nombrar no requiere permiso. Tres permisos, no uno
+
+- **Date** 2026-10-09 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El muro de gates de [D-017](#d-017) exigía `useTrademark: cleared` para **listar** una montura. Consecuencia: ninguna marca real podía aparecer en el catálogo. El fundador lo cuestionó —«¿dices que poner nombre y referencia es ilegal?»— y tenía razón en que algo no cuadraba.
+- **Evidence** Ninguna nueva. Es una corrección de razonamiento sobre la evidencia que ya había: los términos de [D-015](#d-015) restringen **los materiales que el anunciante te entrega**, no el acto de nombrar un producto.
+- **Decision** Se separan tres permisos que estaban fundidos en uno, y **nombrar deja de ser uno de ellos**:
+  1. `displayOfficialImage` — mostrar su foto de producto → GA-1
+  2. `deriveOfficialImage` — derivar una imagen nueva de ella → GA-2, `denied` por defecto
+  3. `useLogo` — usar su logotipo como gráfico
+- **Reason** Nombrar el producto al que enlazas es **uso nominativo**, y es lo que hace todo el sector de referencia: comparadores, blogs de afiliación, retailers multimarca. Si no se pudiera nombrar un producto, no existiría el comercio de referencia. Yo había convertido una cautela en una prohibición.
+- **Impact** `isPubliclyListable()` solo exige que la montura esté activa. El catálogo pasa de 17 monturas sintéticas a **24 monturas reales de 13 marcas**, con marca, modelo y referencia — y sin una sola imagen suya: se dibujan con nuestro glifo hasta que GA-1 se resuelva.
+- **Límite** Nombrar sí, **logotipo no**: el mockup del fundador llevaba el logotipo de Ray-Ban en cada ficha y eso es un paso más. Y esto sigue siendo lectura de términos, no asesoramiento jurídico; los límites del uso nominativo varían por jurisdicción.
+
+<a id="d-022"></a>
+## D-022 · Generar desde el conocimiento del modelo: la tercera vía
+
+- **Date** 2026-10-09 · **Type** HIPÓTESIS · **Status** OPEN
+- **Context** El fundador generó con ChatGPT seis simulaciones suyas con distintos modelos de Ray-Ban, reconocibles y distinguibles entre sí. Al analizar **cómo** lo hizo, aparece una ruta que no estaba en el análisis.
+- **Evidence** `[T]` El modelo generó desde su conocimiento interno del producto, **sin partir de ningún archivo del anunciante**. Awin restringe «Advertiser Materials», definido como material *«provided by or on behalf of an Advertiser»*: si nunca te lo entregan, no hay material que modificar.
+- **Hipótesis** Existe una tercera ruta al try-on que no toca los términos de afiliación, porque no usa ningún activo ajeno: ni la foto del feed (Clase B clásica), ni el 3D del proveedor (Clase A), sino la representación interna del modelo generativo.
+- **Qué corrige** [D-016](#d-016) decía «el riesgo de licencia es de la Clase B». Más preciso: **es de la Clase B *sobre imagen de feed***. Esta variante no lo tiene. Mi resumen anterior fue más categórico que la evidencia.
+- **Dónde se mueve el problema** De derechos de autor a **exactitud**. El modelo no reproduce la RB3016: reproduce *su idea* de una RB3016. Si enlazas a comprarla con esa imagen, estás en el escenario que [D-002](#d-002) prohíbe. El propio ChatGPT se lo advirtió al fundador: *«no tomaría como exactos el tamaño ni el ajuste»*.
+- **Implementación** `TryOnAssetOwnership` gana el modo `model-prior`, y aparece `canLabelAsProduct()` separado de `canTryOn()`: **se puede generar la imagen y aun así no poder decir que es esa montura**. Hoy `GENERATIVE_FIDELITY_VERIFIED = false`, así que toda imagen generada se etiqueta como simulación de estilo.
+- **Validates if** GT-1: ≥70 % de acierto en test ciego de 3 opciones. Entonces la bandera pasa a `true` y la misma imagen puede llevar marca, modelo y referencia.
+- **Falsified if** <50 %. El flujo seguiría funcionando pero sin poder enlazar a una referencia concreta: sería descubrimiento de estilo, no de producto.
+- **Pendiente de comprobar** Los términos del proveedor generativo —algunos restringen generar marcas de terceros— y que esta ruta **sí envía la foto fuera del dispositivo**, lo que reabre el bloque de privacidad: DPA, transferencia internacional y retención.
 
 ---
 

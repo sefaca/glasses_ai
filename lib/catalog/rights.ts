@@ -1,59 +1,81 @@
 import type { FrameProfile } from "./types";
 
 /**
- * El muro de gates, en código.
+ * El muro de gates, en código. **Revisado el 2026-10-09** → D-021.
  *
- * Todas las puertas niegan por defecto. Si un día alguien añade una montura
- * nueva y se olvida de los derechos, la montura simplemente no aparece — que
- * es el fallo correcto. El fallo incorrecto sería publicarla.
+ * La versión anterior exigía permiso escrito de marca para *listar* una
+ * montura, y eso era un error: **nombrar el producto al que enlazas es uso
+ * nominativo** y es lo que hace todo el sector de referencia. Si no se pudiera
+ * nombrar un producto, no existirían ni los comparadores ni la afiliación.
+ *
+ * Lo que sí está gateado son tres cosas distintas, que antes estaban
+ * mezcladas en una:
+ *
+ *   1. mostrar la imagen OFICIAL del producto          → GA-1
+ *   2. DERIVAR una imagen nueva de esa imagen oficial  → GA-2, denegado por
+ *      los términos estándar (D-015)
+ *   3. usar el LOGOTIPO de la marca como gráfico       → distinto de nombrarla
+ *
+ * Y hay una cuarta vía que no toca ninguna de las tres: generar la imagen
+ * desde el conocimiento del modelo, sin partir de ningún archivo del
+ * anunciante. Ahí la restricción no es de derechos sino de **fidelidad**, que
+ * es RULE #1 y se mide con GT-1.
+ *
+ * Esto no es asesoramiento jurídico: es lectura de términos publicados. Antes
+ * de producción lo revisa un profesional.
  */
 
 /** Cómo obtiene el proveedor de try-on el activo que pinta sobre la cara. */
 export type TryOnAssetOwnership =
-  /**
-   * Clase A. El activo es un modelo 3D del proveedor, licenciado por él.
-   * No reproduce ni altera la imagen del anunciante → D-016.
-   */
+  /** Clase A. Modelo 3D del proveedor, con derechos resueltos aguas arriba. */
   | "provider"
-  /**
-   * Clase B. El activo es la imagen oficial del producto, que el modelo
-   * generativo deriva. Es justo lo que los términos estándar prohíben.
-   */
+  /** Clase B sobre feed. Deriva de la imagen oficial: lo que D-015 cierra. */
   | "advertiser-image"
+  /**
+   * Clase B desde el conocimiento del modelo. No parte de ningún archivo del
+   * anunciante, así que los términos de afiliación no le aplican. Su límite
+   * es la fidelidad, no el permiso.
+   */
+  | "model-prior"
   /** Desarrollo. No sale nada hacia ningún proveedor real. */
   | "mock";
 
-export function canDisplayFrameImage(frame: FrameProfile): boolean {
-  return frame.rights.displayImage === "cleared";
+/**
+ * ¿Hemos medido que este proveedor reproduce monturas identificables?
+ *
+ * Es GT-1 de B1: test ciego de 3 opciones, umbral del 70 % sobre un azar del
+ * 33 %. **Nadie lo ha medido todavía**, así que es `false` y toda imagen
+ * generada se etiqueta como simulación de estilo, no como ese producto.
+ *
+ * Cuando GT-1 pase, esto se pone a `true` y la misma imagen puede llevar
+ * marca, modelo y referencia. La diferencia entre un producto y otro la
+ * decide una medición, no una opinión.
+ */
+export const GENERATIVE_FIDELITY_VERIFIED = false;
+
+export function canDisplayOfficialImage(frame: FrameProfile): boolean {
+  return frame.rights.displayOfficialImage === "cleared";
 }
 
-export function canUseTrademark(frame: FrameProfile): boolean {
-  return frame.rights.useTrademark === "cleared";
+export function canDeriveOfficialImage(frame: FrameProfile): boolean {
+  return frame.rights.deriveOfficialImage === "cleared";
 }
 
-/** Derivar la imagen oficial. Hoy, `false` para cualquier marca real. */
-export function canDeriveFrameImage(frame: FrameProfile): boolean {
-  return frame.rights.deriveImage === "cleared";
+export function canUseLogo(frame: FrameProfile): boolean {
+  return frame.rights.useLogo === "cleared";
 }
 
 /**
  * ¿Se puede listar públicamente?
  *
- * Mostrar marca y modelo es uso de marca, así que exige `useTrademark`. La
- * imagen no es imprescindible: sin ella dibujamos un glifo propio y la ficha
- * sigue siendo honesta.
+ * Solo exige que esté activa. Nombrarla por marca, modelo y referencia es uso
+ * nominativo; si no tenemos su imagen, dibujamos nuestro propio esquema y la
+ * ficha sigue siendo honesta.
  */
 export function isPubliclyListable(frame: FrameProfile): boolean {
-  return frame.active && canUseTrademark(frame);
+  return frame.active;
 }
 
-/**
- * ¿Se puede ofrecer try-on de esta montura con este proveedor?
- *
- * Con un proveedor de Clase A el activo es suyo y los derechos de derivación
- * se resolvieron aguas arriba, así que basta con poder listarla. Con Clase B
- * hace falta autorización explícita de derivación.
- */
 export function canTryOn(
   frame: FrameProfile,
   ownership: TryOnAssetOwnership,
@@ -63,9 +85,38 @@ export function canTryOn(
     case "provider":
       return true;
     case "advertiser-image":
-      return canDeriveFrameImage(frame);
+      return canDeriveOfficialImage(frame);
+    case "model-prior":
+      // Generar no requiere permiso sobre ningún archivo ajeno. Lo que
+      // requiere es no mentir sobre el resultado, y de eso se encarga
+      // `canLabelAsProduct`.
+      return true;
     case "mock":
       return true;
+  }
+}
+
+/**
+ * ¿Podemos decir que **esa imagen es ese producto**?
+ *
+ * Es la pregunta que de verdad importa y la que RULE #1 (D-002) gobierna.
+ * Con un activo del proveedor o con la imagen oficial autorizada, sí. Con una
+ * imagen generada desde el conocimiento del modelo, solo si GT-1 ha
+ * demostrado que la montura resulta identificable.
+ */
+export function canLabelAsProduct(
+  frame: FrameProfile,
+  ownership: TryOnAssetOwnership,
+): boolean {
+  switch (ownership) {
+    case "provider":
+      return isPubliclyListable(frame);
+    case "advertiser-image":
+      return canDeriveOfficialImage(frame);
+    case "model-prior":
+      return GENERATIVE_FIDELITY_VERIFIED;
+    case "mock":
+      return false;
   }
 }
 
@@ -76,8 +127,7 @@ export function tryOnBlockedReason(
 ): string | null {
   if (canTryOn(frame, ownership)) return null;
   if (!frame.active) return "frame-inactive";
-  if (!canUseTrademark(frame)) return "trademark-not-cleared";
-  if (ownership === "advertiser-image" && !canDeriveFrameImage(frame)) {
+  if (ownership === "advertiser-image" && !canDeriveOfficialImage(frame)) {
     return "derivative-rights-not-cleared";
   }
   return "unknown";

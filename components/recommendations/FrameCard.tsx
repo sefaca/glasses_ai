@@ -80,8 +80,13 @@ export function FrameCard({
       */}
       <h3 className="font-display text-xl leading-tight">
         {frame.model}
-        <span className="block font-sans text-xs tracking-wide text-muted">
-          {frame.brand} · {shapeLabel}
+        {frame.reference && (
+          <span className="ml-1.5 font-sans text-xs text-muted">
+            {frame.reference}
+          </span>
+        )}
+        <span className="mt-0.5 block font-sans text-xs tracking-wide text-muted">
+          {frame.brand} · {shapeLabel} · {frame.colorName}
         </span>
       </h3>
 

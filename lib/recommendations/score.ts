@@ -1,7 +1,7 @@
 import { clamp01, round3 } from "../face/classify";
 import type { FaceProfile, UserPreferences } from "../face/types";
 import { reliablePriceCents } from "../catalog/price";
-import type { FrameProfile } from "../catalog/types";
+import { frameFrontWidthMm, type FrameProfile } from "../catalog/types";
 import {
   BUDGET_TOLERANCE,
   DEFAULT_WEIGHTS,
@@ -74,7 +74,9 @@ function faceGeometry(face: FaceProfile, frame: FrameProfile): RawComponent {
  * al ancho de la cara, y es mejor pasarse un poco que quedarse corta.
  */
 function frameScale(face: FaceProfile, frame: FrameProfile): RawComponent {
-  const frameWidth = frame.measurements.totalWidthMm;
+  // Anchura del frontal: el total si se publica y, si no, aritmética sobre
+  // lente y puente. Lo normal es lo segundo.
+  const frameWidth = frameFrontWidthMm(frame);
   const faceWidth = estimateFaceWidthMm(face);
 
   if (frameWidth === null || faceWidth === null) {

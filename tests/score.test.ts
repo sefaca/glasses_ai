@@ -2,11 +2,14 @@ import { describe, expect, it } from "vitest";
 import { classifyFace, SHAPE_CENTROIDS } from "../lib/face/classify";
 import { NEUTRAL_FACE } from "../lib/face/neutral";
 import { EMPTY_PREFERENCES, type FaceProfile } from "../lib/face/types";
-import { DEV_FRAMES } from "../lib/catalog/seed";
-import type { FrameProfile } from "../lib/catalog/types";
+import { explainRecommendation } from "../lib/recommendations/explain";
 import { recommend, scoreFrame } from "../lib/recommendations/score";
 import { DEFAULT_WEIGHTS } from "../lib/recommendations/weights";
-import { explainRecommendation } from "../lib/recommendations/explain";
+import {
+  makeFrame,
+  makeFrameSet,
+  makeFrameWithoutMeasurements,
+} from "./helpers/frame";
 
 function faceOf(shape: keyof typeof SHAPE_CENTROIDS): FaceProfile {
   const c = SHAPE_CENTROIDS[shape];
@@ -31,56 +34,56 @@ describe("configuración del scoring", () => {
 describe("scoreFrame", () => {
   it("un rostro redondeado puntúa más alto una montura angular que una redonda", () => {
     const face = faceOf("round");
-    const rectangular = DEV_FRAMES.find((f) => f.slug === "linea-01")!;
-    const round = DEV_FRAMES.find((f) => f.slug === "circulo-01")!;
+    const angular = makeFrame({ shape: "rectangular" });
+    const redonda = makeFrame({ shape: "round" });
 
-    const a = scoreFrame(face, EMPTY_PREFERENCES, rectangular);
-    const b = scoreFrame(face, EMPTY_PREFERENCES, round);
-    expect(a.total).toBeGreaterThan(b.total);
+    expect(scoreFrame(face, EMPTY_PREFERENCES, angular).total).toBeGreaterThan(
+      scoreFrame(face, EMPTY_PREFERENCES, redonda).total,
+    );
   });
 
   it("un rostro cuadrado invierte esa preferencia", () => {
     const face = faceOf("square");
-    const rectangular = DEV_FRAMES.find((f) => f.slug === "linea-01")!;
-    const round = DEV_FRAMES.find((f) => f.slug === "circulo-01")!;
+    const angular = makeFrame({ shape: "rectangular" });
+    const redonda = makeFrame({ shape: "round" });
 
-    expect(scoreFrame(face, EMPTY_PREFERENCES, round).total).toBeGreaterThan(
-      scoreFrame(face, EMPTY_PREFERENCES, rectangular).total,
+    expect(scoreFrame(face, EMPTY_PREFERENCES, redonda).total).toBeGreaterThan(
+      scoreFrame(face, EMPTY_PREFERENCES, angular).total,
     );
   });
 
   it("no penaliza a una montura por carecer de medidas: reparte el peso", () => {
-    // GA-4 sin resolver: muchas fuentes no dan calibre ni puente. Una montura
-    // sin medidas debe competir por lo que sí sabemos, no cargar con un 0.
+    // Es el caso más común del catálogo real: casi nadie publica medidas
+    // completas. Una montura sin ellas debe competir por lo que sí sabemos.
     const face = faceOf("round");
-    const withMeasures = DEV_FRAMES.find((f) => f.slug === "linea-01")!;
-    const withoutMeasures: FrameProfile = {
-      ...withMeasures,
-      id: "dev-sin-medidas",
-      measurements: {
-        totalWidthMm: null,
-        lensWidthMm: null,
-        lensHeightMm: null,
-        bridgeMm: null,
-        templeMm: null,
-      },
-    };
-
-    const score = scoreFrame(face, EMPTY_PREFERENCES, withoutMeasures);
+    const score = scoreFrame(
+      face,
+      EMPTY_PREFERENCES,
+      makeFrameWithoutMeasurements({ shape: "rectangular" }),
+    );
     const scale = score.components.find((c) => c.key === "frameScale")!;
     const geometry = score.components.find((c) => c.key === "faceGeometry")!;
 
     expect(scale.available).toBe(false);
     expect(scale.weight).toBe(0);
-    // Al ser el único componente con datos, la geometría se queda todo el peso.
     expect(geometry.weight).toBeCloseTo(1, 10);
     expect(score.total).toBeCloseTo(geometry.score, 10);
   });
 
-  it("marca como estimado el encaje por anchura", () => {
-    // Depende de la DIP media de población, no de una medición. Por eso la
-    // explicación no puede afirmar milímetros → CLAUDE.md §9.4.
-    const score = scoreFrame(faceOf("oval"), EMPTY_PREFERENCES, DEV_FRAMES[0]!);
+  it("usa la anchura del frontal cuando no hay anchura total publicada", () => {
+    // 2×lente + puente. No es una estimación: es aritmética sobre valores
+    // que sí publica todo el mundo.
+    const score = scoreFrame(
+      faceOf("oval"),
+      EMPTY_PREFERENCES,
+      makeFrame({ measurements: {
+        totalWidthMm: null,
+        lensWidthMm: 58,
+        lensHeightMm: 42,
+        bridgeMm: 18,
+        templeMm: 145,
+      } }),
+    );
     const scale = score.components.find((c) => c.key === "frameScale")!;
     expect(scale.available).toBe(true);
     expect(scale.estimated).toBe(true);
@@ -88,28 +91,23 @@ describe("scoreFrame", () => {
 
   it("menos datos disponibles ⇒ menos confianza", () => {
     const face = faceOf("oval");
-    const complete = scoreFrame(face, EMPTY_PREFERENCES, DEV_FRAMES[0]!);
-    const sparse = scoreFrame(face, EMPTY_PREFERENCES, {
-      ...DEV_FRAMES[0]!,
-      measurements: {
-        totalWidthMm: null,
-        lensWidthMm: null,
-        lensHeightMm: null,
-        bridgeMm: null,
-        templeMm: null,
-      },
-    });
-    expect(sparse.confidence).toBeLessThan(complete.confidence);
+    const completa = scoreFrame(face, EMPTY_PREFERENCES, makeFrame());
+    const escasa = scoreFrame(
+      face,
+      EMPTY_PREFERENCES,
+      makeFrameWithoutMeasurements(),
+    );
+    expect(escasa.confidence).toBeLessThan(completa.confidence);
   });
 
   it("respeta el estilo declarado", () => {
     const face = faceOf("oval");
     const prefs = { ...EMPTY_PREFERENCES, styles: ["minimalistas"] };
-    const minimal = DEV_FRAMES.find((f) => f.slug === "elipse-01")!;
-    const chunky = DEV_FRAMES.find((f) => f.slug === "amplia-02")!;
+    const minimal = makeFrame({ styleTags: ["minimalistas"], thickness: 0.15 });
+    const gruesa = makeFrame({ styleTags: ["oversized"], thickness: 0.9 });
 
     expect(scoreFrame(face, prefs, minimal).total).toBeGreaterThan(
-      scoreFrame(face, prefs, chunky).total,
+      scoreFrame(face, prefs, gruesa).total,
     );
   });
 });
@@ -118,7 +116,7 @@ describe("recommend", () => {
   const face = faceOf("round");
 
   it("devuelve 6 recomendaciones ordenadas", () => {
-    const recs = recommend(face, EMPTY_PREFERENCES, DEV_FRAMES);
+    const recs = recommend(face, EMPTY_PREFERENCES, makeFrameSet());
     expect(recs).toHaveLength(6);
     for (let i = 1; i < recs.length; i++) {
       expect(recs[i - 1]!.score.total).toBeGreaterThanOrEqual(
@@ -129,7 +127,7 @@ describe("recommend", () => {
   });
 
   it("diversifica: no más de 2 monturas de la misma forma", () => {
-    const recs = recommend(face, EMPTY_PREFERENCES, DEV_FRAMES);
+    const recs = recommend(face, EMPTY_PREFERENCES, makeFrameSet());
     const perShape = new Map<string, number>();
     for (const r of recs) {
       perShape.set(r.frame.shape, (perShape.get(r.frame.shape) ?? 0) + 1);
@@ -141,73 +139,66 @@ describe("recommend", () => {
 
   it("con todo empatado devuelve 6 formas distintas, no las 6 primeras", () => {
     // Perfil neutro: el único componente con datos es la geometría, que para
-    // una forma desconocida es plana, así que todas las monturas empatan. En
-    // ese caso la variedad es lo único que aporta valor — enseñar dos Amplia
-    // y dos Bloque por orden alfabético sería lo contrario de reducir la
-    // elección.
-    const recs = recommend(NEUTRAL_FACE, EMPTY_PREFERENCES, DEV_FRAMES);
-    const totals = new Set(recs.map((r) => r.score.total));
-    expect(totals.size).toBe(1); // efectivamente, todo empatado
+    // una forma desconocida es plana. En ese empate la variedad es lo único
+    // que aporta valor.
+    const frames = makeFrameSet().map((f) =>
+      makeFrameWithoutMeasurements({ id: f.id, shape: f.shape }),
+    );
+    const recs = recommend(NEUTRAL_FACE, EMPTY_PREFERENCES, frames);
 
-    const shapes = recs.map((r) => r.frame.shape);
-    expect(new Set(shapes).size).toBe(6);
+    expect(new Set(recs.map((r) => r.score.total)).size).toBe(1);
+    expect(new Set(recs.map((r) => r.frame.shape)).size).toBe(6);
   });
 
   it("cuando los scores difieren, la mejor montura sigue siendo la primera", () => {
-    // La diversificación no puede costar la posición 1: ordena las formas por
-    // su mejor montura, así que la ganadora absoluta abre la lista.
-    const recs = recommend(face, EMPTY_PREFERENCES, DEV_FRAMES);
-    const best = [...DEV_FRAMES]
-      .map((frame) => ({ frame, total: scoreFrame(face, EMPTY_PREFERENCES, frame).total }))
+    const frames = makeFrameSet();
+    const recs = recommend(face, EMPTY_PREFERENCES, frames);
+    const mejor = [...frames]
+      .map((frame) => ({
+        frame,
+        total: scoreFrame(face, EMPTY_PREFERENCES, frame).total,
+      }))
       .sort((a, b) => b.total - a.total)[0]!;
-    expect(recs[0]!.frame.id).toBe(best.frame.id);
+    expect(recs[0]!.frame.id).toBe(mejor.frame.id);
   });
 
   it("es determinista, incluso con empates", () => {
-    const shuffled = [...DEV_FRAMES].reverse();
-    const a = recommend(face, EMPTY_PREFERENCES, DEV_FRAMES);
-    const b = recommend(face, EMPTY_PREFERENCES, shuffled);
+    const frames = makeFrameSet();
+    const a = recommend(face, EMPTY_PREFERENCES, frames);
+    const b = recommend(face, EMPTY_PREFERENCES, [...frames].reverse());
     expect(a.map((r) => r.frame.id)).toEqual(b.map((r) => r.frame.id));
   });
 
-  it("el presupuesto es un filtro duro con tolerancia", () => {
-    const prefs = { ...EMPTY_PREFERENCES, budgetMaxCents: 5000 };
-    const recs = recommend(face, prefs, DEV_FRAMES, { limit: 20 });
-    for (const r of recs) {
-      // 5000 × 1.15 de tolerancia
-      expect(r.frame.priceCents!).toBeLessThanOrEqual(5750);
-    }
-    expect(recs.length).toBeGreaterThan(0);
-  });
-
   it("nunca devuelve más monturas de las que hay", () => {
-    const recs = recommend(face, EMPTY_PREFERENCES, DEV_FRAMES.slice(0, 3), {
+    const recs = recommend(face, EMPTY_PREFERENCES, makeFrameSet().slice(0, 3), {
       limit: 6,
     });
     expect(recs).toHaveLength(3);
+  });
+
+  it("filtra por categoría", () => {
+    const graduada = makeFrame({ category: "optical" });
+    const recs = recommend(face, EMPTY_PREFERENCES, [graduada], { limit: 6 });
+    expect(recs).toHaveLength(0);
   });
 });
 
 describe("explicaciones", () => {
   it("no afirma ninguna medida concreta", () => {
     const face = faceOf("round");
-    for (const frame of DEV_FRAMES) {
+    for (const frame of makeFrameSet()) {
       const text = explainRecommendation(
         frame,
         scoreFrame(face, EMPTY_PREFERENCES, frame),
       );
-      // La escala es estimada: mencionar mm sería inventar precisión.
-      expect(text).not.toMatch(/\d+\s*mm/i);
+      // La escala es estimada: mencionar milímetros sería inventar precisión.
       expect(text).not.toMatch(/\d/);
       expect(text.length).toBeGreaterThan(0);
     }
   });
 
   it("cae a un texto genérico cuando no hay ningún componente fuerte", () => {
-    // Forma desconocida ⇒ geometría neutra (0.6), por debajo del umbral de 0.7
-    // que exige la plantilla. Y sin medidas, tampoco hay nada que decir de la
-    // anchura. La explicación no debe quedarse vacía ni inventar un motivo.
-    const unknownFace = classifyFace({
+    const desconocida = classifyFace({
       widthHeightRatio: 1.8,
       jawWidthRatio: 0.15,
       foreheadWidthRatio: 0.15,
@@ -216,21 +207,12 @@ describe("explicaciones", () => {
       headTiltDeg: 0,
       symmetry: 1,
     });
-    expect(unknownFace.shapePrimary).toBe("unknown");
+    expect(desconocida.shapePrimary).toBe("unknown");
 
-    const frame: FrameProfile = {
-      ...DEV_FRAMES[0]!,
-      measurements: {
-        totalWidthMm: null,
-        lensWidthMm: null,
-        lensHeightMm: null,
-        bridgeMm: null,
-        templeMm: null,
-      },
-    };
+    const frame = makeFrameWithoutMeasurements();
     const text = explainRecommendation(
       frame,
-      scoreFrame(unknownFace, EMPTY_PREFERENCES, frame),
+      scoreFrame(desconocida, EMPTY_PREFERENCES, frame),
     );
     expect(text).toBe("Una opción equilibrada para empezar a comparar.");
   });

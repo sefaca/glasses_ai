@@ -4,7 +4,7 @@ import {
   GLYPH_PUPIL_DISTANCE,
 } from "../ui/glyph-geometry";
 import { POPULATION_PD_MM } from "../recommendations/weights";
-import type { FrameProfile } from "../catalog/types";
+import { frameFrontWidthMm, type FrameProfile } from "../catalog/types";
 import type { FacePlacement } from "./landmarks";
 
 /**
@@ -52,7 +52,9 @@ export function computeFrameOverlay(
   frame: FrameProfile,
   placement: FacePlacement,
 ): FrameOverlay {
-  const totalWidthMm = frame.measurements.totalWidthMm;
+  // Anchura del frontal: el total si está publicado, y si no, la aritmética
+  // sobre lente y puente, que sí publican todos.
+  const totalWidthMm = frameFrontWidthMm(frame);
 
   // Anchura de la montura en píxeles de esta foto.
   //
@@ -96,17 +98,20 @@ export function assessWidthFit(
   frame: FrameProfile,
   placement: FacePlacement,
 ): WidthFit {
-  const totalWidthMm = frame.measurements.totalWidthMm;
-  if (totalWidthMm === null) return "unknown";
+  const frontWidthMm = frameFrontWidthMm(frame);
+  if (frontWidthMm === null) return "unknown";
 
   const frameWidthPx =
-    (totalWidthMm * placement.interocularPx) / POPULATION_PD_MM;
+    (frontWidthMm * placement.interocularPx) / POPULATION_PD_MM;
   const ratio = frameWidthPx / placement.faceWidthPx;
 
-  // Regla del sector: la montura debe aproximarse al ancho de la cara, y
-  // pasarse un poco molesta menos que quedarse corta.
-  if (ratio < 0.92) return "narrow";
-  if (ratio > 1.1) return "wide";
+  // Umbrales calibrados sobre **anchura de frontal**, no total: el frontal
+  // excluye el vuelo de las bisagras, así que queda unos milímetros por
+  // debajo. Son hipótesis de producto, como los pesos del scoring.
+  //
+  // Asimétricos a propósito: quedarse estrecho molesta más que sobrar.
+  if (ratio < 0.88) return "narrow";
+  if (ratio > 1.04) return "wide";
   return "good";
 }
 

@@ -42,20 +42,27 @@ export type ColorFamily =
  */
 export type RightsStatus = "cleared" | "pending" | "denied";
 
+/**
+ * Tres permisos distintos, que antes estaban mezclados en uno.
+ *
+ * **Nombrar** la montura por marca, modelo y referencia no está aquí a
+ * propósito: es uso nominativo y no requiere permiso. Lo que requiere permiso
+ * es usar *sus activos* → D-021.
+ */
 export interface FrameRights {
-  /** ¿Podemos **mostrar** la imagen de producto tal cual? → gate GA-1 */
-  displayImage: RightsStatus;
+  /** Mostrar la imagen **oficial** del producto tal cual → GA-1 */
+  displayOfficialImage: RightsStatus;
   /**
-   * ¿Podemos **derivar** una imagen nueva a partir de ella, es decir, hacer
-   * try-on generativo? → gate GA-2 / D-015.
+   * **Derivar** una imagen nueva a partir de la oficial → GA-2 / D-015.
    *
-   * Sobre términos estándar de Awin y Amazon esto es `denied`. Solo pasa a
-   * `cleared` con autorización escrita de ese anunciante.
+   * Sobre términos estándar de Awin y Amazon es `denied`: su licencia cubre
+   * publicar «without modification». Solo pasa a `cleared` con autorización
+   * escrita de ese anunciante.
    */
-  deriveImage: RightsStatus;
-  /** ¿Podemos usar marca y modelo en títulos, URLs y metadatos? → GA-7 */
-  useTrademark: RightsStatus;
-  /** De dónde sale el dato. `synthetic-dev` = creado por nosotros. */
+  deriveOfficialImage: RightsStatus;
+  /** Usar el **logotipo** de la marca como gráfico. Distinto de nombrarla. */
+  useLogo: RightsStatus;
+  /** De dónde sale el dato. */
   source: string;
   /** Fecha ISO de verificación, o `null` si nadie lo ha verificado. */
   verifiedAt: string | null;
@@ -80,7 +87,10 @@ export type PriceStatus =
 
 /** Medidas en milímetros. `null` cuando la fuente no las da — GA-4. */
 export interface FrameMeasurements {
-  /** Ancho total de la montura, sien a sien. El que más pesa en el encaje. */
+  /**
+   * Ancho total sien a sien. Rara vez se publica: las marcas dan la notación
+   * de tres números (lente-puente-varilla), no el total.
+   */
   totalWidthMm: number | null;
   lensWidthMm: number | null;
   lensHeightMm: number | null;
@@ -88,18 +98,57 @@ export interface FrameMeasurements {
   templeMm: number | null;
 }
 
+/**
+ * Fiabilidad de las medidas, con la misma disciplina que el precio.
+ *
+ * Importa porque **las fuentes se contradicen**: para la RB2132 unas dan 52/55
+ * y otras 58, y los puentes apenas se publican. La fuente fiable es la
+ * notación impresa en la varilla o la ficha oficial del fabricante.
+ */
+export type MeasurementsStatus = "verified" | "indicative" | "unknown";
+
+/**
+ * Anchura del frontal: lo que de verdad ocupa la montura en la cara.
+ *
+ * Si no hay ancho total publicado —que es lo normal— se calcula de los dos
+ * datos que sí publica todo el mundo. No es una estimación: es aritmética
+ * sobre valores declarados. Queda algo por debajo del total real, porque
+ * excluye el vuelo de las bisagras.
+ */
+export function frameFrontWidthMm(frame: {
+  measurements: FrameMeasurements;
+}): number | null {
+  const { totalWidthMm, lensWidthMm, bridgeMm } = frame.measurements;
+  if (totalWidthMm !== null) return totalWidthMm;
+  if (lensWidthMm === null || bridgeMm === null) return null;
+  return 2 * lensWidthMm + bridgeMm;
+}
+
 export interface FrameProfile {
   id: string;
   slug: string;
+  /** Referencia a `lib/catalog/brands.ts`. La marca es una entidad, no texto. */
+  brandId: string;
+  /** Nombre de la marca, desnormalizado para no resolver en cada render. */
   brand: string;
   model: string;
+  /**
+   * Referencia comercial del modelo, como la usa el sector: «RB3016».
+   * `null` en las casas sintéticas, que no tienen referencias reales.
+   */
+  reference: string | null;
   shape: FrameShape;
   category: "sunglasses" | "optical";
   material: FrameMaterial;
   colorFamily: ColorFamily;
+  /** Nombre comercial del color: «Negro / Dorado», «Havana». */
+  colorName: string;
+  /** Color de lente, como lo nombra el sector: «G-15 Verde», «Prizm». */
+  lensName: string;
   /** Grosor aparente de la montura 0..1. 0 = al aire, 1 = muy gruesa. */
   thickness: number;
   measurements: FrameMeasurements;
+  measurementsStatus: MeasurementsStatus;
   priceCents: number | null;
   priceStatus: PriceStatus;
   /** Fecha ISO de la última verificación del precio, o `null`. */
@@ -124,12 +173,16 @@ export interface FrameProfile {
   updatedAt: string;
 }
 
-/** Derechos por defecto de cualquier dato nuevo: nada autorizado. */
+/**
+ * Derechos por defecto de cualquier dato nuevo: ningún activo ajeno
+ * autorizado. La montura **sí se puede listar y nombrar**, porque eso no
+ * depende de estos permisos.
+ */
 export function unverifiedRights(source: string, note?: string): FrameRights {
   return {
-    displayImage: "pending",
-    deriveImage: "denied",
-    useTrademark: "pending",
+    displayOfficialImage: "pending",
+    deriveOfficialImage: "denied",
+    useLogo: "pending",
     source,
     verifiedAt: null,
     note,

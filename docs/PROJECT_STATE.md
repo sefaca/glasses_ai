@@ -55,7 +55,11 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Previsualización de proporción: montura a escala sobre la foto | **HECHO** → [D-020](DECISION_LOG.md#d-020). **No es el try-on de §8.7** |
 | Comparación de 2–4 monturas sobre la misma cara | **HECHO** |
 | Lectura cualitativa de ajuste por anchura | **HECHO** |
-| 105 tests · build, typecheck y lint en verde | **HECHO** |
+| Flujo **foto → marcas → simulaciones** | **HECHO** |
+| Catálogo real: 24 monturas de 13 marcas, con referencia | **HECHO** — sin imágenes suyas |
+| Registro de 34 marcas con grupo propietario y accesibilidad | **HECHO** → [brands.ts](../lib/catalog/brands.ts) |
+| Sugerencia de marcas según las proporciones del rostro | **HECHO** |
+| 123 tests · build, typecheck y lint en verde | **HECHO** |
 | Analítica del embudo y outbound clicks | pendiente |
 | Supabase, rate limiting, deploy | pendiente |
 | **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |
@@ -242,6 +246,8 @@ No: dominio, marca, logo, anuncios, Supabase, Next.js, herramientas de SEO ni su
 | **Oclusión fuerte no se detecta.** CLAUDE.md §8.4 la pide; MediaPipe no da confianza por landmark y detectarla de verdad necesitaría otro modelo. Declarado en `KNOWN_GAPS` para que nadie asuma cobertura que no existe | aceptado |
 
 ## Last Updated
+
+**2026-10-09 (4)** — flujo **foto → marcas → simulaciones** y catálogo real: 24 monturas de 13 marcas con referencia, registro de 34 marcas con grupo propietario, y sugerencia de marcas por rostro. Dos correcciones de razonamiento: **nombrar una montura no requiere permiso** ([D-021](DECISION_LOG.md#d-021)) y **generar desde el conocimiento del modelo es una tercera vía** que no toca los términos de afiliación ([D-022](DECISION_LOG.md#d-022)). 123 tests.
 
 **2026-10-09 (3)** — previsualización de proporción y comparación ([D-020](DECISION_LOG.md#d-020)): la montura se dibuja a escala real sobre la foto usando las pupilas, y se pueden comparar hasta cuatro sobre la misma cara. 105 tests. **No cierra ningún gate de B1**: GT-1 sigue sin medir y el try-on fotorrealista sigue detrás del muro.
 

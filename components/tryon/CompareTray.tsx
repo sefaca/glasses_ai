@@ -66,39 +66,58 @@ export function CompareTray({
           const buyUrl = outboundUrl(frame);
 
           return (
-            <article key={frame.id}>
-              <FaceOverlay
-                photoUrl={photoUrl}
-                placement={placement}
-                frame={frame}
-              />
-
-              <div className="mt-3 flex items-baseline justify-between gap-2">
-                <h3 className="font-display text-base leading-tight">
-                  {frame.model}
-                  <span className="block font-sans text-xs tracking-wide text-muted">
-                    {frame.brand} · {shapeLabels[frame.shape]}
-                  </span>
-                </h3>
+            <article key={frame.id} className="overflow-hidden rounded-xl">
+              <div className="relative">
+                <FaceOverlay
+                  photoUrl={photoUrl}
+                  placement={placement}
+                  frame={frame}
+                  className="rounded-b-none"
+                />
                 <button
                   type="button"
                   onClick={() => onRemove(frame.id)}
                   aria-label={`Quitar ${frame.model} de la comparación`}
-                  className="shrink-0 text-muted transition-colors hover:text-ink"
+                  className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/45 text-sm text-white backdrop-blur-sm transition-colors hover:bg-black/70"
                 >
                   ×
                 </button>
               </div>
 
-              {fitLabel && (
-                <p
-                  className={`mt-2 text-xs ${
-                    fit === "good" ? "text-accent" : "text-muted"
-                  }`}
-                >
-                  {fitLabel}
+              {/*
+                Pie de ficha al estilo de catálogo: modelo y referencia arriba,
+                color y lente debajo. La referencia es el dato que convierte
+                «unas negras» en un producto que se puede ir a comprar.
+              */}
+              <div className="bg-[#23201c] px-3 py-3 text-center text-[#f3efe8]">
+                <p className="text-sm leading-tight font-medium">
+                  {frame.model}
+                  {frame.reference && (
+                    <span className="ml-1.5 font-normal opacity-70">
+                      {frame.reference}
+                    </span>
+                  )}
                 </p>
-              )}
+                <p className="mt-1 text-[0.7rem] opacity-65">
+                  {frame.brand}
+                  <span className="mx-1.5">·</span>
+                  {frame.colorName}
+                  <span className="mx-1.5">·</span>
+                  {frame.lensName}
+                </p>
+              </div>
+
+              <p className="mt-2 text-xs text-muted">
+                {shapeLabels[frame.shape]}
+                {fitLabel && (
+                  <>
+                    <span className="mx-1.5">·</span>
+                    <span className={fit === "good" ? "text-accent" : undefined}>
+                      {fitLabel}
+                    </span>
+                  </>
+                )}
+              </p>
 
               {buyUrl ? (
                 <a
