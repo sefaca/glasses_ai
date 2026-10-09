@@ -50,10 +50,12 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Páginas legales honestas, sin texto de plantilla | **HECHO** |
 | Upload con validación de tipo, peso, dimensiones y megapíxeles | **HECHO** |
 | Quality check: cara única, giro, inclinación, apertura ocular, encuadre | **HECHO** |
-| Landmarks reales con MediaPipe **en el navegador** (478 puntos, con iris) | **HECHO** — sin verificar en navegador real |
+| Landmarks reales con MediaPipe **en el navegador** (478 puntos, con iris) | **HECHO y verificado** `[X]` en navegador real con una foto real, 2026-10-09 |
 | Perfil facial personalizado que reordena las 6 recomendaciones | **HECHO** |
-| 91 tests · build, typecheck y lint en verde | **HECHO** |
-| Comparación 2–4 resultados | pendiente |
+| Previsualización de proporción: montura a escala sobre la foto | **HECHO** → [D-020](DECISION_LOG.md#d-020). **No es el try-on de §8.7** |
+| Comparación de 2–4 monturas sobre la misma cara | **HECHO** |
+| Lectura cualitativa de ajuste por anchura | **HECHO** |
+| 105 tests · build, typecheck y lint en verde | **HECHO** |
 | Analítica del embudo y outbound clicks | pendiente |
 | Supabase, rate limiting, deploy | pendiente |
 | **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |
@@ -151,7 +153,7 @@ Nota de método: cuando el upload esté hecho, la plataforma pasa a ser el instr
 
 ## Current Decisions
 
-19 entradas en [DECISION_LOG.md](DECISION_LOG.md). En vigor y sin validar: D-001 a D-007, D-011, D-014, D-017, **D-018** (paleta), **D-019** (sin precios). Aplazadas: D-010 (dominio y marca), D-012 (foto vs cámara). Descartadas: D-009 (nombres). Validadas: D-013, D-015, D-016.
+20 entradas en [DECISION_LOG.md](DECISION_LOG.md). En vigor y sin validar: D-001 a D-007, D-011, D-014, D-017, D-018 (paleta), D-019 (sin precios), **D-020** (previsualización de proporción). Aplazadas: D-010 (dominio y marca), D-012 (foto vs cámara). Descartadas: D-009 (nombres). Validadas: D-013, D-015, D-016.
 
 D-019 deja sin efecto el «precio aproximado» que [CLAUDE.md §8.6](../CLAUDE.md) lista entre los campos de la card.
 
@@ -235,11 +237,13 @@ No: dominio, marca, logo, anuncios, Supabase, Next.js, herramientas de SEO ni su
 
 | | Estado |
 |---|---|
-| **MediaPipe sin verificar en un navegador real.** Toda la geometría está testeada con mallas sintéticas (91 tests), pero **que el modelo detecte una cara en una foto de verdad no lo ha comprobado nadie.** Es lo primero que hay que probar a mano | abierto |
+| ~~MediaPipe sin verificar en un navegador real~~ | **cerrado** el 2026-10-09: el fundador subió una foto real, el modelo detectó la cara y las recomendaciones se reordenaron según sus proporciones |
 | **8 vulnerabilidades de npm, todas en devDependencies** (vitest/tinypool y eslint-config-next→micromatch). Ninguna en `dependencies` ni en nada que llegue al navegador. El arreglo es vitest 5, que **exige Node ≥20.19 y aquí hay 20.14**, así que su binario nativo no instala. Subir a Node 20.19+ o 22 LTS las reduciría a las de eslint | requiere acción del fundador |
 | **Oclusión fuerte no se detecta.** CLAUDE.md §8.4 la pide; MediaPipe no da confianza por landmark y detectarla de verdad necesitaría otro modelo. Declarado en `KNOWN_GAPS` para que nadie asuma cobertura que no existe | aceptado |
 
 ## Last Updated
+
+**2026-10-09 (3)** — previsualización de proporción y comparación ([D-020](DECISION_LOG.md#d-020)): la montura se dibuja a escala real sobre la foto usando las pupilas, y se pueden comparar hasta cuatro sobre la misma cara. 105 tests. **No cierra ningún gate de B1**: GT-1 sigue sin medir y el try-on fotorrealista sigue detrás del muro.
 
 **2026-10-09 (2)** — Sprint 2: análisis facial real. Upload validado, quality check, landmarks de MediaPipe **en el navegador** (478 puntos con iris) y perfil facial que reordena las recomendaciones. 91 tests. Retirado el selector de presupuesto de la UI (la capacidad sigue en el dominio). Pendiente de verificar en un navegador real que el modelo detecta caras en fotos de verdad.
 

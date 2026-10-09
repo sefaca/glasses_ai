@@ -45,6 +45,7 @@
 | [D-017](#d-017) | 2026-10-08 | Construir la plataforma antes de cerrar B1, con muro de gates | DECISIÓN | OPEN |
 | [D-018](#d-018) | 2026-10-09 | Paleta: escenario neutro cálido + un acento coñac del producto | DECISIÓN | OPEN |
 | [D-019](#d-019) | 2026-10-09 | No mostramos precios en nuestra interfaz | DECISIÓN | OPEN |
+| [D-020](#d-020) | 2026-10-09 | Previsualización de proporción: esquema a escala, **no** try-on | DECISIÓN | OPEN |
 
 ---
 
@@ -284,6 +285,20 @@
   - El filtro de presupuesto se mantiene, reformulado como pregunta —«cuánto quieres gastar»— y con una línea explícita: *«Nosotros no vendemos gafas: el precio y la compra son de la tienda a la que te llevemos.»*
   - Efecto lateral que mejora el filtro: con `priceStatus`, una montura **sin precio fiable queda excluida** de una búsqueda con presupuesto, en vez de colarse. Enseñar algo que puede costar el triple a quien acaba de decir cuánto quiere gastar es peor que no enseñar nada.
 - **Modifica** [CLAUDE.md §8.6](../CLAUDE.md), que lista «precio aproximado» entre los campos de la card. Queda sin efecto para la tarjeta de recomendación. §18.4 («precio vigente cuando esté verificado») sigue aplicando a la futura ficha de producto, donde el precio sí irá, **atribuido al retailer y con fecha**.
+
+<a id="d-020"></a>
+## D-020 · Previsualización de proporción: esquema a escala, no try-on
+
+- **Date** 2026-10-09 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El botón «Probarme» de las tarjetas no hacía nada, porque el try-on real está detrás del muro de gates de [D-017](#d-017). Pero tras el Sprint 2 tenemos en el navegador la foto del usuario **y** sus landmarks, incluidas las pupilas.
+- **Evidence** `[X]` Geometría verificada con 20 tests sobre mallas sintéticas: una montura de la anchura estimada de la cara cubre exactamente esa anchura, una más ancha se dibuja más ancha, y la escala es proporcional al tamaño de la cara en la foto.
+- **Alternatives** (a) Dejar el botón muerto; (b) quitarlo hasta tener proveedor; (c) conectar el `MockTryOnProvider`, que no produce ninguna imagen; (d) **superponer el glifo de la montura a escala real sobre la foto** ← elegida.
+- **Decision** Se dibuja la montura sobre la foto escalando por su anchura real: `anchoMonturaPx = anchoMm · interpupilarPx / DIP_media`. El ancho de la cara se cancela en la fórmula, así que la escala no depende de haber estimado bien el contorno facial. Hereda la inclinación de la cabeza.
+- **Qué NO es, y es lo importante** **No es el try-on de [CLAUDE.md §8.7](../CLAUDE.md) y no cierra ningún gate de B1.** No hay foto de producto, no hay render fotorrealista y no se parece a llevar esas gafas puestas. GT-1 (test ciego de identidad) sigue sin medir, y [D-016](#d-016) sigue sin ratificar.
+- **Qué sí es** La respuesta a *«¿esta montura es demasiado ancha para mi cara?»*, que es la mitad de la duda real de compra. Y comparar 2–4 monturas sobre la misma cara es exactamente lo que una marca **no puede** ofrecer, porque solo puede enseñarse a sí misma — es la hipótesis H-M2 hecha producto.
+- **Por qué es compatible con RULE #1** [D-002](#d-002) prohíbe presentar como try-on de un producto una generación que no represente esa montura. Un dibujo de línea **no se confunde con una foto**, así que no puede inducir a creer que el producto se ve como no se ve. La UI lo declara: «esquema a escala estimada, no una simulación fotorrealista».
+- **Límite declarado** La escala absoluta usa la DIP media de población (63 mm), no una medición de esta persona: el error entre individuos ronda el ±8 %. Por eso las etiquetas de ajuste son **cualitativas** —«puede quedarte ancha»— y nunca afirman milímetros → [CLAUDE.md §9.4](../CLAUDE.md). Hay un test que falla si alguna etiqueta contiene un dígito.
+- **Impact** Coste cero, proveedor ninguno, problema de licencia ninguno: el glifo es nuestro, la foto es del usuario y todo ocurre en su navegador. Permite ejecutar el Track D de B1 con producto real en vez de láminas montadas a mano, con la advertencia de que lo que se estaría validando es el valor de **comparar**, no la fidelidad del try-on.
 
 ---
 

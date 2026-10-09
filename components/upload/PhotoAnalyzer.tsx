@@ -5,6 +5,7 @@ import {
   analyzeFaceImage,
   releaseFaceAnalysis,
   warmUpFaceAnalysis,
+  type FaceSession,
 } from "@/lib/face/analyze";
 import type { FaceProfile } from "@/lib/face/types";
 import { describeFaceProfile } from "@/lib/recommendations/explain";
@@ -29,10 +30,10 @@ import {
 type Phase = "idle" | "decoding" | "analyzing" | "rejected" | "done";
 
 interface PhotoAnalyzerProps {
-  onProfile: (profile: FaceProfile | null) => void;
+  onAnalysis: (session: FaceSession | null) => void;
 }
 
-export function PhotoAnalyzer({ onProfile }: PhotoAnalyzerProps) {
+export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -65,8 +66,10 @@ export function PhotoAnalyzer({ onProfile }: PhotoAnalyzerProps) {
 
   const handleFile = useCallback(
     async (file: File) => {
+      // Se avisa al padre ANTES de revocar el blob anterior: si lo revocásemos
+      // primero, lo que esté mostrando esa foto se quedaría con una URL muerta.
       setProfile(null);
-      onProfile(null);
+      onAnalysis(null);
 
       // Metadatos antes de decodificar: lo caro y lo peligroso es decodificar.
       const meta = checkUploadMetadata(file);
@@ -79,7 +82,8 @@ export function PhotoAnalyzer({ onProfile }: PhotoAnalyzerProps) {
 
       setPhase("decoding");
       setMessage(null);
-      setPreview(URL.createObjectURL(file));
+      const photoUrl = URL.createObjectURL(file);
+      setPreview(photoUrl);
 
       let bitmap: ImageBitmap;
       try {
@@ -104,7 +108,11 @@ export function PhotoAnalyzer({ onProfile }: PhotoAnalyzerProps) {
 
       if (outcome.status === "ok") {
         setProfile(outcome.profile);
-        onProfile(outcome.profile);
+        onAnalysis({
+          profile: outcome.profile,
+          placement: outcome.placement,
+          photoUrl,
+        });
         setPhase("done");
         setMessage(null);
         return;
@@ -113,13 +121,14 @@ export function PhotoAnalyzer({ onProfile }: PhotoAnalyzerProps) {
       setPhase("rejected");
       setMessage(outcome.message);
     },
-    [onProfile, setPreview],
+    [onAnalysis, setPreview],
   );
 
   function reset() {
-    setPreview(null);
+    // Mismo orden que arriba: primero se desengancha el padre, luego se revoca.
     setProfile(null);
-    onProfile(null);
+    onAnalysis(null);
+    setPreview(null);
     setPhase("idle");
     setMessage(null);
     if (inputRef.current) inputRef.current.value = "";

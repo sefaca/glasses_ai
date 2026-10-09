@@ -229,6 +229,69 @@ export function extractMeasurements(
   };
 }
 
+/**
+ * Dónde está la cara dentro de la foto, para poder superponerle algo.
+ *
+ * Separado de `FaceMeasurements` a propósito: aquellas son **proporciones
+ * adimensionales** y son lo único que viaja al servidor; esto son coordenadas
+ * ligadas a una imagen concreta y **se queda en el navegador**, junto con la
+ * foto. Mezclarlos acabaría mandando posiciones de la cara a algún sitio sin
+ * necesidad.
+ */
+export interface FacePlacement {
+  /** Punto medio entre pupilas, en fracción de la imagen 0..1. */
+  eyeCenter: { x: number; y: number };
+  /** Distancia interpupilar, en píxeles de la imagen. */
+  interocularPx: number;
+  /** Ancho de referencia del rostro, en píxeles. */
+  faceWidthPx: number;
+  /** Inclinación de la línea entre pupilas, en grados. */
+  tiltDeg: number;
+  image: ImageSize;
+}
+
+export function extractPlacement(
+  landmarks: Landmark[],
+  image: ImageSize,
+): FacePlacement | null {
+  if (landmarks.length < REQUIRED_LANDMARKS) return null;
+  if (image.width <= 0 || image.height <= 0) return null;
+
+  const irisLeft = toPixels(landmarks, LM.irisLeft, image);
+  const irisRight = toPixels(landmarks, LM.irisRight, image);
+  const interocularPx = distance(irisLeft, irisRight);
+  if (interocularPx === 0) return null;
+
+  const faceWidthPx = Math.max(
+    distance(
+      toPixels(landmarks, LM.foreheadLeft, image),
+      toPixels(landmarks, LM.foreheadRight, image),
+    ),
+    distance(
+      toPixels(landmarks, LM.faceLeft, image),
+      toPixels(landmarks, LM.faceRight, image),
+    ),
+    distance(
+      toPixels(landmarks, LM.jawLeft, image),
+      toPixels(landmarks, LM.jawRight, image),
+    ),
+  );
+  if (faceWidthPx === 0) return null;
+
+  return {
+    eyeCenter: {
+      x: (irisLeft.x + irisRight.x) / 2 / image.width,
+      y: (irisLeft.y + irisRight.y) / 2 / image.height,
+    },
+    interocularPx,
+    faceWidthPx,
+    tiltDeg:
+      (Math.atan2(irisRight.y - irisLeft.y, irisRight.x - irisLeft.x) * 180) /
+      Math.PI,
+    image,
+  };
+}
+
 /** Fracción del ancho de la imagen que ocupa el rostro. */
 export function faceCoverage(
   landmarks: Landmark[],

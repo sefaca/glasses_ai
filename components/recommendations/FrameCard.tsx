@@ -21,6 +21,11 @@ interface FrameCardProps {
   score: FrameScore;
   position: number;
   shapeLabel: string;
+  /** `true` si ya está en la comparación. */
+  selected?: boolean;
+  /** Sin foto analizada no hay nada sobre lo que superponer. */
+  canSelect?: boolean;
+  onToggle?: (frameId: string) => void;
 }
 
 const BLOCKED_COPY: Record<string, string> = {
@@ -35,6 +40,9 @@ export function FrameCard({
   score,
   position,
   shapeLabel,
+  selected = false,
+  canSelect = false,
+  onToggle,
 }: FrameCardProps) {
   const label = matchLabel(score);
   // El mock es lo único conectado hoy: el proveedor real está detrás del muro
@@ -82,20 +90,36 @@ export function FrameCard({
       </p>
 
       <div className="mt-5">
-        {available ? (
-          <button
-            type="button"
-            className="w-full rounded-full border border-ink px-5 py-2.5 text-sm font-medium transition-colors hover:bg-ink hover:text-paper active:translate-y-px"
-          >
-            Probarme
-          </button>
-        ) : (
+        {!available ? (
           <p
             className="w-full rounded-full border border-dashed border-line px-5 py-2.5 text-center text-xs text-muted"
             title={blocked ?? undefined}
           >
             {BLOCKED_COPY[blocked ?? "unknown"]}
           </p>
+        ) : canSelect ? (
+          <button
+            type="button"
+            aria-pressed={selected}
+            onClick={() => onToggle?.(frame.id)}
+            className={[
+              "w-full rounded-full border px-5 py-2.5 text-sm font-medium transition-colors active:translate-y-px",
+              selected
+                ? "border-accent bg-accent text-on-accent"
+                : "border-ink hover:bg-ink hover:text-paper",
+            ].join(" ")}
+          >
+            {selected ? "Quitar" : "Ver en mi cara"}
+          </button>
+        ) : (
+          // Sin foto no hay nada sobre lo que superponer. El botón lo dice en
+          // lugar de aparecer activo y no hacer nada al pulsarlo.
+          <a
+            href="#foto"
+            className="block w-full rounded-full border border-dashed border-line px-5 py-2.5 text-center text-xs text-muted transition-colors hover:border-ink hover:text-ink"
+          >
+            Sube una foto para verla puesta
+          </a>
         )}
       </div>
     </article>

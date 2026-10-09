@@ -1,5 +1,11 @@
 import { classifyFace } from "./classify";
-import { extractMeasurements, type ImageSize, type Landmark } from "./landmarks";
+import {
+  extractMeasurements,
+  extractPlacement,
+  type FacePlacement,
+  type ImageSize,
+  type Landmark,
+} from "./landmarks";
 import { checkQuality, primaryIssueMessage, type QualityResult } from "./quality";
 import type { FaceProfile } from "./types";
 
@@ -22,8 +28,31 @@ import type { FaceProfile } from "./types";
  * usa el producto.
  */
 
+/**
+ * Lo que queda vivo tras un análisis correcto, **solo en el navegador**.
+ *
+ * `profile` es lo único que podría viajar al servidor: proporciones anónimas.
+ * `placement` y `photoUrl` no salen de aquí — son coordenadas de una imagen
+ * concreta y un `blob:` local.
+ */
+export interface FaceSession {
+  profile: FaceProfile;
+  placement: FacePlacement;
+  photoUrl: string;
+}
+
 export type AnalysisOutcome =
-  | { status: "ok"; profile: FaceProfile; quality: QualityResult }
+  | {
+      status: "ok";
+      profile: FaceProfile;
+      quality: QualityResult;
+      /**
+       * Dónde está la cara en la foto, para superponerle monturas a escala.
+       * **Se queda en el navegador**: son coordenadas de una imagen concreta,
+       * no proporciones anónimas como el `profile`.
+       */
+      placement: FacePlacement;
+    }
   /** La foto se pudo procesar pero no sirve. `message` dice qué hacer. */
   | { status: "rejected"; quality: QualityResult; message: string }
   /** Fallo técnico: no cargó el modelo, no se pudo decodificar la imagen… */
@@ -131,7 +160,8 @@ export async function analyzeFaceImage(
   }
 
   const measurements = extractMeasurements(faces[0]!, image);
-  if (!measurements) {
+  const placement = extractPlacement(faces[0]!, image);
+  if (!measurements || !placement) {
     return {
       status: "rejected",
       quality,
@@ -139,7 +169,12 @@ export async function analyzeFaceImage(
     };
   }
 
-  return { status: "ok", profile: classifyFace(measurements), quality };
+  return {
+    status: "ok",
+    profile: classifyFace(measurements),
+    quality,
+    placement,
+  };
 }
 
 /** Libera el modelo. Para cuando el usuario sale del flujo de análisis. */

@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FrameCard } from "@/components/recommendations/FrameCard";
+import { CompareTray, MAX_COMPARE } from "@/components/tryon/CompareTray";
 import { PhotoAnalyzer } from "@/components/upload/PhotoAnalyzer";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { listableFrames } from "@/lib/catalog";
 import type { FrameShape } from "@/lib/catalog/types";
+import type { FaceSession } from "@/lib/face/analyze";
 import { NEUTRAL_FACE } from "@/lib/face/neutral";
-import type { FaceProfile, UserPreferences } from "@/lib/face/types";
+import type { UserPreferences } from "@/lib/face/types";
 import { getDictionary } from "@/lib/i18n";
 import { recommend } from "@/lib/recommendations/score";
 
@@ -39,7 +41,9 @@ const STYLE_OPTIONS = [
 
 export default function ProbarPage() {
   const [styles, setStyles] = useState<string[]>([]);
-  const [profile, setProfile] = useState<FaceProfile | null>(null);
+  const [session, setSession] = useState<FaceSession | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const profile = session?.profile ?? null;
 
   const prefs: UserPreferences = useMemo(
     () => ({ category: "sunglasses", styles, budgetMaxCents: null }),
@@ -66,6 +70,27 @@ export default function ProbarPage() {
     resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [profile]);
 
+  // La comparación se vacía en el mismo evento que cambia la foto, no
+  // reaccionando a ella con un efecto: sin cara no hay nada sobre lo que
+  // superponer, y una selección huérfana solo confunde.
+  function handleAnalysis(next: FaceSession | null) {
+    setSession(next);
+    setSelectedIds([]);
+  }
+
+  // La comparación aparece debajo, así que al seleccionar la primera montura
+  // hay que llevar al usuario hasta ella. Solo la primera: después ya sabe
+  // dónde está, y seguir moviéndole la página sería molesto.
+  const compareRef = useRef<HTMLDivElement>(null);
+  const hadSelection = useRef(false);
+  useEffect(() => {
+    const has = selectedIds.length > 0;
+    if (has && !hadSelection.current) {
+      compareRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    hadSelection.current = has;
+  }, [selectedIds]);
+
   function toggleStyle(id: string) {
     setStyles((current) =>
       current.includes(id)
@@ -73,6 +98,24 @@ export default function ProbarPage() {
         : [...current, id],
     );
   }
+
+  function toggleCompare(frameId: string) {
+    setSelectedIds((current) => {
+      if (current.includes(frameId)) {
+        return current.filter((id) => id !== frameId);
+      }
+      // Al llegar al tope entra la nueva y sale la más antigua, en vez de
+      // bloquear el botón sin explicar por qué no pasa nada.
+      const next = [...current, frameId];
+      return next.slice(-MAX_COMPARE);
+    });
+  }
+
+  const selectedFrames = selectedIds
+    .map((id) => frames.find((frame) => frame.id === id))
+    .filter((frame): frame is NonNullable<typeof frame> => Boolean(frame));
+
+  const shapeLabels = dict.frames.shapes as Record<string, string>;
 
   return (
     <div className="min-h-dvh">
@@ -175,6 +218,9 @@ export default function ProbarPage() {
                   shapeLabel={
                     dict.frames.shapes[rec.frame.shape as FrameShape]
                   }
+                  selected={selectedIds.includes(rec.frame.id)}
+                  canSelect={session !== null}
+                  onToggle={toggleCompare}
                 />
               ))}
             </div>
@@ -197,9 +243,23 @@ export default function ProbarPage() {
             dispositivo.
           </p>
           <div className="mt-7">
-            <PhotoAnalyzer onProfile={setProfile} />
+            <PhotoAnalyzer onAnalysis={handleAnalysis} />
           </div>
         </section>
+
+        {/* ---------- Comparación sobre la foto ---------- */}
+        <div ref={compareRef}>
+          {session && (
+            <CompareTray
+              photoUrl={session.photoUrl}
+              placement={session.placement}
+              frames={selectedFrames}
+              shapeLabels={shapeLabels}
+              onRemove={toggleCompare}
+              onClear={() => setSelectedIds([])}
+            />
+          )}
+        </div>
       </main>
     </div>
   );

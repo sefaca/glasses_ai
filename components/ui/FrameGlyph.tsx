@@ -1,4 +1,5 @@
 import type { FrameShape } from "@/lib/catalog/types";
+import { GLYPH } from "@/lib/ui/glyph-geometry";
 
 /**
  * Dibujo de línea de una montura, generado a partir de su forma.
@@ -75,7 +76,7 @@ export function FrameGlyph({
 
   return (
     <svg
-      viewBox="0 0 200 80"
+      viewBox={`0 0 ${GLYPH.viewBoxWidth} ${GLYPH.viewBoxHeight}`}
       className={className}
       role={label ? "img" : "presentation"}
       aria-label={label || undefined}
@@ -87,10 +88,14 @@ export function FrameGlyph({
       strokeLinecap="round"
       vectorEffect="non-scaling-stroke"
     >
-      <g transform="translate(58 40)">
+      <g
+        transform={`translate(${GLYPH.lensCenterLeftX} ${GLYPH.lensCenterY})`}
+      >
         <Lens shape={shape} flip />
       </g>
-      <g transform="translate(142 40)">
+      <g
+        transform={`translate(${GLYPH.lensCenterRightX} ${GLYPH.lensCenterY})`}
+      >
         <Lens shape={shape} flip={false} />
       </g>
 
@@ -104,9 +109,10 @@ export function FrameGlyph({
         <path d="M 89 36 Q 100 30 111 36" />
       )}
 
-      {/* Patillas */}
-      <path d="M 26 32 L 8 27" />
-      <path d="M 174 32 L 192 27" />
+      {/* Patillas. Sus extremos definen el ancho real de la montura dibujada,
+          que es lo que `lib/face/overlay.ts` escala sobre la cara. */}
+      <path d={`M 26 32 L ${GLYPH.templeLeftX} 27`} />
+      <path d={`M 174 32 L ${GLYPH.templeRightX} 27`} />
     </svg>
   );
 }
