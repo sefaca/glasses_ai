@@ -17,14 +17,19 @@ export type TryOnStatus = "queued" | "processing" | "completed" | "failed";
 
 export interface TryOnInput {
   /** Imagen del usuario. URL firmada de corta duración, nunca pública. */
-  userImageUrl: string;
+  userImageUrl?: string;
+  /** Imagen del usuario en línea, para proveedores que la reciben en el cuerpo. */
+  userImage?: { mimeType: string; base64: string };
   frameId: string;
   /**
-   * Imagen de producto. Solo se envía a proveedores de Clase B y solo cuando
-   * la montura tiene derechos de derivación. En Clase A no hace falta: el
-   * activo 3D es del proveedor.
+   * Imagen de producto. Solo se envía a proveedores de Clase B sobre feed y
+   * solo con derechos de derivación. La ruta `model-prior` no la usa: ahí la
+   * montura se describe con texto, que es lo que la mantiene fuera de los
+   * términos de afiliación.
    */
   frameImageUrl?: string;
+  /** Descripción de la montura para la ruta `model-prior`. */
+  framePrompt?: string;
 }
 
 export interface TryOnJob {
@@ -39,8 +44,15 @@ export interface TryOnJob {
 }
 
 export interface TryOnResult extends TryOnJob {
-  /** Ruta del resultado en storage privado. `null` salvo `completed`. */
-  resultPath: string | null;
+  /**
+   * Dónde está el resultado. `null` salvo `completed`.
+   *
+   * Puede ser una ruta de storage privado o un `data:` en línea, según el
+   * proveedor. Mientras no haya storage, el generativo devuelve `data:` y
+   * **la imagen no se persiste en ningún sitio** — es la opción más
+   * respetuosa con §14 y además la más simple.
+   */
+  resultUrl: string | null;
   /** Código estable, nunca el error crudo del proveedor → regla 5. */
   errorCode: TryOnErrorCode | null;
   completedAt: string | null;

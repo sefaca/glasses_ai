@@ -8,6 +8,7 @@ import {
 } from "./landmarks";
 import { checkQuality, primaryIssueMessage, type QualityResult } from "./quality";
 import type { FaceProfile } from "./types";
+import type { UploadPayload } from "../upload/prepare";
 
 /**
  * Análisis facial **en el navegador**.
@@ -38,7 +39,16 @@ import type { FaceProfile } from "./types";
 export interface FaceSession {
   profile: FaceProfile;
   placement: FacePlacement;
+  /** `blob:` local para la vista previa. No sale de aquí. */
   photoUrl: string;
+  /**
+   * Foto reducida y recodificada, lista para enviar al generativo.
+   *
+   * Existe por separado del `blob:` porque **sí sale del dispositivo**, y por
+   * eso va reducida y sin EXIF. Es la frontera de privacidad hecha explícita:
+   * lo que se ve en pantalla y lo que se envía no son el mismo archivo.
+   */
+  photo: UploadPayload;
 }
 
 export type AnalysisOutcome =

@@ -40,7 +40,7 @@ describe("MockTryOnProvider", () => {
     c.advance(900);
     const done = await p.getJob(job.id);
     expect(done.status).toBe("completed");
-    expect(done.resultPath).not.toBeNull();
+    expect(done.resultUrl).not.toBeNull();
     expect(done.errorCode).toBeNull();
     expect(done.completedAt).not.toBeNull();
   });
@@ -64,7 +64,7 @@ describe("MockTryOnProvider", () => {
     const failed = await p.getJob(job.id);
     expect(failed.status).toBe("failed");
     expect(failed.billable).toBe(false);
-    expect(failed.resultPath).toBeNull();
+    expect(failed.resultUrl).toBeNull();
   });
 
   it("un input inválido falla de inmediato y tampoco se factura", async () => {

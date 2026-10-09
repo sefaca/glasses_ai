@@ -9,6 +9,7 @@ import {
 } from "@/lib/face/analyze";
 import type { FaceProfile } from "@/lib/face/types";
 import { describeFaceProfile } from "@/lib/recommendations/explain";
+import { prepareUpload } from "@/lib/upload/prepare";
 import {
   ACCEPT_ATTRIBUTE,
   checkUploadDimensions,
@@ -107,11 +108,24 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
       bitmap.close();
 
       if (outcome.status === "ok") {
+        // Se prepara ya la versión reducida y sin EXIF que se enviaría al
+        // generativo, para que al pedir una prueba no haya que esperar dos
+        // veces. Prepararla no la envía a ningún sitio.
+        let photo;
+        try {
+          photo = await prepareUpload(file);
+        } catch {
+          setPhase("rejected");
+          setMessage("No hemos podido preparar esa imagen. Prueba con otra.");
+          return;
+        }
+
         setProfile(outcome.profile);
         onAnalysis({
           profile: outcome.profile,
           placement: outcome.placement,
           photoUrl,
+          photo,
         });
         setPhase("done");
         setMessage(null);

@@ -52,7 +52,9 @@ export class MockTryOnProvider implements TryOnProvider {
   }
 
   async createTryOn(input: TryOnInput): Promise<TryOnJob> {
-    if (!input.userImageUrl || !input.frameId) {
+    // La foto puede llegar como URL firmada o en línea, según el proveedor.
+    const hasImage = Boolean(input.userImageUrl || input.userImage);
+    if (!hasImage || !input.frameId) {
       const job = this.record({
         input,
         status: "failed",
@@ -90,7 +92,7 @@ export class MockTryOnProvider implements TryOnProvider {
       : {
           ...job,
           status: "completed",
-          resultPath: `mock/${job.frameId}/${job.id}.svg`,
+          resultUrl: `mock/${job.frameId}/${job.id}.svg`,
           errorCode: null,
           completedAt: new Date(this.now()).toISOString(),
         };
@@ -114,7 +116,7 @@ export class MockTryOnProvider implements TryOnProvider {
       frameId: args.input.frameId,
       costEstimateCents: this.costPerTryOnCents,
       createdAt: new Date(this.now()).toISOString(),
-      resultPath: null,
+      resultUrl: null,
       errorCode: args.errorCode,
       completedAt: args.status === "failed" ? new Date(this.now()).toISOString() : null,
       billable: args.billable,

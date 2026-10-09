@@ -270,6 +270,7 @@ export default function ProbarPage() {
           {session && (
             <CompareTray
               photoUrl={session.photoUrl}
+              photo={session.photo}
               placement={session.placement}
               frames={compareFrames}
               shapeLabels={shapeLabels}
