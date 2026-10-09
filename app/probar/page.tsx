@@ -121,8 +121,12 @@ export default function ProbarPage() {
         {/* ---------- Presupuesto ---------- */}
         <fieldset className="mt-10 border-t border-line pt-6">
           <legend className="rule-label text-[0.7rem] text-muted">
-            Presupuesto
+            Cuánto quieres gastar
           </legend>
+          <p className="mt-3 text-sm text-muted">
+            Lo usamos solo para filtrar. Nosotros no vendemos gafas: el precio y
+            la compra son de la tienda a la que te llevemos.
+          </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
             {BUDGET_OPTIONS.map((option) => {
               const active = budgetMaxCents === option.id;
@@ -158,6 +162,15 @@ export default function ProbarPage() {
               Selección orientativa, sin tu foto todavía
             </p>
           </div>
+
+          {recommendations.length > 0 && (
+            // Honestidad explícita: el catálogo de hoy es una muestra propia de
+            // desarrollo, no producto comprable.
+            <p className="mt-4 text-xs leading-relaxed text-muted">
+              Catálogo de muestra: estas monturas son nuestras, de desarrollo.
+              Todavía no hay producto comprable.
+            </p>
+          )}
 
           {recommendations.length === 0 ? (
             <p className="py-14 text-sm text-muted">

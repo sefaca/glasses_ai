@@ -43,6 +43,8 @@
 | [D-015](#d-015) | 2026-09-25 | El try-on crea una obra derivada de la imagen oficial | HIPÓTESIS | **VALIDATED** |
 | [D-016](#d-016) | 2026-10-08 | Corrección: el riesgo de licencia es de la Clase B, no de la Clase A | HIPÓTESIS | VALIDATED |
 | [D-017](#d-017) | 2026-10-08 | Construir la plataforma antes de cerrar B1, con muro de gates | DECISIÓN | OPEN |
+| [D-018](#d-018) | 2026-10-09 | Paleta: escenario neutro cálido + un acento coñac del producto | DECISIÓN | OPEN |
+| [D-019](#d-019) | 2026-10-09 | No mostramos precios en nuestra interfaz | DECISIÓN | OPEN |
 
 ---
 
@@ -251,6 +253,37 @@
 - **Impact** El repo pasa de solo documentación a aplicación. Aparecen `npm run check` y el checklist de [CLAUDE.md §35](../CLAUDE.md) como puerta real. El presupuesto de [D-005](#d-005) sigue intacto: el stack elegido no cuesta nada hasta que se despliega.
 - **Riesgo asumido, explícito** Si B1 sale NO-GO técnico, se habrá construido un producto sin su pieza central. Mitigación: lo que se construye primero es precisamente lo que **sobrevive a un NO-GO de try-on** — discovery, recomendación, comparación y catálogo —, y el proveedor queda detrás de un adaptador sustituible.
 - **Status note** No invalida D-004: lo reordena. B1, B3, B4 y B5 siguen pendientes y sus gates siguen vigentes. Construir no es validar.
+
+<a id="d-018"></a>
+## D-018 · Paleta: escenario neutro cálido + un acento coñac del producto
+
+- **Date** 2026-10-09 · **Type** DECISIÓN · **Status** OPEN
+- **Context** La primera paleta se eligió por criterio estético general, sin mirar la categoría. Encargo del fundador: revisar qué hacen las marcas de gafas y las ópticas, concluir qué funciona y **usarlo como guía vinculante**.
+- **Evidence** `[T]` Guía de color de eyewear 2026/2027 y observación directa de Hawkers — [research/design/eyewear-palette.md](../research/design/eyewear-palette.md). Contrastes WCAG **calculados**, no estimados.
+  - **Advertencia de calidad:** la mayoría de webs de marca bloquean el scraping (403 en Brandfetch, Ace & Tate, Cubitts, Warby Parker, Encycolorpedia) y los agregadores de «brand colors» se contradicen entre sí; varios admiten que sus valores no salen de guías oficiales. **No se ha usado ningún hex de marca ajena como referencia.**
+- **Alternatives** (a) Mantener la paleta anterior; (b) copiar el verde de óptica tipo Specsavers o el cerúleo de Warby Parker; (c) blanco puro minimalista.
+- **Decision** Escenario casi monocromo en marfil cálido con un **único acento coñac/tortoise**. Tokens, valores y contrastes en [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+- **Reason** En eyewear de moda **el color de marca no está en la interfaz: lo pone el producto**. Las paletas con color protagonista son de las *cadenas* de óptica, que venden confianza y precio, y nosotros hemos decidido no ser eso ([D-001](#d-001)). Copiar a Specsavers nos haría parecer una óptica; copiar a Warby Parker, su clon.
+- **Qué cambia, concretamente** Dos calibraciones, no una reescritura. La dirección anterior era correcta.
+  - `paper` `#f4f1ea` → **`#f7f5f1`**. Era beige editorial; el sector apunta a marfil claro y señala que el blanco opaco puro es difícil de vender en esta categoría.
+  - `accent` `#a84a14` → **`#7e4420`**. El naranja quemado caía cerca de *Energy Orange*, clasificado como **el color de mayor riesgo** de la temporada. El coñac sale del núcleo comercial real: marrón transparente, tortoise y negro.
+- **Impact** La guía es **vinculante**: no se introducen colores fuera de los ocho tokens, no hay hex escritos a mano en componentes, y cualquier cambio de token se revalida en contraste antes de entrar. Todos los pares de texto cumplen AA en los dos temas.
+- **Status note** Es una **hipótesis de diseño**, como los pesos del scoring: coherente con la categoría y legible, pero **sin ningún dato de conversión** detrás. Se recalibra con comportamiento real.
+
+<a id="d-019"></a>
+## D-019 · No mostramos precios en nuestra interfaz
+
+- **Date** 2026-10-09 · **Type** DECISIÓN · **Status** OPEN
+- **Context** Las tarjetas de recomendación mostraban el precio, siguiendo [CLAUDE.md §8.6](../CLAUDE.md) («precio aproximado»). El fundador lo señaló: **parece que se lo vamos a cobrar nosotros**.
+- **Evidence** Ninguna externa. Razonamiento de posicionamiento.
+- **Alternatives** (a) Mantener el precio como pedía §8.6; (b) mostrarlo marcado como aproximado y con estado de verificación —fue mi primer arreglo, y se quedaba corto porque resolvía la exactitud, no el problema—; (c) mostrar una banda de precio; (d) **quitarlo** ← elegida.
+- **Reason** El problema no era que el precio fuera inexacto: era **de quién parece el precio**. Una cifra junto a una montura en *nuestra* interfaz se lee como *nuestro* precio, y da a entender que vendemos nosotros. No vendemos: somos una capa de descubrimiento que lleva a la tienda ([D-001](#d-001)). El precio es del retailer y su sitio es su ficha, al otro lado de «ver dónde comprar».
+- **Impact**
+  - `FrameCard` no muestra precio. `formatPrice` eliminado de i18n.
+  - **El dato se queda**: `priceCents` y `priceStatus` siguen en `FrameProfile` porque los necesita el filtro de presupuesto y vendrán en el feed.
+  - El filtro de presupuesto se mantiene, reformulado como pregunta —«cuánto quieres gastar»— y con una línea explícita: *«Nosotros no vendemos gafas: el precio y la compra son de la tienda a la que te llevemos.»*
+  - Efecto lateral que mejora el filtro: con `priceStatus`, una montura **sin precio fiable queda excluida** de una búsqueda con presupuesto, en vez de colarse. Enseñar algo que puede costar el triple a quien acaba de decir cuánto quiere gastar es peor que no enseñar nada.
+- **Modifica** [CLAUDE.md §8.6](../CLAUDE.md), que lista «precio aproximado» entre los campos de la card. Queda sin efecto para la tarjeta de recomendación. §18.4 («precio vigente cuando esté verificado») sigue aplicando a la futura ficha de producto, donde el precio sí irá, **atribuido al retailer y con fecha**.
 
 ---
 

@@ -1,5 +1,6 @@
 import { clamp01, round3 } from "../face/classify";
 import type { FaceProfile, UserPreferences } from "../face/types";
+import { reliablePriceCents } from "../catalog/price";
 import type { FrameProfile } from "../catalog/types";
 import {
   BUDGET_TOLERANCE,
@@ -141,8 +142,9 @@ function categoryFit(
 ): RawComponent {
   const parts: number[] = [];
 
-  if (prefs.budgetMaxCents !== null && frame.priceCents !== null) {
-    const ratio = frame.priceCents / prefs.budgetMaxCents;
+  const price = reliablePriceCents(frame);
+  if (prefs.budgetMaxCents !== null && price !== null) {
+    const ratio = price / prefs.budgetMaxCents;
     // Dentro de presupuesto, puntúa igual: ser más barato no es mejor encaje.
     parts.push(ratio <= 1 ? 1 : clamp01(1 - (ratio - 1) / (BUDGET_TOLERANCE - 1)));
   }
@@ -224,9 +226,16 @@ function passesHardFilters(
   frame: FrameProfile,
 ): boolean {
   if (frame.category !== prefs.category) return false;
-  if (prefs.budgetMaxCents !== null && frame.priceCents !== null) {
-    if (frame.priceCents > prefs.budgetMaxCents * BUDGET_TOLERANCE) return false;
+
+  if (prefs.budgetMaxCents !== null) {
+    const price = reliablePriceCents(frame);
+    // Sin precio fiable no se puede sostener que encaje en el presupuesto, así
+    // que no se cuela. Lo contrario sería enseñar algo que puede costar el
+    // triple a alguien que acaba de decir cuánto quiere gastar.
+    if (price === null) return false;
+    if (price > prefs.budgetMaxCents * BUDGET_TOLERANCE) return false;
   }
+
   return true;
 }
 

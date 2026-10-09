@@ -38,7 +38,7 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Pieza | Estado |
 |---|---|
 | Esqueleto Next.js 16 + React 19 + Tailwind 4 + TS estricto | **HECHO** |
-| Design system (tokens, claro/oscuro, grano, tipografía) | **HECHO** |
+| Design system con paleta investigada y contrastes AA verificados | **HECHO** → [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) |
 | Landing mobile-first `/` | **HECHO** |
 | Base de i18n `es` + `en`, textos fuera de componentes | **HECHO** |
 | `FaceProfile` + clasificación de forma por pertenencia difusa | **HECHO** |
@@ -148,7 +148,9 @@ Nota de método: cuando el upload esté hecho, la plataforma pasa a ser el instr
 
 ## Current Decisions
 
-17 entradas en [DECISION_LOG.md](DECISION_LOG.md). En vigor y sin validar: D-001 a D-007, D-011, D-014, **D-017**. Aplazadas: D-010 (dominio y marca), D-012 (foto vs cámara). Descartadas: D-009 (nombres). Validadas: D-013, D-015, D-016.
+19 entradas en [DECISION_LOG.md](DECISION_LOG.md). En vigor y sin validar: D-001 a D-007, D-011, D-014, D-017, **D-018** (paleta), **D-019** (sin precios). Aplazadas: D-010 (dominio y marca), D-012 (foto vs cámara). Descartadas: D-009 (nombres). Validadas: D-013, D-015, D-016.
+
+D-019 deja sin efecto el «precio aproximado» que [CLAUDE.md §8.6](../CLAUDE.md) lista entre los campos de la card.
 
 **D-001 a D-014 están transcritas del repositorio, pendientes de ratificación del fundador.** D-016 además contiene una **decisión pendiente** sobre el orden de B1.
 
@@ -227,6 +229,8 @@ No: dominio, marca, logo, anuncios, Supabase, Next.js, herramientas de SEO ni su
 **Blocker resuelto:** [D-015](DECISION_LOG.md#d-015) ya no espera respuesta. Se contestó con términos publicados, sin preguntar a nadie y sin coste.
 
 ## Last Updated
+
+**2026-10-09** — paleta investigada y fijada como guía vinculante ([D-018](DECISION_LOG.md#d-018), [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)): escenario neutro cálido más un acento coñac derivado del núcleo comercial de la categoría, con contrastes AA calculados en ambos temas. Y se retiran los precios de la interfaz ([D-019](DECISION_LOG.md#d-019)): parecían nuestros, y no vendemos nosotros. 50 tests. Sin cambios en validación: el Track 0 sigue sin enviar.
 
 **2026-10-08 (2)** — arranca la construcción con muro de gates → [D-017](DECISION_LOG.md#d-017). Esqueleto, design system, landing, i18n, clasificación facial, motor de recomendación, catálogo con derechos en el tipo, adaptador de try-on y 39 tests. Seis rutas. Ninguna hipótesis de negocio validada: el Track 0 sigue sin enviar.
 

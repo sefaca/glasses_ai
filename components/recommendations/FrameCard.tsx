@@ -1,7 +1,6 @@
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { canTryOn, tryOnBlockedReason } from "@/lib/catalog/rights";
 import type { FrameProfile } from "@/lib/catalog/types";
-import { formatPrice, type Locale } from "@/lib/i18n";
 import { explainRecommendation, matchLabel } from "@/lib/recommendations/explain";
 import type { FrameScore } from "@/lib/recommendations/score";
 
@@ -22,7 +21,6 @@ interface FrameCardProps {
   score: FrameScore;
   position: number;
   shapeLabel: string;
-  locale?: Locale;
 }
 
 const BLOCKED_COPY: Record<string, string> = {
@@ -37,9 +35,7 @@ export function FrameCard({
   score,
   position,
   shapeLabel,
-  locale = "es",
 }: FrameCardProps) {
-  const price = formatPrice(frame.priceCents, locale);
   const label = matchLabel(score);
   // El mock es lo único conectado hoy: el proveedor real está detrás del muro
   // de gates de D-017.
@@ -68,17 +64,18 @@ export function FrameCard({
         />
       </div>
 
-      <div className="flex items-baseline justify-between gap-3">
-        <h3 className="font-display text-xl leading-tight">
-          {frame.model}
-          <span className="block text-xs font-sans tracking-wide text-muted">
-            {frame.brand} · {shapeLabel}
-          </span>
-        </h3>
-        {price && (
-          <p className="shrink-0 text-sm tabular-nums">{price}</p>
-        )}
-      </div>
+      {/*
+        Sin precio, a propósito → D-019. Un precio en nuestra interfaz se lee
+        como nuestro precio y da a entender que vendemos nosotros. El precio
+        es del retailer y aparece en su ficha, al otro lado de «ver dónde
+        comprar».
+      */}
+      <h3 className="font-display text-xl leading-tight">
+        {frame.model}
+        <span className="block font-sans text-xs tracking-wide text-muted">
+          {frame.brand} · {shapeLabel}
+        </span>
+      </h3>
 
       <p className="mt-3 grow text-sm leading-relaxed text-muted">
         {explainRecommendation(frame, score)}

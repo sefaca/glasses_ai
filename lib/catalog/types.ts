@@ -62,6 +62,22 @@ export interface FrameRights {
   note?: string;
 }
 
+/**
+ * Fiabilidad del precio.
+ *
+ * Misma disciplina que `FrameRights` y que el `estimated` del scoring: un dato
+ * que no hemos verificado no se presenta como un hecho. CLAUDE.md §18.4 pide
+ * «precio vigente cuando esté verificado», y un número inventado mostrado como
+ * precio autoritativo es exactamente lo que no podemos hacer.
+ */
+export type PriceStatus =
+  /** Verificado contra la fuente, con fecha. Se muestra tal cual. */
+  | "verified"
+  /** Referencia sin verificar. Se muestra **siempre** como aproximado. */
+  | "indicative"
+  /** No lo sabemos. No se muestra nada. */
+  | "unknown";
+
 /** Medidas en milímetros. `null` cuando la fuente no las da — GA-4. */
 export interface FrameMeasurements {
   /** Ancho total de la montura, sien a sien. El que más pesa en el encaje. */
@@ -85,6 +101,9 @@ export interface FrameProfile {
   thickness: number;
   measurements: FrameMeasurements;
   priceCents: number | null;
+  priceStatus: PriceStatus;
+  /** Fecha ISO de la última verificación del precio, o `null`. */
+  priceCheckedAt: string | null;
   currency: "EUR";
   styleTags: string[];
   /** Ficha pública del retailer. Nunca una URL de afiliado: eso va aparte. */

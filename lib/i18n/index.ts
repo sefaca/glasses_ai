@@ -27,15 +27,7 @@ export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
 }
 
-/** Precio en céntimos → texto localizado. `null` cuando no hay precio verificado. */
-export function formatPrice(
-  cents: number | null,
-  locale: Locale = DEFAULT_LOCALE,
-): string | null {
-  if (cents === null) return null;
-  return new Intl.NumberFormat(locale === "es" ? "es-ES" : "en-GB", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
-  }).format(cents / 100);
-}
+// Aquí había un `formatPrice`. Se ha eliminado: no mostramos precios en
+// nuestra interfaz → D-019. Cuando exista la ficha de producto y el precio se
+// muestre atribuido al retailer, volverá con el formato por moneda y país que
+// pide CLAUDE.md §21.

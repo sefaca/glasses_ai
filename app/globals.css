@@ -1,10 +1,20 @@
 @import "tailwindcss";
 
 /*
-  Sistema de diseño — «catálogo editorial de óptica».
-  Papel cálido, serif de alto contraste, grotesca para lo técnico, un único
-  acento ámbar de lente tintada. Nada de gradientes morados ni estética de SaaS:
-  el producto se parece más a una tienda que a una app.
+  Sistema de diseño. Guía vinculante en docs/DESIGN_SYSTEM.md, evidencia en
+  research/design/eyewear-palette.md, decisión en D-018.
+
+  Principio: en eyewear de moda el color de marca no está en la interfaz. El
+  producto pone el color y la UI es un escenario neutro. Las paletas con color
+  protagonista son de las cadenas de óptica —Specsavers verde, Afflelou rojo—
+  y nosotros no somos eso (D-001).
+
+  De ahí: marfil cálido dominante, un único acento coñac derivado del núcleo
+  comercial de la categoría (tortoise, marrón, negro), y casi monocromo para
+  que las monturas sean lo único con color propio.
+
+  Todos los pares de texto verificados en WCAG AA (≥4,5:1) en ambos temas.
+  Cualquier cambio de token se revalida antes de entrar.
 */
 
 @theme inline {
@@ -23,27 +33,27 @@
 
 :root {
   color-scheme: light;
-  --paper: #f4f1ea;
-  --surface: #fbf9f4;
-  --ink: #1a1713;
-  --muted: #6d6456;
-  --line: #ddd5c5;
-  --accent: #a84a14;
-  --accent-soft: #f0e2d2;
-  --on-accent: #fdfaf4;
+  --paper: #f7f5f1; /* marfil cálido; el blanco puro es difícil en eyewear */
+  --surface: #fffefc;
+  --ink: #1c1a17; /* no negro puro: sobre papel cálido corta */
+  --muted: #6b6258;
+  --line: #e3ded5;
+  --accent: #7e4420; /* coñac/tortoise, no naranja: Energy Orange es el color de mayor riesgo */
+  --accent-soft: #f0e5da;
+  --on-accent: #fdfbf8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --paper: #15130f;
-    --surface: #1d1a15;
-    --ink: #ece5d7;
-    --muted: #9c9283;
-    --line: #342f26;
-    --accent: #e0914f;
-    --accent-soft: #2a2118;
-    --on-accent: #15130f;
+    --paper: #141210;
+    --surface: #1c1916;
+    --ink: #ece7df;
+    --muted: #9b9289;
+    --line: #2f2b25;
+    --accent: #d08a52; /* coñac aclarado para mantener el contraste sobre oscuro */
+    --accent-soft: #2a2017;
+    --on-accent: #141210;
   }
 }
 
