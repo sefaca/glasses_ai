@@ -47,7 +47,9 @@ export function getTryOnProvider(): TryOnProvider {
       cached = new OpenAITryOnProvider({
         apiKey,
         model: process.env.TRYON_MODEL ?? "gpt-image-2",
-        quality: "high",
+        // La calidad manda sobre latencia y coste a la vez, así que es
+        // configurable: `high` tarda ~70 s, que no cabe en una petición web.
+        quality: parseQuality(process.env.TRYON_QUALITY) ?? "medium",
         size: "auto",
       });
       return cached;
@@ -80,4 +82,17 @@ export function hasRealProvider(): boolean {
 /** Para los tests: obliga a releer el entorno. */
 export function resetTryOnProvider(): void {
   cached = null;
+}
+
+type Quality = "low" | "medium" | "high" | "auto";
+
+/** Un valor desconocido se ignora en vez de tumbar la petición. */
+function parseQuality(value: string | undefined): Quality | null {
+  const normalised = value?.trim().toLowerCase();
+  return normalised === "low" ||
+    normalised === "medium" ||
+    normalised === "high" ||
+    normalised === "auto"
+    ? normalised
+    : null;
 }

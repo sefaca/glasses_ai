@@ -83,7 +83,9 @@ export class OpenAITryOnProvider implements TryOnProvider {
     this.apiKey = options.apiKey;
     this.model = options.model ?? "gpt-image-2";
     this.size = options.size ?? "auto";
-    this.quality = options.quality ?? "high";
+    // `medium` por defecto, medido: ~30 s frente a ~70 s de `high`, y la
+    // montura se reconoce igual. `high` no cabe en una petición web.
+    this.quality = options.quality ?? "medium";
     this.timeoutMs = options.timeoutMs ?? 120_000;
     this.fetchImpl = options.fetchImpl ?? fetch;
     this.now = options.now ?? (() => Date.now());
