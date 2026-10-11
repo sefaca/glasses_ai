@@ -50,6 +50,7 @@
 | [D-022](#d-022) | 2026-10-09 | Generar desde el conocimiento del modelo: tercera vía | HIPÓTESIS | OPEN |
 | [D-023](#d-023) | 2026-10-11 | La shortlist de nombres está entera ocupada; `.io` descartado | DECISIÓN | OPEN |
 | [D-024](#d-024) | 2026-10-11 | Nombre y dominio: **lookfit.app** | DECISIÓN | OPEN |
+| [D-025](#d-025) | 2026-10-11 | Código de acceso compartido, no rate limiting real, para abrir la alfa | DECISIÓN | OPEN |
 
 ---
 
@@ -361,6 +362,17 @@
 - **Descartado por colisión de marca** `mirafit` — Mirafit es una marca británica de material de gimnasio con web activa. Es exactamente la comprobación que pide §22.4.
 - **Consecuencia técnica no evidente** Todo el TLD `.app` está en la **lista de precarga HSTS**: los navegadores rechazan `http://` antes de conectar. Sin certificado el dominio **no carga en absoluto**, ni con aviso. El *redirect* que Namecheap crea por defecto apunta a `http://www.lookfit.app/` y por tanto **está roto de origen**; hay que borrarlo, igual que la *parking page*.
 - **Pendiente** La comprobación de marca en EUIPO y OEPM que exige §22.4 **sigue sin hacer**. Registrar un dominio no da derechos de marca.
+
+<a id="d-025"></a>
+## D-025 · Código de acceso compartido en vez de rate limiting real
+
+- **Date** 2026-10-11 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El dominio está comprado y el despliegue hecho ([D-024](#d-024)), así que la siguiente pregunta es si se puede meter `OPENAI_API_KEY` en producción. No se puede: cada generación cuesta ~0,10 € reales y nuestro `checkRateLimit` vive **en memoria del proceso**. En serverless cada instancia lleva su propia cuenta, así que un script con un bucle multiplica el límite por instancias. El `noindex` esconde la URL de Google, no de una persona.
+- **Decision** `ACCESS_CODE`, un código compartido comprobado en el servidor (`lib/server/access.ts`) antes del rate limiting y antes de tocar al proveedor. Sin la variable definida no hay puerta, que es lo que mantiene el desarrollo local sin fricción. El navegador lo guarda en `localStorage` y la UI lo pide solo cuando el servidor devuelve 401.
+- **Evidence** `[X]` La ruta rechaza con 401 `access_denied` toda petición sin código; 4 tests cubren el caso sin variable, el de espacios, el de cabecera ausente y el de código incorrecto.
+- **Lo que esto NO es** No es autenticación. No identifica a nadie, no caduca, no se revoca por usuario y quien tiene el código lo puede reenviar. No sustituye al **límite de gasto duro** del panel de OpenAI, que es la única red que no depende de nuestro código.
+- **Alternatives** (a) Upstash Redis para rate limiting persistente — la solución correcta, pero añade un servicio y una dependencia para enseñar el producto a diez personas, contra [CLAUDE.md §29.1](../CLAUDE.md); (b) Vercel Password Protection, que es de plan Pro; (c) dejar la URL abierta con el `noindex` como única defensa, que es apostar el saldo a que nadie encuentra la URL; (d) no desplegar con clave y quedarse en `mock`, que impide que alguien que no sea el fundador vea el producto real.
+- **Cuándo caduca esta decisión** Al abrir al público. Entonces hacen falta sesión anónima y rate limiting persistente, y la puerta estorba más de lo que protege. Queda escrito para que no se confunda con una solución de seguridad.
 
 ---
 

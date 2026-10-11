@@ -142,18 +142,27 @@ compute** el techo es de 300 s en Hobby, así que sobra margen — pero un
 proyecto con Fluid desactivado cae a los límites antiguos y **la ruta daría
 504**. Comprobarlo en la configuración del proyecto.
 
-### ⚠️ No pongas la clave de OpenAI todavía
+### Antes de meter la clave de OpenAI
 
 Con una URL pública, cada generación cuesta ~0,10 € **de tu bolsillo**, y
 nuestro límite de uso vive en memoria del proceso: en serverless cada
 instancia lleva su propia cuenta, así que contra un script no sirve de nada.
 El `noindex` evita que te encuentre Google, no una persona.
 
-Antes de meter `OPENAI_API_KEY` en producción hacen falta las dos cosas:
+Hacen falta las dos cosas, y en este orden:
 
-- **límite de gasto duro** en el panel de OpenAI — la única red que no
-  depende de nuestro código;
-- **rate limiting de verdad** (Upstash o Supabase) o una puerta de acceso.
+1. **Límite de gasto duro** en el panel de OpenAI. Es la única red que no
+   depende de nuestro código, así que va primero.
+2. **`ACCESS_CODE`** en las variables de Vercel, con cualquier cadena que no
+   se adivine. La ruta de generación rechaza con 401 todo lo que no lo
+   traiga, y la web pide el código la primera vez que alguien genera. Sin esa
+   variable **no hay puerta**: la URL queda abierta.
+
+`ACCESS_CODE` no es autenticación y no lo pretende — convierte una URL
+pública en una alfa privada. Para abrir al público hacen falta sesión anónima
+y rate limiting persistente (Upstash o Supabase).
+
+En local se deja sin definir y no estorba.
 
 ## Privacidad
 

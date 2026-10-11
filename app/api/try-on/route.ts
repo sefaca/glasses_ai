@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { findFrameById } from "@/lib/catalog";
 import { canLabelAsProduct, canTryOn } from "@/lib/catalog/rights";
+import { ACCESS_HEADER, checkAccess } from "@/lib/server/access";
 import { checkRateLimit, pruneRateLimits } from "@/lib/server/rate-limit";
 import { buildTryOnPrompt, PROMPT_VERSION } from "@/lib/tryon/prompt";
 import { getTryOnProvider, hasRealProvider } from "@/lib/tryon/registry";
@@ -49,6 +50,15 @@ export async function POST(request: Request) {
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     request.headers.get("x-real-ip") ??
     "unknown";
+
+  // La puerta va antes que nada: si hay código configurado y no viene, no se
+  // gasta ni una comprobación más, y desde luego no se llama al proveedor.
+  if (checkAccess(request.headers.get(ACCESS_HEADER)) === "denied") {
+    return NextResponse.json(
+      { status: "failed", errorCode: "access_denied" },
+      { status: 401 },
+    );
+  }
 
   pruneRateLimits();
   const limit = checkRateLimit(`try-on:${ip}`, RATE_LIMIT);

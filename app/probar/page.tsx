@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { BrandPicker } from "@/components/brands/BrandPicker";
+import { AccessGate } from "@/components/flow/AccessGate";
 import { StepHeader } from "@/components/flow/StepHeader";
 import { StaggerItem, StepPanel } from "@/components/flow/StepPanel";
 import { FrameCard } from "@/components/recommendations/FrameCard";
@@ -24,7 +25,7 @@ import {
   suggestionsAreMeaningful,
 } from "@/lib/recommendations/brands";
 import { recommend } from "@/lib/recommendations/score";
-import { requestTryOn } from "@/lib/tryon/client";
+import { readAccessCode, requestTryOn } from "@/lib/tryon/client";
 
 /**
  * Flujo de una sola pantalla: **foto → marcas → elegir → resultado**.
@@ -71,6 +72,11 @@ export default function ProbarPage() {
   const [generations, setGenerations] = useState<
     Record<string, GenerationState | undefined>
   >({});
+  /** Montura que espera a que se introduzca el código de acceso. */
+  const [pendingAccess, setPendingAccess] = useState<{
+    frameId: string;
+    retry: boolean;
+  } | null>(null);
 
   const profile = session?.profile ?? null;
   const shapeLabels = dict.frames.shapes as Record<string, string>;
@@ -123,7 +129,22 @@ export default function ProbarPage() {
         [frameId]: { phase: "generating" },
       }));
 
+      // Si había código guardado y aun así se rechaza, es que está mal.
+      const hadCode = Boolean(readAccessCode());
       const result = await requestTryOn(frameId, session.photo);
+
+      if (result.status === "needs-access") {
+        // Sin estado de fallo: no ha fallado nada, falta un paso. La tarjeta
+        // vuelve a quedar como estaba y el panel pide el código.
+        setGenerations((current) => {
+          const next = { ...current };
+          delete next[frameId];
+          return next;
+        });
+        setPendingAccess({ frameId, retry: hadCode });
+        return;
+      }
+
       setGenerations((current) => ({
         ...current,
         [frameId]:
@@ -180,6 +201,18 @@ export default function ProbarPage() {
 
   return (
     <div className="min-h-dvh">
+      {pendingAccess && (
+        <AccessGate
+          retry={pendingAccess.retry}
+          onSubmit={() => {
+            const { frameId } = pendingAccess;
+            setPendingAccess(null);
+            void startGeneration(frameId);
+          }}
+          onCancel={() => setPendingAccess(null)}
+        />
+      )}
+
       <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6 sm:px-8">
         <Link href="/" aria-label="Inicio" className="text-accent">
           <FrameGlyph shape="round" thickness={0.3} className="h-6 w-auto" />

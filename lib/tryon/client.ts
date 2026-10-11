@@ -1,4 +1,29 @@
+import { ACCESS_HEADER } from "../server/access";
 import type { UploadPayload } from "../upload/prepare";
+
+/**
+ * El código de acceso se guarda en el navegador para no pedirlo en cada
+ * prueba. Es una comodidad de alfa privada, no un mecanismo de seguridad:
+ * quien tiene el código lo tiene, esté donde esté guardado.
+ */
+const ACCESS_STORAGE_KEY = "lookfit.accessCode";
+
+export function readAccessCode(): string | null {
+  try {
+    return window.localStorage.getItem(ACCESS_STORAGE_KEY);
+  } catch {
+    // Ventana privada o almacenamiento bloqueado: se pedirá cada vez.
+    return null;
+  }
+}
+
+export function saveAccessCode(code: string): void {
+  try {
+    window.localStorage.setItem(ACCESS_STORAGE_KEY, code.trim());
+  } catch {
+    // Si no se puede guardar, la petición de esta sesión igualmente funciona.
+  }
+}
 
 /**
  * Cliente del endpoint de try-on.
@@ -16,6 +41,8 @@ export type TryOnClientResult =
       /** `true` ⇒ no hay proveedor real detrás; es el mock. */
       simulated: boolean;
     }
+  /** Hace falta código de acceso. La UI debe pedirlo, no mostrar un error. */
+  | { status: "needs-access" }
   | { status: "failed"; message: string };
 
 /** Códigos del servidor → algo que una persona pueda hacer al respecto. */
@@ -37,11 +64,16 @@ export async function requestTryOn(
   photo: UploadPayload,
   signal?: AbortSignal,
 ): Promise<TryOnClientResult> {
+  const accessCode = readAccessCode();
   let response: Response;
   try {
     response = await fetch("/api/try-on", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        // Si no hay código, no se manda la cabecera: en local no hay puerta.
+        ...(accessCode ? { [ACCESS_HEADER]: accessCode } : {}),
+      },
       signal,
       body: JSON.stringify({
         frameId,
@@ -76,5 +108,8 @@ export async function requestTryOn(
   }
 
   const code = payload.errorCode ?? "unknown";
+  // La puerta no es un error del usuario: es un paso que falta. La UI pide el
+  // código en lugar de enseñar un fallo.
+  if (code === "access_denied") return { status: "needs-access" };
   return { status: "failed", message: MESSAGES[code] ?? MESSAGES.unknown! };
 }

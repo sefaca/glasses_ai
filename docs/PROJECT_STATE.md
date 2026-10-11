@@ -59,9 +59,11 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Catálogo real: 24 monturas de 13 marcas, con referencia | **HECHO** — sin imágenes suyas |
 | Registro de 34 marcas con grupo propietario y accesibilidad | **HECHO** → [brands.ts](../lib/catalog/brands.ts) |
 | Sugerencia de marcas según las proporciones del rostro | **HECHO** |
-| 123 tests · build, typecheck y lint en verde | **HECHO** |
+| 141 tests · build, typecheck y lint en verde | **HECHO** |
+| Dominio `lookfit.app` y despliegue en Vercel | **HECHO** → [D-024](DECISION_LOG.md#d-024). DNS sin conectar |
+| Puerta de acceso `ACCESS_CODE` en la ruta de generación | **HECHO** → [D-025](DECISION_LOG.md#d-025) |
 | Analítica del embudo y outbound clicks | pendiente |
-| Supabase, rate limiting, deploy | pendiente |
+| Supabase, rate limiting persistente | pendiente — la puerta es un apaño de alfa, no la solución |
 | **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |
 | **Imágenes y marcas de terceros** | **bloqueado** — GA-1, [D-015](DECISION_LOG.md#d-015) |
 | **URLs de afiliado** | **bloqueado** — GA-3 |
