@@ -36,9 +36,10 @@ sin nivel de evidencia; nada de contenido facial en material de marketing; no so
 
 - **Hosting real**: Vercel. Proyecto `lookfit`, producción en `lookfit-brown.vercel.app`
   `[X]` verificado 2026-10-11 (200, ~0,6 s).
-- **Dominio**: `lookfit.app` (Namecheap, registro A → Vercel). **DNS sin propagar** a fecha
-  de hoy. Todo el TLD `.app` está en precarga HSTS → sin certificado el dominio no carga
-  → [D-024](DECISION_LOG.md#d-024).
+- **Dominio**: `lookfit.app` (Namecheap). **No es que el DNS no haya propagado: no hay
+  registro.** `[X]` 2026-10-11, `dns1.registrar-servers.com` no devuelve A para el apex y
+  `www` es NXDOMAIN; solo existe el TXT de SPF. Hay que crearlos. Todo el TLD `.app` está
+  en precarga HSTS → sin certificado el dominio no carga → [D-024](DECISION_LOG.md#d-024).
 - **Cómo se publica**: push a `main` → build automático en Vercel. `prebuild` descarga los
   activos de MediaPipe (~41 MB), por eso `public/mediapipe/` no está en git.
 - **Sitemaps / robots.txt / llms.txt**: **no existen todavía.** El sitio entero está en
@@ -53,9 +54,20 @@ sin nivel de evidencia; nada de contenido facial en material de marketing; no so
 Pendiente de la primera ronda de research. Lo que hay hasta ahora es **Google Trends, que
 no es volumen de búsqueda** — §23 Paso 1 lo prohíbe expresamente como sustituto.
 
+Cinco grupos en ES, ya cargados en [tracker.config.json](../growth/tracker.config.json).
+**Volumen `[?]` en todos** hasta la ronda 1 de Keyword Planner: lo que hay es criterio, no
+datos.
+
 | Grupo | Keywords | Intención | Encaje negocio |
 |---|---|---|---|
-| — | pendiente de GK-1 | — | — |
+| `es_forma` | wayfarer · aviador · redondas · cuadradas · rectangulares | Comparar | **Alto** — es el cluster B de §18.2 y donde el catálogo da para escribir |
+| `es_modelo_talla` | rb3025 · rb2140 · rb2132 · rb3016 · tallas · aviator o wayfarer | Transaccional | **Alto** — long-tail de entidad, la señal temprana |
+| `es_probador` | probar gafas online · probador (virtual) de gafas · simulador | Transaccional | **Alto**, pero la SERP la ocupan proveedores B2B `[T]` |
+| `es_cara` | cara redonda · cara cuadrada · qué gafas me favorecen | Informacional | **Medio** — §1.2 ya avisó de que es más débil de lo que parece |
+| `es_medidas` | números de las gafas · medidas · ancho · talla | Informacional | **Medio** — barata de ganar y buena para citas en buscadores de IA |
+
+Los cuatro idiomas restantes están en `keywordsPlanned`, que el script ignora: sus grupos se
+mueven a `keywords` el día que el idioma abra.
 
 Criterio de prioridad: **volumen × encaje con el cliente ideal**. Una keyword de alto
 volumen y mal encaje vale menos que una de volumen medio que coincide con quien compra.
@@ -64,7 +76,8 @@ volumen y mal encaje vale menos que una de volumen medio que coincide con quien 
 
 | Fecha | Acción | Resultado / siguiente paso |
 |---|---|---|
-| 2026-10-11 | Sistema de growth instalado (agente `growth-seo-expert` + tracker semanal + workflows) | Nada que medir todavía: sin dominio propagado, sin Search Console y con el sitio en `noindex` |
+| 2026-10-11 | **Plan de posicionamiento multilingüe trazado** (pendiente de ratificar). Diagnóstico `[X]`: `lookfit.app` sin registro A en el servidor autoritativo y `www` NXDOMAIN; `robots.txt` y `sitemap.xml` 404; `noindex` global; VisuTry cubre 9 idiomas **sin italiano**, ~109 URLs por idioma y localización superficial (H1 en inglés). Propuesta: publicar **solo ES**, fontanería i18n para los cinco, segundo idioma por gate G1. `tracker.config.json` aplicado | Siguiente: crear A `@` y CNAME `www`; crear `sc-domain:lookfit.app`; ronda 1 de Keyword Planner en ES; decidir quién firma las guías y quién revisa italiano |
+| 2026-10-11 | Sistema de growth instalado (agente `growth-seo-expert` + tracker semanal + workflows) | Nada que medir todavía: sin dominio resuelto, sin Search Console y con el sitio en `noindex` |
 
 ## 5. Aprendizajes validados
 
@@ -85,6 +98,16 @@ Se marcan como heredados hasta que los confirme un dato nuestro.
 - `[X] 2026-10-11` **El `.com` internacional de este nicho está agotado.** ~190 dominios
   comprobados por RDAP, cero libres con raíz inglesa → [D-024](DECISION_LOG.md#d-024). Afecta
   al SEO de marca: la búsqueda «lookfit» competirá con lo que haya en `lookfit.com`.
+- `[X] 2026-10-11` **«Sin propagar» puede ser «sin registro».** Antes de esperar a la
+  propagación, preguntar al **servidor autoritativo**:
+  `nslookup -type=A lookfit.app dns1.registrar-servers.com`. Para `lookfit.app` no había ni
+  A ni `www`: no había nada que propagar, había que crearlos.
+- `[X] 2026-10-11` **VisuTry no está en italiano y su localización es superficial.** Nueve
+  idiomas en su sitemap (en, id, ar, ru, de, ja, es, pt, fr), `/it` → 404, ~109 URLs por
+  idioma — pero el H1 de `/es/try-on/glasses` sigue en inglés y `/es/brand/oakley` titula
+  «Oakley Virtual Try-On Guide». La SERP de «probar gafas online» en ES, IT, DE y PT la
+  ocupan proveedores B2B y herramientas genéricas, no contenido de consumidor `[T]`. La
+  diferenciación real por idioma es **localizar de verdad, no traducir**.
 - `[X] 2026-10-11` **Verificar disponibilidad por RDAP, nunca por DNS.** Hay resolvers que
   secuestran NXDOMAIN, y RDAP puede devolver 200 con cuerpo vacío al limitar peticiones:
   hay que comprobar que venga `ldhName`. Dos informes míos de «0 libres» fueron falsos por
@@ -109,7 +132,35 @@ Actions → `index-check` (URL Inspection API, cuota ~2.000/día) → `growth/sn
 
 ## 7. Backlog de experimentos (priorizado)
 
-Pendiente del plan que trace el agente.
+Gates propuestos **antes** de ver datos, para no acomodarlos al resultado. Son hipótesis, no
+verdades. Lectura de cualquiera: nunca por debajo de 10 impresiones por query.
+
+| ID | Hipótesis | Métrica | Abandono |
+|---|---|---|---|
+| E-01 | Las páginas de forma con datos y diagramas propios (wayfarer, aviador, redondas, cuadradas) se indexan en ≤6 semanas | % de URLs indexadas (`index-check`) y queries con ≥10 impresiones | <50 % indexadas a las 16 semanas desde G0, o cero queries con ≥10 impresiones |
+| E-02 | Las fichas de talla (RB3025, RB2140 vs RB2132) son la señal temprana de long-tail | Impresiones por tallo (`rb3025`, `rb2132`) | Sin impresiones a las 10 semanas |
+| E-03 | Las guías de cara redonda y cuadrada hacen hueco frente a VisuTry porque la SERP ES es débil | Impresiones y posición en «gafas de sol cara redonda» | Ninguna página >10 impresiones a las 12 semanas |
+| E-04 | `/guias/probar-gafas-online` captura el cluster E **sin prometer fidelidad** | Impresiones en «probador» / «probar gafas online» | Sin impresiones a las 12 semanas |
+| E-05 | La previsualización gratuita convierte tráfico orgánico | `preview_completed` por sesión orgánica, 4 semanas | <20 en 4 semanas con tráfico suficiente: revisar el CTA antes de abrir idiomas |
+| E-06 | El segundo idioma se elige por datos (IT por defecto, EN si gana el desempate) | Tramo de volumen de anclas · `serp_owners` débiles · revisor con nombre | Sin revisor, no abre |
+| E-07 | LATAM es una variante léxica, no un idioma nuevo (`es-mx`) | % de impresiones ES desde MX, AR, CO, CL | <25 % durante 4 semanas: no se abre |
+| E-08 | GEO: las páginas de medidas y de mecanismo se citan en buscadores de IA | Auditoría mensual, 10 preguntas reales en ES, cita sí/no por fuente | Sin citas tras 3 auditorías: revisar formato, no abandonar |
+| E-09 | pt-BR como apuesta tardía y contraestacional | Impresiones desde BR | Solo si G2 se cumple |
+
+### Oportunidades descartadas, para que conste que se valoraron
+
+- **«Probar Ray-Ban / Oakley / Persol online»** — las keywords de más intención del nicho.
+  Exigen presentar una generación como ese modelo y `GENERATIVE_FIDELITY_VERIFIED = false`.
+  Reabre solo tras GT-1 ≥70 %. Mientras tanto se atacan con «previsualiza el tamaño sobre tu
+  cara», que es lo que sí hacemos.
+- **«Poner gafas a una foto con IA»** (Fotor, insMind, Dreamina) — volumen de
+  entretenimiento. Choca con la regla 19: no somos un generador de imágenes genérico.
+- **Páginas «modelo × forma de cara × género»** al estilo VisuTry, ~109 por idioma.
+  Prohibidas por §0 y por la política de contenido escalado de Google `[D]`.
+- **Keywords de precio, outlet o «comprar Ray-Ban barato»** — no vendemos, y
+  [D-019](DECISION_LOG.md#d-019) prohíbe precios.
+- **Logotipos o lenguaje de «tienda oficial»** — sin acuerdo no hay partner
+  → [D-021](DECISION_LOG.md#d-021).
 
 ## 8. Baseline (antes de empezar)
 

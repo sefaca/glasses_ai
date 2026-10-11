@@ -1,26 +1,117 @@
 {
-  "$comment": "Config del rank tracker semanal. La cura el agente growth-seo-expert: añadir/quitar keywords y competidores es editar este archivo. Las URLs de competidores con status != 200 en dos snapshots seguidos deben corregirse.",
-  "site": "sc-domain:tudominio.com",
-  "siteUrl": "https://tudominio.com",
-  "brandRegex": "tumarca|tu marca",
+  "$comment": "lookfit.app. Curada por growth-seo-expert. 'sin datos' en keywords no publicadas = no hay impresiones, no es una caida. EXCEPCION: 'TRIPWIRE VisuTry IT' devuelve 404 a proposito; alerta si pasa a 200. Hashes de contenido de retailers = ruido; solo cuentan title, status o >25% de palabras. 'keywordsPlanned' lo ignora el script: al abrir un idioma, su grupo se mueve a 'keywords'.",
+  "site": "sc-domain:lookfit.app",
+  "siteUrl": "https://lookfit.app",
+  "brandRegex": "lookfit|look fit",
   "sitemapsDir": "public",
   "sitemaps": [
-    "https://tudominio.com/sitemap.xml"
+    "https://lookfit.app/sitemap.xml"
   ],
   "gscSites": [
-    "sc-domain:tudominio.com"
+    "sc-domain:lookfit.app"
   ],
   "keywords": {
-    "principal": [
-      "keyword objetivo 1",
-      "keyword objetivo 2 ciudad"
+    "es_forma": [
+      "gafas de sol wayfarer",
+      "gafas de sol aviador",
+      "gafas de sol redondas",
+      "gafas de sol cuadradas",
+      "gafas de sol rectangulares"
     ],
-    "secundaria": [
-      "keyword b2b o de otro segmento"
+    "es_modelo_talla": [
+      "rb3025",
+      "rb2140",
+      "rb2132",
+      "rb3016",
+      "ray-ban aviator tallas",
+      "aviator o wayfarer"
+    ],
+    "es_probador": [
+      "probar gafas online",
+      "probador de gafas",
+      "probador virtual de gafas",
+      "probar gafas de sol",
+      "gafas virtuales",
+      "simulador de gafas"
+    ],
+    "es_cara": [
+      "gafas de sol cara redonda",
+      "gafas de sol cara cuadrada",
+      "qué gafas me quedan bien",
+      "qué gafas me favorecen"
+    ],
+    "es_medidas": [
+      "números de las gafas",
+      "medidas de las gafas",
+      "ancho de gafas",
+      "talla de gafas"
+    ]
+  },
+  "keywordsPlanned": {
+    "it": [
+      "provare occhiali online",
+      "prova occhiali virtuale",
+      "occhiali da sole aviator",
+      "misure ray-ban aviator",
+      "occhiali da sole viso rotondo",
+      "numeri sugli occhiali"
+    ],
+    "en": [
+      "virtual glasses try on",
+      "try on sunglasses online",
+      "aviator sunglasses",
+      "ray-ban aviator size",
+      "sunglasses for round face",
+      "numbers on glasses mean"
+    ],
+    "de": [
+      "brille virtuell anprobieren",
+      "sonnenbrille anprobieren",
+      "pilotenbrille",
+      "ray-ban aviator größe",
+      "sonnenbrille rundes gesicht",
+      "zahlen auf der brille"
+    ],
+    "pt-br": [
+      "provador virtual de óculos",
+      "provar óculos online",
+      "óculos de sol aviador",
+      "tamanho ray-ban aviator",
+      "óculos de sol rosto redondo",
+      "números dos óculos"
     ]
   },
   "competitors": [
-    { "name": "Competidor A (tipo)", "url": "https://competidor-a.com/" },
-    { "name": "Competidor B (tipo)", "url": "https://competidor-b.com/pagina-clave" }
+    { "name": "VisuTry P ES try-on", "url": "https://www.visutry.com/es/try-on/glasses" },
+    { "name": "VisuTry P ES forma de cara", "url": "https://www.visutry.com/es/glasses-for-face-shape" },
+    { "name": "VisuTry P ES marca Oakley", "url": "https://www.visutry.com/es/brand/oakley" },
+    { "name": "VisuTry P EN try-on", "url": "https://www.visutry.com/en/try-on/glasses" },
+    { "name": "VisuTry P DE try-on", "url": "https://www.visutry.com/de/try-on/glasses" },
+    { "name": "VisuTry P PT try-on", "url": "https://www.visutry.com/pt/try-on/glasses" },
+    { "name": "VisuTry sitemap core", "url": "https://www.visutry.com/sitemaps/core.xml" },
+    { "name": "TRIPWIRE VisuTry IT (404 esperado)", "url": "https://www.visutry.com/it" },
+    { "name": "SpecFit P", "url": "https://specfit.app/" },
+    { "name": "VirtualGlassesTryOn P", "url": "https://virtualglassestryon.ai/" },
+    { "name": "Afflelou ES C", "url": "https://www.afflelou.es/gafas-de-sol" },
+    { "name": "MultiOpticas ES C", "url": "https://www.multiopticas.com/gafas-de-sol" },
+    { "name": "General Optica ES C", "url": "https://www.generaloptica.es/" },
+    { "name": "Opticalia ES C", "url": "https://www.opticalia.com/" },
+    { "name": "Vision Express UK C try-on", "url": "https://www.visionexpress.com/sunglasses/virtual-try-on" },
+    { "name": "Warby Parker US C", "url": "https://www.warbyparker.com/sunglasses" },
+    { "name": "FramesDirect EN guia cara redonda", "url": "https://www.framesdirect.com/knowledge-center/best-sunglasses-for-round-faces" },
+    { "name": "Fotor generativo", "url": "https://www.fotor.com/features/virtual-try-on-glasses/" },
+    { "name": "Visiofactory Ray-Ban fitting", "url": "https://www.visiofactory.com/en/sunglasses/ray-ban/virtual-fitting/" },
+    { "name": "Amazon IT virtual try-on C", "url": "https://www.amazon.it/virtualtryon" },
+    { "name": "SmartBuyGlasses IT C", "url": "https://www.smartbuyglasses.it/occhiali-da-sole" },
+    { "name": "Occhiali24 IT C", "url": "https://www.occhiali24.it/" },
+    { "name": "Mister Spex IT C", "url": "https://www.misterspex.it/" },
+    { "name": "Mister Spex DE C pilotenbrillen", "url": "https://www.misterspex.de/sonnenbrillen/pilotenbrillen" },
+    { "name": "Fielmann DE C", "url": "https://www.fielmann.de/sonnenbrillen/" },
+    { "name": "Otto DE C", "url": "https://www.otto.de/herren/accessoires/brillen/sonnenbrillen/" },
+    { "name": "insMind DE generativo", "url": "https://www.insmind.com/de-de/bild-werkzeuge/virtuelle-brillenanprobe" },
+    { "name": "Chilli Beans BR C", "url": "https://www.chillibeans.com.br/" },
+    { "name": "Oticas Carol BR C", "url": "https://www.oticascarol.com.br/" },
+    { "name": "Oticas Diniz BR C", "url": "https://www.oticasdiniz.com.br/" },
+    { "name": "Mercado Livre BR aviador", "url": "https://lista.mercadolivre.com.br/oculos-aviador-feminino" }
   ]
 }

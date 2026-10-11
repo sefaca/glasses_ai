@@ -56,7 +56,7 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Comparación de 2–4 monturas sobre la misma cara | **HECHO** |
 | Lectura cualitativa de ajuste por anchura | **HECHO** |
 | Flujo **foto → marcas → simulaciones** | **HECHO** |
-| Catálogo real: 24 monturas de 13 marcas, con referencia | **HECHO** — sin imágenes suyas |
+| Catálogo real: **23 monturas de 14 marcas**, con referencia | **HECHO** — sin imágenes suyas. Recuento `[X]` verificado 2026-10-11 contra `frames.ts`; antes decía 24/13 |
 | Registro de 34 marcas con grupo propietario y accesibilidad | **HECHO** → [brands.ts](../lib/catalog/brands.ts) |
 | Sugerencia de marcas según las proporciones del rostro | **HECHO** |
 | 141 tests · build, typecheck y lint en verde | **HECHO** |
