@@ -20,6 +20,12 @@ export interface Dictionary {
     ctaSecondary: string;
     note: string;
   };
+  demo: {
+    /** Advertencia obligatoria: la persona y las monturas son generadas. */
+    disclaimer: string;
+    original: string;
+    items: ReadonlyArray<{ model: string; reference: string }>;
+  };
   steps: {
     label: string;
     items: ReadonlyArray<{ title: string; body: string }>;

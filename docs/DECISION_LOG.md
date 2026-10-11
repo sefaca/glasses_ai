@@ -48,6 +48,7 @@
 | [D-020](#d-020) | 2026-10-09 | Previsualización de proporción: esquema a escala, **no** try-on | DECISIÓN | OPEN |
 | [D-021](#d-021) | 2026-10-09 | Corrección: nombrar no requiere permiso. Tres permisos, no uno | DECISIÓN | OPEN |
 | [D-022](#d-022) | 2026-10-09 | Generar desde el conocimiento del modelo: tercera vía | HIPÓTESIS | OPEN |
+| [D-023](#d-023) | 2026-10-11 | La shortlist de nombres está entera ocupada; `.io` descartado | DECISIÓN | OPEN |
 
 ---
 
@@ -329,6 +330,23 @@
 - **Validates if** GT-1: ≥70 % de acierto en test ciego de 3 opciones. Entonces la bandera pasa a `true` y la misma imagen puede llevar marca, modelo y referencia.
 - **Falsified if** <50 %. El flujo seguiría funcionando pero sin poder enlazar a una referencia concreta: sería descubrimiento de estilo, no de producto.
 - **Pendiente de comprobar** Los términos del proveedor generativo —algunos restringen generar marcas de terceros— y que esta ruta **sí envía la foto fuera del dispositivo**, lo que reabre el bloque de privacidad: DPA, transferencia internacional y retención.
+
+<a id="d-023"></a>
+## D-023 · La shortlist de nombres está ocupada entera; `.io` descartado
+
+- **Date** 2026-10-11 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El fundador reabre [D-010](#d-010) para desplegar, pidiendo «el mejor para posicionar pero más barato» y preguntando si sirve `.io`.
+- **Evidence** `[X]` 45 dominios comprobados por **RDAP de Verisign**, que es autoritativo para `.com` — no por DNS, que no vale: hay resolvers que secuestran NXDOMAIN, y el registro `.es` responde a todo.
+- **Hallazgo que invalida parte de [D-009](#d-009)/[D-010](#d-010)** Las cinco candidatas de [CLAUDE.md §22.3](../CLAUDE.md) —**Fitalens, Frameora, Gafora, Vistria, Optifora**— están **todas registradas**, y varias apuntan a servidores de aparcamiento, es decir en venta y caras. El screening de §22.4 decía que no demostraba disponibilidad; ahora está comprobado que no la había.
+  - De 25 nombres construidos con criterio, **solo `miradda.com` libre**. Su doble `d` filtra tráfico a `mirada.com`, que está pillado.
+  - Dos de los libres son trampas en español: **`lentisimo`** se lee «lentísimo» y **`gafado`** significa gafado.
+- **`.io`: descartado, por tres razones**
+  1. **No es más barato: es 4–7× más caro.** Renovación ~46–75 $/año frente a ~10 $ del `.com` `[T]`.
+  2. **No posiciona mejor.** Google trata los gTLD por igual y a `.io` como gTLD genérico pese a ser técnicamente ccTLD. La extensión no es señal de ranking `[T]`.
+  3. **Riesgo de existencia.** Depende del Territorio Británico del Océano Índico, transferido a Mauricio por tratado en mayo de 2025. Los ccTLD se apoyan en códigos ISO 3166 `[T]`.
+- **Decision sobre TLD** `.com` en **Cloudflare Registrar**, a precio de coste (~10,46 $/año, misma renovación) `[T]`. Alternativa independiente: Porkbun ~11 $. **Namecheap no**: barato el primer año, 18,48 $ al renovar. Ojo: Verisign sube el `.com` un 7 % el 1 de noviembre de 2026.
+- **Único efecto SEO real de un TLD** Un ccTLD como `.es` da geolocalización a España, que ayuda hoy y estorba cuando toque LATAM e inglés ([CLAUDE.md §21](../CLAUDE.md)). No es gratis como decisión.
+- **Pendiente** Hace falta **otra ronda de naming**: no hay candidato bueno y comprar uno mediocre por cerrar el tema sería peor que esperar. Los nombres descartados de §22.2 siguen descartados.
 
 ---
 

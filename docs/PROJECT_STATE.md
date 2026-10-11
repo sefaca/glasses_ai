@@ -245,7 +245,23 @@ No: dominio, marca, logo, anuncios, Supabase, Next.js, herramientas de SEO ni su
 | **8 vulnerabilidades de npm, todas en devDependencies** (vitest/tinypool y eslint-config-next→micromatch). Ninguna en `dependencies` ni en nada que llegue al navegador. El arreglo es vitest 5, que **exige Node ≥20.19 y aquí hay 20.14**, así que su binario nativo no instala. Subir a Node 20.19+ o 22 LTS las reduciría a las de eslint | requiere acción del fundador |
 | **Oclusión fuerte no se detecta.** CLAUDE.md §8.4 la pide; MediaPipe no da confianza por landmark y detectarla de verdad necesitaría otro modelo. Declarado en `KNOWN_GAPS` para que nadie asuma cobertura que no existe | aceptado |
 
+## Open Questions — cobro
+
+**Pasarela, sin decidir.** Investigado el 2026-10-11, pendiente de ratificación y de confirmar con un gestor:
+
+| | Stripe | Paddle |
+|---|---|---|
+| Comisión | ~1,5 % + 0,25 € (EU) | 5 % + 0,50 $ |
+| IVA europeo | lo declaras tú (+0,5 % con Stripe Tax) | lo gestiona Paddle |
+| Packs <10 $ | sin problema | **exige precio a medida** |
+
+- Ese último punto choca con [CLAUDE.md §16](../CLAUDE.md), que propone packs de **2,99 € y 5,99 €**: los dos por debajo del umbral de Paddle.
+- **Lemon Squeezy descartado** pese a ser la opción obvia: lo compró Stripe, su CEO reconoció en enero de 2026 que el soporte iba lento porque el equipo construye el producto de Stripe, y hay señales de altas restringidas `[T]`.
+- **Recomendación: Stripe + Stripe Tax.** El mercado inicial es España, así que el IVA es mayoritariamente doméstico, y ~2 % frente a ~5 % importa sobre un ticket de 3 €.
+
 ## Last Updated
+
+**2026-10-11** — diseño: demostración real en la landing con las tres imágenes generadas (persona sintética, declarado), transiciones entre pasos y entrada escalonada. Dominio: la shortlist de nombres está **ocupada entera** y `.io` queda descartado → [D-023](DECISION_LOG.md#d-023). Cobro: investigado, sin decidir.
 
 **2026-10-09 (4)** — flujo **foto → marcas → simulaciones** y catálogo real: 24 monturas de 13 marcas con referencia, registro de 34 marcas con grupo propietario, y sugerencia de marcas por rostro. Dos correcciones de razonamiento: **nombrar una montura no requiere permiso** ([D-021](DECISION_LOG.md#d-021)) y **generar desde el conocimiento del modelo es una tercera vía** que no toca los términos de afiliación ([D-022](DECISION_LOG.md#d-022)). 123 tests.
 

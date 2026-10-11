@@ -25,6 +25,15 @@ export const en: Dictionary = {
     ctaSecondary: "Browse styles",
     note: "No account. Your photo isn't stored.",
   },
+  demo: {
+    disclaimer:
+      "Generated example. The person in the photo does not exist and the frames are simulations, not product photography.",
+    original: "The photo",
+    items: [
+      { model: "Clubmaster", reference: "RB3016" },
+      { model: "Round Metal", reference: "RB3447" },
+    ],
+  },
   steps: {
     label: "How it works",
     items: [

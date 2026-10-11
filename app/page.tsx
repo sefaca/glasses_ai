@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DemoTriptych } from "@/components/landing/DemoTriptych";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { countByShape } from "@/lib/catalog";
 import type { FrameShape } from "@/lib/catalog/types";
@@ -18,9 +19,6 @@ import { DEFAULT_LOCALE, getDictionary } from "@/lib/i18n";
  */
 
 const dict = getDictionary(DEFAULT_LOCALE);
-
-/** Tres formas con silueta muy distinta para el collage del hero. */
-const HERO_SHAPES: FrameShape[] = ["aviator", "cat-eye", "wayfarer"];
 
 export default function HomePage() {
   const counts = countByShape();
@@ -112,24 +110,12 @@ export default function HomePage() {
               {dict.hero.note}
             </p>
 
-            {/* Collage de siluetas. Lo que el usuario recuerda de la página. */}
-            <div
-              className="reveal mt-16 flex items-center justify-center gap-6 sm:mt-24 sm:gap-14"
-              style={{ animationDelay: "480ms" }}
-              aria-hidden
-            >
-              {HERO_SHAPES.map((shape, i) => (
-                <FrameGlyph
-                  key={shape}
-                  shape={shape}
-                  thickness={i === 1 ? 0.7 : 0.25}
-                  className={[
-                    "h-auto text-ink",
-                    i === 1 ? "w-40 sm:w-72" : "w-24 opacity-45 sm:w-44",
-                    i === 0 ? "-rotate-6" : i === 2 ? "rotate-6" : "",
-                  ].join(" ")}
-                />
-              ))}
+            {/*
+              La demostración, no la descripción. Es lo que el usuario
+              recuerda de la página, y lo que pide §8.1.
+            */}
+            <div className="mt-14 sm:mt-20 lg:max-w-3xl">
+              <DemoTriptych />
             </div>
           </div>
         </section>

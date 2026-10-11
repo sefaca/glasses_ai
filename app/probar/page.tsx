@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { BrandPicker } from "@/components/brands/BrandPicker";
 import { StepHeader } from "@/components/flow/StepHeader";
+import { StaggerItem, StepPanel } from "@/components/flow/StepPanel";
 import { FrameCard } from "@/components/recommendations/FrameCard";
 import {
   MAX_COMPARE,
@@ -59,6 +60,9 @@ const STYLE_OPTIONS = [
 export default function ProbarPage() {
   const [step, setStep] = useState(0);
   const [reached, setReached] = useState(0);
+  // Avanzar y retroceder tienen que sentirse distintos, o se pierde la noción
+  // de dónde se está en el flujo.
+  const [direction, setDirection] = useState(1);
 
   const [session, setSession] = useState<FaceSession | null>(null);
   const [brandIds, setBrandIds] = useState<string[]>([]);
@@ -106,6 +110,7 @@ export default function ProbarPage() {
     .filter((frame): frame is NonNullable<typeof frame> => Boolean(frame));
 
   function goTo(index: number) {
+    setDirection(index >= step ? 1 : -1);
     setStep(index);
     setReached((current) => Math.max(current, index));
   }
@@ -194,6 +199,7 @@ export default function ProbarPage() {
           />
 
           <div className="mt-8">
+            <StepPanel stepKey={STEPS[step]!.id} direction={direction}>
             {/* ---------- 1 · Foto ---------- */}
             {step === 0 && (
               <section>
@@ -299,17 +305,20 @@ export default function ProbarPage() {
                   </p>
                 ) : (
                   <div className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {recommendations.map((rec) => (
-                      <FrameCard
-                        key={rec.frame.id}
-                        frame={rec.frame}
-                        score={rec.score}
-                        position={rec.position}
-                        shapeLabel={shapeLabels[rec.frame.shape as FrameShape]!}
-                        selected={chosenIds.includes(rec.frame.id)}
-                        canSelect
-                        onToggle={chooseFrame}
-                      />
+                    {recommendations.map((rec, index) => (
+                      <StaggerItem key={rec.frame.id} index={index}>
+                        <FrameCard
+                          frame={rec.frame}
+                          score={rec.score}
+                          position={rec.position}
+                          shapeLabel={
+                            shapeLabels[rec.frame.shape as FrameShape]!
+                          }
+                          selected={chosenIds.includes(rec.frame.id)}
+                          canSelect
+                          onToggle={chooseFrame}
+                        />
+                      </StaggerItem>
                     ))}
                   </div>
                 )}
@@ -385,6 +394,7 @@ export default function ProbarPage() {
                 </div>
               </section>
             )}
+            </StepPanel>
           </div>
         </div>
 

@@ -21,6 +21,15 @@ export const es: Dictionary = {
     ctaSecondary: "Explorar estilos",
     note: "Sin registro. Tu foto no se guarda.",
   },
+  demo: {
+    disclaimer:
+      "Ejemplo generado. La persona de la foto no existe y las monturas son simulaciones, no fotografías de producto.",
+    original: "La foto",
+    items: [
+      { model: "Clubmaster", reference: "RB3016" },
+      { model: "Round Metal", reference: "RB3447" },
+    ],
+  },
   steps: {
     label: "Cómo funciona",
     items: [
