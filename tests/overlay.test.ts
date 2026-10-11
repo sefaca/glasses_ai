@@ -1,26 +1,17 @@
 import { describe, expect, it } from "vitest";
 import type { FrameProfile } from "../lib/catalog/types";
 import { extractPlacement } from "../lib/face/landmarks";
-import {
-  assessWidthFit,
-  computeFrameOverlay,
-  WIDTH_FIT_LABEL,
-} from "../lib/face/overlay";
+import { assessWidthFit, WIDTH_FIT_LABEL } from "../lib/face/overlay";
 import { POPULATION_PD_MM } from "../lib/recommendations/weights";
-import {
-  GLYPH,
-  GLYPH_FRAME_WIDTH,
-  GLYPH_PUPIL_DISTANCE,
-} from "../lib/ui/glyph-geometry";
 import { makeFrame, makeFrameWithoutMeasurements } from "./helpers/frame";
 import { buildSyntheticFace } from "./helpers/synthetic-face";
 
 /**
- * Superposición a escala de la montura sobre la cara.
+ * Posición de la cara y lectura de ajuste por anchura.
  *
- * No es el try-on de §8.7: es un esquema que responde a «¿es demasiado ancha
- * para mi cara?». Lo que se comprueba es la escala, que es lo único que hace
- * útil al esquema.
+ * Es lo que aporta algo que la imagen generada **no** dice: si la montura es
+ * ancha o estrecha *para esta cara*. Gratis e instantáneo, sin pasar por
+ * ningún proveedor.
  */
 
 /** Cara sintética: ancho de referencia 400 px, DIP 180 px ⇒ ~140 mm. */
@@ -29,7 +20,7 @@ function placementOf(options = {}) {
   return extractPlacement(landmarks, image)!;
 }
 
-/** Montura con una anchura de frontal concreta, vía lente y puente. */
+/** Montura con una anchura de frontal concreta. */
 function frameOfWidth(frontWidthMm: number | null): FrameProfile {
   if (frontWidthMm === null) return makeFrameWithoutMeasurements();
   return makeFrame({
@@ -43,7 +34,7 @@ function frameOfWidth(frontWidthMm: number | null): FrameProfile {
   });
 }
 
-describe("extracción de la posición de la cara", () => {
+describe("posición de la cara en la foto", () => {
   it("sitúa el centro entre pupilas y mide la DIP", () => {
     const p = placementOf();
     expect(p.eyeCenter.x).toBeCloseTo(0.5, 6);
@@ -55,97 +46,18 @@ describe("extracción de la posición de la cara", () => {
     expect(placementOf({ tiltDeg: 12 }).tiltDeg).toBeCloseTo(12, 4);
   });
 
+  it("conserva el tamaño de la imagen, que la rejilla usa para el aspecto", () => {
+    const p = placementOf({ image: { width: 1024, height: 1536 } });
+    expect(p.image).toEqual({ width: 1024, height: 1536 });
+  });
+
   it("devuelve null sin iris", () => {
     const { landmarks, image } = buildSyntheticFace();
     expect(extractPlacement(landmarks.slice(0, 468), image)).toBeNull();
   });
 });
 
-describe("escala de la superposición", () => {
-  it("una montura de la anchura de la cara ocupa la anchura de la cara", () => {
-    // Con DIP 180 px y DIP media de 63 mm, la cara estimada mide
-    // 63 · 400/180 = 140 mm. Una montura de 140 mm debe cubrir los 400 px.
-    const p = placementOf();
-    const overlay = computeFrameOverlay(frameOfWidth(140), p);
-
-    const svgWidthPx = overlay.widthPct * p.image.width;
-    const frameWidthPx = (svgWidthPx * GLYPH_FRAME_WIDTH) / GLYPH.viewBoxWidth;
-
-    expect(frameWidthPx).toBeCloseTo(400, 4);
-    expect(overlay.scaledFromFrameWidth).toBe(true);
-  });
-
-  it("deriva la anchura de lente y puente cuando no hay total publicado", () => {
-    // Es el caso normal: las marcas publican 58-14-135, no el ancho total.
-    const p = placementOf();
-    const frame = makeFrame({
-      measurements: {
-        totalWidthMm: null,
-        lensWidthMm: 58,
-        lensHeightMm: 50,
-        bridgeMm: 14,
-        templeMm: 135,
-      },
-    });
-
-    const svgWidthPx = computeFrameOverlay(frame, p).widthPct * p.image.width;
-    const frameWidthPx = (svgWidthPx * GLYPH_FRAME_WIDTH) / GLYPH.viewBoxWidth;
-    const esperado = ((2 * 58 + 14) * p.interocularPx) / POPULATION_PD_MM;
-
-    expect(frameWidthPx).toBeCloseTo(esperado, 4);
-  });
-
-  it("una montura más ancha se dibuja más ancha", () => {
-    const p = placementOf();
-    expect(computeFrameOverlay(frameOfWidth(155), p).widthPct).toBeGreaterThan(
-      computeFrameOverlay(frameOfWidth(130), p).widthPct,
-    );
-  });
-
-  it("la escala es proporcional al tamaño de la cara en la foto", () => {
-    // La misma montura sobre una cara que sale al doble de grande debe
-    // dibujarse al doble. Si no, el esquema miente sobre la proporción.
-    const cerca = placementOf({ cheekboneWidthPx: 400, interocularPx: 180 });
-    const lejos = placementOf({ cheekboneWidthPx: 200, interocularPx: 90 });
-    const frame = frameOfWidth(140);
-
-    const a = computeFrameOverlay(frame, cerca).widthPct;
-    const b = computeFrameOverlay(frame, lejos).widthPct;
-    expect(a / b).toBeCloseTo(2, 4);
-  });
-
-  it("sin medidas, alinea lentes con pupilas y lo declara", () => {
-    const p = placementOf();
-    const overlay = computeFrameOverlay(makeFrameWithoutMeasurements(), p);
-
-    expect(overlay.scaledFromFrameWidth).toBe(false);
-
-    const svgWidthPx = overlay.widthPct * p.image.width;
-    const pupilSpanPx = (svgWidthPx * GLYPH_PUPIL_DISTANCE) / GLYPH.viewBoxWidth;
-    expect(pupilSpanPx).toBeCloseTo(p.interocularPx, 4);
-  });
-
-  it("hereda la inclinación de la cabeza", () => {
-    const p = placementOf({ tiltDeg: -9 });
-    expect(computeFrameOverlay(frameOfWidth(140), p).rotationDeg).toBeCloseTo(
-      -9,
-      4,
-    );
-  });
-
-  it("mantiene el aspecto del viewBox", () => {
-    const p = placementOf();
-    const overlay = computeFrameOverlay(frameOfWidth(140), p);
-    const widthPx = overlay.widthPct * p.image.width;
-    const heightPx = overlay.heightPct * p.image.height;
-    expect(widthPx / heightPx).toBeCloseTo(
-      GLYPH.viewBoxWidth / GLYPH.viewBoxHeight,
-      6,
-    );
-  });
-});
-
-describe("lectura de ajuste por anchura", () => {
+describe("ajuste por anchura", () => {
   const p = placementOf(); // cara estimada de 140 mm
 
   it("una montura de la anchura de la cara está equilibrada", () => {
@@ -156,6 +68,41 @@ describe("lectura de ajuste por anchura", () => {
     // Umbrales sobre anchura de frontal: <0,88 y >1,04 de la cara.
     expect(assessWidthFit(frameOfWidth(118), p)).toBe("narrow");
     expect(assessWidthFit(frameOfWidth(152), p)).toBe("wide");
+  });
+
+  it("deriva la anchura de lente y puente cuando no hay total publicado", () => {
+    // Es el caso normal: las marcas publican 58-14-135, no el ancho total.
+    // 2×58 + 14 = 130 mm sobre una cara de 140 ⇒ ratio 0,93, equilibrada.
+    const frame = makeFrame({
+      measurements: {
+        totalWidthMm: null,
+        lensWidthMm: 58,
+        lensHeightMm: 50,
+        bridgeMm: 14,
+        templeMm: 135,
+      },
+    });
+    expect(assessWidthFit(frame, p)).toBe("good");
+  });
+
+  it("escala con el tamaño de la cara en la foto, no con la foto", () => {
+    // La misma montura sobre la misma cara que sale más pequeña en el
+    // encuadre debe dar la misma lectura: lo que importa es la proporción.
+    //
+    // Hay que encoger la cara ENTERA, no solo los pómulos: el ancho de
+    // referencia es el máximo de las tres anchuras, así que dejar la frente
+    // grande no reduce nada.
+    const scale = (k: number) => ({
+      cheekboneWidthPx: 400 * k,
+      foreheadWidthPx: 340 * k,
+      jawWidthPx: 320 * k,
+      faceHeightPx: 500 * k,
+      interocularPx: 180 * k,
+    });
+
+    const frame = frameOfWidth(140);
+    expect(assessWidthFit(frame, placementOf(scale(1)))).toBe("good");
+    expect(assessWidthFit(frame, placementOf(scale(0.5)))).toBe("good");
   });
 
   it("sin medidas no se pronuncia, y no hay etiqueta que mostrar", () => {
@@ -171,7 +118,7 @@ describe("lectura de ajuste por anchura", () => {
   });
 
   it("la DIP media usada es la misma que la del scoring", () => {
-    // Si el overlay y el scoring estimasen la cara con escalas distintas,
+    // Si el ajuste y el scoring estimasen la cara con escalas distintas,
     // dirían cosas contradictorias sobre la misma montura.
     expect(POPULATION_PD_MM).toBe(63);
   });
