@@ -1,0 +1,26 @@
+{
+  "$comment": "Config del rank tracker semanal. La cura el agente growth-seo-expert: añadir/quitar keywords y competidores es editar este archivo. Las URLs de competidores con status != 200 en dos snapshots seguidos deben corregirse.",
+  "site": "sc-domain:tudominio.com",
+  "siteUrl": "https://tudominio.com",
+  "brandRegex": "tumarca|tu marca",
+  "sitemapsDir": "public",
+  "sitemaps": [
+    "https://tudominio.com/sitemap.xml"
+  ],
+  "gscSites": [
+    "sc-domain:tudominio.com"
+  ],
+  "keywords": {
+    "principal": [
+      "keyword objetivo 1",
+      "keyword objetivo 2 ciudad"
+    ],
+    "secundaria": [
+      "keyword b2b o de otro segmento"
+    ]
+  },
+  "competitors": [
+    { "name": "Competidor A (tipo)", "url": "https://competidor-a.com/" },
+    { "name": "Competidor B (tipo)", "url": "https://competidor-b.com/pagina-clave" }
+  ]
+}

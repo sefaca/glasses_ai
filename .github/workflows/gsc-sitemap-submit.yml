@@ -1,0 +1,16 @@
+name: gsc-sitemap-submit
+# Reenvío manual de sitemaps a GSC (empujar cola de indexación tras una ola).
+on:
+  workflow_dispatch:
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Reenviar sitemaps
+        env:
+          GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
+        run: node growth/sitemap-submit.mjs

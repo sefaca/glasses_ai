@@ -1,0 +1,33 @@
+name: index-check
+# Cobertura de indexación (URL Inspection API): jueves 05:30 UTC + manual.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 5 * * 4'
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Inspeccionar indexación
+        env:
+          GSC_SA_KEY: ${{ secrets.GSC_SA_KEY }}
+        run: node growth/indexcheck.mjs
+      - name: Commit snapshot
+        run: |
+          git config user.name "growth-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add growth/snapshots/
+          git commit -m "chore(growth): snapshot de indexacion" || { echo "sin cambios"; exit 0; }
+          # El chequeo tarda horas (inspecciona ~1500 URLs); main avanza mientras
+          # y el push chocaba por non-fast-forward (fallos 6-ago y 13-ago-2026).
+          # Rebase + reintento: solo tocamos growth/snapshots/, no hay conflicto real.
+          for i in 1 2 3 4 5; do
+            git pull --rebase --autostash origin main && git push && break
+            echo "push $i falló (main avanzó), reintentando..."; sleep 5
+          done

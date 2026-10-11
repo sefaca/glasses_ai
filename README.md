@@ -84,7 +84,9 @@ Cuatro capas de documentación, y no deben mezclarse: **cómo** se trabaja, **d�
 │   └── project-brain.md           # subagente de estrategia (piensa; no implementa)
 ├── docs/
 │   ├── PROJECT_STATE.md           # DÓNDE: estado vivo del proyecto
-│   └── DECISION_LOG.md            # QUÉ: decisiones con evidencia y estado
+│   ├── DECISION_LOG.md            # QUÉ: decisiones con evidencia y estado
+│   └── GROWTH_SEO.md              # documento vivo del canal de adquisición
+├── growth/                        # rank tracker y vigilancia de competidores
 └── research/                      # POR QUÉ: la evidencia
     ├── README.md                  # convenciones: dónde va cada cosa, niveles de evidencia
     ├── b1-tryon-benchmark/        # protocolo de B1, sin ejecutar
