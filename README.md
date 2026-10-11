@@ -102,6 +102,59 @@ Reglas de la estructura: `PROJECT_STATE.md` es estado, **no un diario** — se t
 
 ---
 
+## Desplegar
+
+Dominio: **`lookfit.app`** (Namecheap, registrado 2026-10-11).
+
+### Antes de conectar el dominio
+
+Dos ajustes en el panel de Namecheap, y el primero es obligatorio:
+
+1. **Borrar el Redirect Domain** `lookfit.app → http://www.lookfit.app/`. **No puede funcionar**: todo el TLD `.app` está en la lista de precarga HSTS de los navegadores, así que `http://` se rechaza antes incluso de conectar. Un redirect a `http` está roto por definición.
+2. **Apagar la Parking Page**, o seguirá sirviéndose en vez de la aplicación.
+
+Dejar como están: **auto-renovación ON** y **WithheldforPrivacy ON**.
+
+### Pasos
+
+```
+1. vercel.com → importar el repo
+2. Variable de entorno:  TRYON_PROVIDER = mock      ← sin clave todavía
+3. Deploy. Se comprueba el flujo entero en el *.vercel.app
+4. Vercel → Settings → Domains → añadir lookfit.app
+5. Namecheap → Nameservers → Custom DNS, con los valores EXACTOS que
+   muestre Vercel (cambian; no copiarlos de memoria ni de un tutorial)
+```
+
+El certificado lo emite Vercel solo. En `.app` no es opcional: sin HTTPS el
+dominio **no carga**, ni siquiera con aviso.
+
+### Lo que el build hace solo
+
+`prebuild` ejecuta `scripts/vision-assets.mjs`, que copia el wasm de MediaPipe
+y descarga el modelo (~41 MB). Por eso `public/mediapipe/` no está en git.
+Build completo desde cero: **~32 s**.
+
+### Límite de duración de la función
+
+La generación tarda ~30 s y la ruta declara `maxDuration = 60`. Con **Fluid
+compute** el techo es de 300 s en Hobby, así que sobra margen — pero un
+proyecto con Fluid desactivado cae a los límites antiguos y **la ruta daría
+504**. Comprobarlo en la configuración del proyecto.
+
+### ⚠️ No pongas la clave de OpenAI todavía
+
+Con una URL pública, cada generación cuesta ~0,10 € **de tu bolsillo**, y
+nuestro límite de uso vive en memoria del proceso: en serverless cada
+instancia lleva su propia cuenta, así que contra un script no sirve de nada.
+El `noindex` evita que te encuentre Google, no una persona.
+
+Antes de meter `OPENAI_API_KEY` en producción hacen falta las dos cosas:
+
+- **límite de gasto duro** en el panel de OpenAI — la única red que no
+  depende de nuestro código;
+- **rate limiting de verdad** (Upstash o Supabase) o una puerta de acceso.
+
 ## Privacidad
 
 Se manejan fotografías faciales. Reglas no negociables desde el día 1: bucket privado, signed URLs con expiración, borrado duro por TTL, sin reconocimiento de identidad, sin inferencia de atributos sensibles, sin entrenar modelos con las fotos, y sin fotos ni contenido facial en logs ni en analytics.

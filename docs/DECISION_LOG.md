@@ -49,6 +49,7 @@
 | [D-021](#d-021) | 2026-10-09 | Corrección: nombrar no requiere permiso. Tres permisos, no uno | DECISIÓN | OPEN |
 | [D-022](#d-022) | 2026-10-09 | Generar desde el conocimiento del modelo: tercera vía | HIPÓTESIS | OPEN |
 | [D-023](#d-023) | 2026-10-11 | La shortlist de nombres está entera ocupada; `.io` descartado | DECISIÓN | OPEN |
+| [D-024](#d-024) | 2026-10-11 | Nombre y dominio: **lookfit.app** | DECISIÓN | OPEN |
 
 ---
 
@@ -346,7 +347,20 @@
   3. **Riesgo de existencia.** Depende del Territorio Británico del Océano Índico, transferido a Mauricio por tratado en mayo de 2025. Los ccTLD se apoyan en códigos ISO 3166 `[T]`.
 - **Decision sobre TLD** `.com` en **Cloudflare Registrar**, a precio de coste (~10,46 $/año, misma renovación) `[T]`. Alternativa independiente: Porkbun ~11 $. **Namecheap no**: barato el primer año, 18,48 $ al renovar. Ojo: Verisign sube el `.com` un 7 % el 1 de noviembre de 2026.
 - **Único efecto SEO real de un TLD** Un ccTLD como `.es` da geolocalización a España, que ayuda hoy y estorba cuando toque LATAM e inglés ([CLAUDE.md §21](../CLAUDE.md)). No es gratis como decisión.
-- **Pendiente** Hace falta **otra ronda de naming**: no hay candidato bueno y comprar uno mediocre por cerrar el tema sería peor que esperar. Los nombres descartados de §22.2 siguen descartados.
+- **Resuelto el 2026-10-11 → [D-024](#d-024).** La ronda de naming se hizo y el dominio está comprado.
+
+<a id="d-024"></a>
+## D-024 · Nombre y dominio: lookfit.app
+
+- **Date** 2026-10-11 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El fundador pide un nombre **internacional**, con el argumento de que el mercado anglosajón tiene más volumen y ticket más alto. Eso descarta las raíces españolas de [D-023](#d-023) —`gafateca` y compañía— y obliga a buscar en otro espacio.
+- **Evidence** `[X]` ~190 dominios comprobados por RDAP. El `.com` internacional está **agotado**: de 92 nombres con raíz inglesa o inventados, cero libres. Los pocos `.com` disponibles (`pickshades`, `shadepicker`, `shadefitter`) atan el producto a gafas de sol, justo cuando [CLAUDE.md §4.1](../CLAUDE.md) pide sitio para crecer a graduadas.
+- **Decision** **`lookfit.app`**, comprado en Namecheap el 2026-10-11, con auto-renovación y privacidad WHOIS activadas.
+- **Alternatives** (a) `gafateca.com`, mejor marca pero solo español; (b) `vistafit.app`, que era mi recomendación porque «vista» es palabra real en los dos idiomas; (c) un `.com` premium del mercado secundario, de cientos a miles de euros; (d) `.io`, descartado en D-023 por caro y por el riesgo del código ISO.
+- **Riesgo asumido** «fit» arrastra connotación de gimnasio en inglés. Es la razón por la que yo prefería `vistafit`, y el fundador eligió igualmente. Queda escrito para que dentro de seis meses se sepa que era un riesgo conocido y no un descuido.
+- **Descartado por colisión de marca** `mirafit` — Mirafit es una marca británica de material de gimnasio con web activa. Es exactamente la comprobación que pide §22.4.
+- **Consecuencia técnica no evidente** Todo el TLD `.app` está en la **lista de precarga HSTS**: los navegadores rechazan `http://` antes de conectar. Sin certificado el dominio **no carga en absoluto**, ni con aviso. El *redirect* que Namecheap crea por defecto apunta a `http://www.lookfit.app/` y por tanto **está roto de origen**; hay que borrarlo, igual que la *parking page*.
+- **Pendiente** La comprobación de marca en EUIPO y OEPM que exige §22.4 **sigue sin hacer**. Registrar un dominio no da derechos de marca.
 
 ---
 
