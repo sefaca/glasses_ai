@@ -236,6 +236,38 @@ export interface Dictionary {
   };
 
   /**
+   * Registro por código de seis dígitos.
+   *
+   * Registrarse y entrar son el mismo gesto a propósito: nadie debería tener
+   * que recordar si ya tenía cuenta.
+   */
+  auth: {
+    title: string;
+    body: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    sendCode: string;
+    /** Qué implica registrarse. Visible antes de dar el correo. */
+    promise: string;
+    codeTitle: string;
+    /** `{email}`. */
+    codeBody: string;
+    codeLabel: string;
+    codePlaceholder: string;
+    verify: string;
+    resend: string;
+    useAnotherEmail: string;
+    signOut: string;
+    errors: {
+      invalidEmail: string;
+      invalidCode: string;
+      rateLimited: string;
+      unavailable: string;
+      generic: string;
+    };
+  };
+
+  /**
    * Lista de espera de la alfa. La promesa tiene que ser **exactamente** lo
    * que vamos a hacer: un aviso, una vez. Cualquier adorno aquí es una
    * promesa que luego hay que cumplir.

@@ -298,6 +298,30 @@ export const en: Dictionary = {
     },
   },
 
+  auth: {
+    title: "Create your account to try them on",
+    body: "No password: we send a six-digit code to your email and that's it. You got this far without giving us anything, and what you've seen stays free.",
+    emailLabel: "Your email",
+    emailPlaceholder: "you@email.com",
+    sendCode: "Send me the code",
+    promise:
+      "We only use your email so you can sign in. No newsletter, no ads, and we give it to nobody. You can ask us to delete your account whenever you like.",
+    codeTitle: "Check your email",
+    codeBody: "We've sent a six-digit code to {email}.",
+    codeLabel: "Code",
+    codePlaceholder: "000000",
+    verify: "Sign in",
+    resend: "Send another code",
+    useAnotherEmail: "Use a different email",
+    signOut: "Sign out",
+    errors: {
+      invalidEmail: "That address doesn't look valid. Check it.",
+      invalidCode: "That code is wrong or has expired. Ask for another.",
+      rateLimited: "Too many attempts in a row. Try again in a while.",
+      unavailable: "Sign-up isn't available right now. Please try again later.",
+      generic: "We couldn't complete it. Please try again.",
+    },
+  },
   waitlist: {
     prompt: "I don't have a code",
     title: "We'll let you know when you can try it",
@@ -415,7 +439,7 @@ export const en: Dictionary = {
           heading: "What will be used once there's a product",
           paragraphs: [],
           items: [
-            "A technical anonymous-session cookie, so we can skip sign-up and still apply usage limits. The product can't work without it.",
+            "If you create an account, a technical cookie to keep you signed in. It is strictly necessary — without it we can't tell it's you — which is why it needs no consent, but here it is stated. It lasts 30 days and disappears when you sign out. If you don't register, it is never set.",
             "Local storage in your browser to remember the preferences you choose, which never leaves your device.",
             "Product analytics with no facial content and without identifying you personally, to measure the funnel.",
           ],

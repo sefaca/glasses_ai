@@ -53,6 +53,7 @@
 | [D-025](#d-025) | 2026-10-11 | Código de acceso compartido, no rate limiting real, para abrir la alfa | DECISIÓN | OPEN |
 | [D-026](#d-026) | 2026-10-13 | Cinco idiomas a la vez, **contra la recomendación técnica** | DECISIÓN | OPEN |
 | [D-027](#d-027) | 2026-10-13 | Máximo de páginas sin esperar a verificar medidas | DECISIÓN | OPEN |
+| [D-028](#d-028) | 2026-10-13 | Registro antes que pago, y por código de correo | DECISIÓN | OPEN |
 
 ---
 
@@ -404,6 +405,19 @@
 - **Mitigación** El `noindex` **no se toca**. Las 154 páginas existen y no son visibles para Google. Abrirlas es añadir un idioma a `INDEXABLE_LOCALES`, y esa es una decisión aparte que toma el fundador viendo las páginas. Recomendación mía: abrir **solo español** primero y mirar a las 6 semanas qué porcentaje queda en «Rastreada, actualmente sin indexar»; por encima del 30 % es la señal de que Google no les ve valor, y entonces conviene enriquecer antes de abrir más.
 - **Alternatives** (a) El techo de 45-55 páginas con puertas de admisión, que era la recomendación; (b) publicar solo español y traducir por demanda; (c) esperar a verificar las medidas de 17 monturas —2-3 horas de trabajo— y publicar con datos, que habría hecho estas mismas páginas mucho más defendibles.
 - **Qué lo convertiría en acierto** Verificar las medidas. Las páginas ya están construidas para mostrarlas: en cuanto `measurementsStatus` pase a `verified`, cada página de forma gana una tabla comparativa multimarca que hoy no tiene ninguna SERP. Es el mismo trabajo de siempre, pero ahora con el continente ya hecho.
+
+<a id="d-028"></a>
+## D-028 · Registro antes que pago, y por código de correo
+
+- **Date** 2026-10-13 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El fundador pide montar «autenticación, tabla de precios, etc.». Se le expuso que el pricing es una de las decisiones que [CLAUDE.md §36](../CLAUDE.md) prohíbe tomar sin validación, y que hoy no hay un solo dato de uso: la generación está tras un código y nadie de fuera la ha probado. Acordado: **registro ahora, pago cuando haya datos**.
+- **Decision** Registro por **código de seis dígitos al correo**, con Supabase Auth. Sin contraseña y sin redes sociales → §24 las excluye de la fase 1. Registrarse y entrar son el mismo gesto: nadie debería tener que recordar si ya tenía cuenta.
+- **Por qué código y no enlace mágico** En el móvil, el enlace del correo abre el navegador de la aplicación de correo, no aquel donde la persona estaba: la sesión queda en el sitio equivocado y el flujo se rompe justo después de haber subido una foto. El código se teclea donde estás.
+- **Qué NO bloquea** Subir la foto, el análisis y las seis recomendaciones siguen siendo gratis y anónimos → §0. Lo que pide cuenta es **la generación**, que es lo que cuesta ~0,10 € reales. El texto de la pantalla lo explica, porque decir por qué se pide algo convierte mejor que pedirlo a secas.
+- **La sesión es nuestra, no de Supabase** Supabase Auth solo manda el código y lo comprueba; de su respuesta se usa el identificador y nada más. A partir de ahí llevamos una cookie `httpOnly` firmada con HMAC. Así no hay tokens de Supabase en el navegador ni refrescos que gestionar. Ocho tests cubren lo único que importa: que no se pueda falsificar.
+- **El código compartido se queda** No como reliquia: el plan gratuito de Supabase limita mucho el envío de correos, y si falla, sin esa puerta nadie podría entrar, ni nosotros.
+- **Alternatives** (a) Contraseña, descartada: más fricción y una superficie de ataque que no queremos mantener; (b) enlace mágico, descartado por el problema del móvil; (c) OAuth con Google, descartado por §24 y porque añade un tercero que ve quién usa el producto; (d) montar Stripe ya, que es lo que el fundador pedía primero, descartado porque el precio saldría de una suposición.
+- **Lo que falta para cobrar, en orden** (1) contabilidad de uso por cuenta, que además arregla la deuda del rate limiting en memoria; (2) abrir la generación con una gratis y medir E-A a E-D; (3) entonces el precio, con un número que salga de lo observado. Mientras tanto no hay tabla de precios, y eso es deliberado.
 
 ---
 

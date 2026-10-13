@@ -295,6 +295,30 @@ export const es: Dictionary = {
     },
   },
 
+  auth: {
+    title: "Crea tu cuenta para probártelas",
+    body: "Sin contraseña: te mandamos un código de seis dígitos al correo y listo. Hasta aquí has llegado sin dar nada, y lo que has visto seguirá siendo gratis.",
+    emailLabel: "Tu correo",
+    emailPlaceholder: "tu@correo.com",
+    sendCode: "Enviarme el código",
+    promise:
+      "Solo usamos tu correo para que puedas entrar. Ni newsletter, ni publicidad, ni se lo damos a nadie. Puedes pedir que borremos tu cuenta cuando quieras.",
+    codeTitle: "Mira tu correo",
+    codeBody: "Hemos enviado un código de seis dígitos a {email}.",
+    codeLabel: "Código",
+    codePlaceholder: "000000",
+    verify: "Entrar",
+    resend: "Enviar otro código",
+    useAnotherEmail: "Usar otro correo",
+    signOut: "Cerrar sesión",
+    errors: {
+      invalidEmail: "Esa dirección no parece válida. Revísala.",
+      invalidCode: "Ese código no es correcto o ha caducado. Pide otro.",
+      rateLimited: "Demasiados intentos seguidos. Prueba dentro de un rato.",
+      unavailable: "El registro no está disponible ahora mismo. Vuelve a intentarlo más tarde.",
+      generic: "No hemos podido completarlo. Vuelve a intentarlo.",
+    },
+  },
   waitlist: {
     prompt: "No tengo código",
     title: "Te avisamos cuando puedas probarlo",
@@ -412,7 +436,7 @@ export const es: Dictionary = {
           heading: "Qué se usará cuando haya producto",
           paragraphs: [],
           items: [
-            "Una cookie técnica de sesión anónima, para no exigir registro y poder aplicar límites de uso. Sin ella el producto no puede funcionar.",
+            "Si creas una cuenta, una cookie técnica para mantener tu sesión. Es estrictamente necesaria —sin ella no podemos saber que eres tú— y por eso no necesita consentimiento, pero aquí queda dicha. Dura 30 días y desaparece al cerrar sesión. Si no te registras, no se instala.",
             "Almacenamiento local en tu navegador para recordar las preferencias que elijas, que nunca sale de tu dispositivo.",
             "Analítica de producto sin contenido facial y sin identificarte personalmente, para medir el embudo.",
           ],

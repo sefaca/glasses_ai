@@ -304,6 +304,30 @@ export const it: Dictionary = {
     },
   },
 
+  auth: {
+    title: "Crea il tuo account per provarli",
+    body: "Senza password: ti mandiamo un codice di sei cifre via email e basta. Fin qui sei arrivato senza dare nulla, e quello che hai visto resta gratis.",
+    emailLabel: "La tua email",
+    emailPlaceholder: "tu@email.com",
+    sendCode: "Mandami il codice",
+    promise:
+      "Usiamo la tua email solo per farti entrare. Niente newsletter, niente pubblicità e non la diamo a nessuno. Puoi chiederci di cancellare l'account quando vuoi.",
+    codeTitle: "Controlla la tua email",
+    codeBody: "Abbiamo inviato un codice di sei cifre a {email}.",
+    codeLabel: "Codice",
+    codePlaceholder: "000000",
+    verify: "Entra",
+    resend: "Invia un altro codice",
+    useAnotherEmail: "Usa un'altra email",
+    signOut: "Esci",
+    errors: {
+      invalidEmail: "Questo indirizzo non sembra valido. Controllalo.",
+      invalidCode: "Il codice non è corretto o è scaduto. Chiedine un altro.",
+      rateLimited: "Troppi tentativi di seguito. Riprova tra un po'.",
+      unavailable: "La registrazione non è disponibile ora. Riprova più tardi.",
+      generic: "Non siamo riusciti a completare. Riprova.",
+    },
+  },
   waitlist: {
     prompt: "Non ho un codice",
     title: "Ti avvisiamo quando potrai provarlo",
@@ -421,7 +445,7 @@ export const it: Dictionary = {
           heading: "Cosa useremo quando ci sarà il prodotto",
           paragraphs: [],
           items: [
-            "Un cookie tecnico di sessione anonima, per non richiedere la registrazione e poter applicare limiti d'uso. Senza di esso il prodotto non può funzionare.",
+            "Se crei un account, un cookie tecnico per mantenere la sessione. È strettamente necessario —senza non possiamo sapere che sei tu— e per questo non richiede consenso, ma qui viene dichiarato. Dura 30 giorni e sparisce quando esci. Se non ti registri, non viene installato.",
             "Archiviazione locale nel browser per ricordare le preferenze che scegli, che non esce mai dal tuo dispositivo.",
             "Analitiche di prodotto senza contenuto del volto e senza identificarti personalmente, per misurare il funnel.",
           ],

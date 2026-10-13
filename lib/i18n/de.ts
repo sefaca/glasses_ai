@@ -310,6 +310,30 @@ export const de: Dictionary = {
     },
   },
 
+  auth: {
+    title: "Leg dein Konto an, um sie anzuprobieren",
+    body: "Ohne Passwort: Wir schicken dir einen sechsstelligen Code per E-Mail, das war's. Bis hierher bist du gekommen, ohne etwas zu geben, und was du gesehen hast, bleibt kostenlos.",
+    emailLabel: "Deine E-Mail",
+    emailPlaceholder: "du@email.de",
+    sendCode: "Code schicken",
+    promise:
+      "Wir nutzen deine E-Mail nur, damit du dich anmelden kannst. Kein Newsletter, keine Werbung, und wir geben sie an niemanden weiter. Du kannst jederzeit verlangen, dass wir dein Konto löschen.",
+    codeTitle: "Schau in deine E-Mails",
+    codeBody: "Wir haben einen sechsstelligen Code an {email} geschickt.",
+    codeLabel: "Code",
+    codePlaceholder: "000000",
+    verify: "Anmelden",
+    resend: "Neuen Code schicken",
+    useAnotherEmail: "Andere E-Mail verwenden",
+    signOut: "Abmelden",
+    errors: {
+      invalidEmail: "Diese Adresse sieht nicht gültig aus. Prüf sie bitte.",
+      invalidCode: "Der Code stimmt nicht oder ist abgelaufen. Fordere einen neuen an.",
+      rateLimited: "Zu viele Versuche hintereinander. Versuch es später.",
+      unavailable: "Die Registrierung ist gerade nicht verfügbar. Versuch es später.",
+      generic: "Wir konnten es nicht abschließen. Versuch es noch einmal.",
+    },
+  },
   waitlist: {
     prompt: "Ich habe keinen Code",
     title: "Wir sagen dir Bescheid, sobald du es testen kannst",
@@ -427,7 +451,7 @@ export const de: Dictionary = {
           heading: "Was genutzt wird, sobald es ein Produkt gibt",
           paragraphs: [],
           items: [
-            "Ein technisches Cookie für eine anonyme Sitzung, damit keine Anmeldung nötig ist und trotzdem Nutzungsgrenzen greifen. Ohne das kann das Produkt nicht funktionieren.",
+            "Wenn du ein Konto anlegst, ein technisches Cookie, um dich angemeldet zu halten. Es ist unbedingt erforderlich — ohne es können wir nicht wissen, dass du es bist — und braucht deshalb keine Einwilligung, steht hier aber ausdrücklich. Es hält 30 Tage und verschwindet beim Abmelden. Ohne Registrierung wird es nie gesetzt.",
             "Lokale Speicherung in deinem Browser für die Einstellungen, die du wählst — sie verlässt dein Gerät nie.",
             "Produktanalytik ohne Gesichtsinhalte und ohne dich persönlich zu identifizieren, um den Funnel zu messen.",
           ],

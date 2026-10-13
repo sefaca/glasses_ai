@@ -2,117 +2,185 @@
 
 import { useState } from "react";
 import { track } from "@/lib/analytics/client";
+import { requestCode, verifyCode } from "@/lib/auth/client";
 import type { Dictionary, Locale } from "@/lib/i18n";
+import { format } from "@/lib/i18n";
 import { joinWaitlist, type LeadResult } from "@/lib/leads/client";
 import { saveAccessCode } from "@/lib/tryon/client";
 
 /**
- * Petición del código de la alfa privada, **y captación**.
+ * La puerta: **registro**, con dos salidas laterales.
  *
- * Aparece solo cuando el servidor rechaza una generación por falta de
- * código, nunca antes: quien llega con el código guardado no ve esto jamás,
- * y en local (sin `ACCESS_CODE`) no existe.
+ * Aparece solo cuando el servidor rechaza una generación, nunca antes. Es el
+ * momento de más intención del producto: quien llega ha subido su foto, ha
+ * visto sus seis recomendaciones y ha pulsado para generar.
  *
- * Este es el momento de más intención de todo el producto. Quien está aquí
- * ha subido su foto, ha visto sus seis recomendaciones y ha pulsado para
- * generar. Hasta ahora se encontraba un callejón sin salida; ahora puede
- * dejar su correo para que le avisemos.
+ * **No bloquea la primera experiencia** → CLAUDE.md §0. Lo que hay detrás es
+ * la generación, que cuesta dinero real; el análisis y las recomendaciones ya
+ * se han visto gratis y sin dar nada. El propio texto lo dice, porque
+ * explicar por qué se pide algo convierte mejor que pedirlo a secas.
  *
- * Dos cosas que no se negocian:
+ * Las dos salidas laterales no son adorno:
  *
- * - **La lista de espera no bloquea nada.** CLAUDE.md §0 prohíbe poner la
- *   primera experiencia detrás de un registro, y lo que hay detrás de esta
- *   pared es la generación, no el producto: el análisis y las
- *   recomendaciones ya se han visto gratis y sin dar nada.
- * - **La promesa va antes de enviar, no después.** Quien deja su correo lee
- *   exactamente qué recibirá mientras decide, no en un correo de
- *   confirmación cuando ya lo ha dado.
+ * - **Lista de espera**, para quien no quiere cuenta.
+ * - **Código compartido**, que sigue existiendo porque si el envío de correos
+ *   falla —y el plan gratuito de Supabase limita bastante— sin él nadie
+ *   podría entrar, ni siquiera nosotros.
  */
 
-type Panel = "code" | "waitlist" | "done";
+type Panel = "email" | "code" | "waitlist" | "joined" | "shared";
 
 interface Props {
-  /** `true` si ya se intentó un código y el servidor lo rechazó. */
   retry: boolean;
   dict: Dictionary;
   lang: Locale;
+  /** Se llama al entrar: la generación se reintenta sola. */
   onSubmit: () => void;
   onCancel: () => void;
 }
 
 export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
-  const [panel, setPanel] = useState<Panel>("code");
-  const [code, setCode] = useState("");
+  const [panel, setPanel] = useState<Panel>("email");
   const [email, setEmail] = useState("");
-  const [sending, setSending] = useState(false);
-  const [failure, setFailure] = useState<LeadResult | null>(null);
+  const [code, setCode] = useState("");
+  const [shared, setShared] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const texts = dict.tryOn.access;
+  const auth = dict.auth;
   const list = dict.waitlist;
+  const access = dict.tryOn.access;
 
-  function submitCode(event: React.FormEvent) {
+  function fail(message: string) {
+    setError(message);
+    setBusy(false);
+  }
+
+  async function sendCode(event: React.FormEvent) {
     event.preventDefault();
-    const trimmed = code.trim();
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+
+    const result = await requestCode(email);
+    setBusy(false);
+
+    if (result === "sent") {
+      track("click_try_free", { step: "auth_code_sent", locale: lang });
+      setPanel("code");
+      setError(null);
+      return;
+    }
+    fail(
+      result === "invalid_email"
+        ? auth.errors.invalidEmail
+        : result === "rate_limited"
+          ? auth.errors.rateLimited
+          : result === "unavailable"
+            ? auth.errors.unavailable
+            : auth.errors.generic,
+    );
+  }
+
+  async function submitCode(event: React.FormEvent) {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+
+    const result = await verifyCode(email, code);
+    setBusy(false);
+
+    if (result === "ok") {
+      track("click_try_free", { step: "auth_completed", locale: lang });
+      // La generación se reintenta sola: la persona pulsó generar hace un
+      // minuto y no debería tener que volver a buscarlo.
+      onSubmit();
+      return;
+    }
+    fail(
+      result === "invalid_code"
+        ? auth.errors.invalidCode
+        : result === "rate_limited"
+          ? auth.errors.rateLimited
+          : result === "unavailable"
+            ? auth.errors.unavailable
+            : auth.errors.generic,
+    );
+  }
+
+  async function join(event: React.FormEvent) {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+
+    const result: LeadResult = await joinWaitlist(email, lang, "access_gate");
+    setBusy(false);
+
+    if (result === "ok") {
+      track("click_try_free", { step: "waitlist_joined", locale: lang });
+      setPanel("joined");
+      return;
+    }
+    fail(
+      result === "invalid_email"
+        ? list.errors.invalidEmail
+        : result === "rate_limited"
+          ? list.errors.rateLimited
+          : result === "unavailable"
+            ? list.errors.unavailable
+            : list.errors.generic,
+    );
+  }
+
+  function useSharedCode(event: React.FormEvent) {
+    event.preventDefault();
+    const trimmed = shared.trim();
     if (!trimmed) return;
     saveAccessCode(trimmed);
     onSubmit();
   }
 
-  async function submitEmail(event: React.FormEvent) {
-    event.preventDefault();
-    if (sending) return;
-    setSending(true);
-    setFailure(null);
-
-    const result = await joinWaitlist(email, lang, "access_gate");
-    setSending(false);
-
-    if (result === "ok") {
-      // Sin el correo: el evento dice que alguien se apuntó, no quién.
-      track("click_try_free", { step: "waitlist_joined", locale: lang });
-      setPanel("done");
-      return;
-    }
-    setFailure(result);
-  }
-
-  const errorText =
-    failure === "invalid_email"
-      ? list.errors.invalidEmail
-      : failure === "rate_limited"
-        ? list.errors.rateLimited
-        : failure === "unavailable"
-          ? list.errors.unavailable
-          : failure
-            ? list.errors.generic
-            : null;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-5 backdrop-blur-sm">
       <div className="w-full max-w-sm rounded-2xl border border-line bg-surface p-6 shadow-xl">
-        {panel === "code" && (
-          <form onSubmit={submitCode}>
+        {/* ---------- Registro: el correo ---------- */}
+        {panel === "email" && (
+          <form onSubmit={sendCode}>
             <h2 className="font-display text-xl tracking-tight">
-              {texts.title}
+              {auth.title}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              {retry ? texts.wrong : texts.body}
+              {auth.body}
             </p>
 
-            <label htmlFor="access-code" className="sr-only">
-              {texts.placeholder}
+            <label htmlFor="auth-email" className="sr-only">
+              {auth.emailLabel}
             </label>
             <input
-              id="access-code"
-              name="access-code"
-              type="text"
-              autoComplete="off"
+              id="auth-email"
+              name="email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
               autoFocus
-              value={code}
-              onChange={(event) => setCode(event.target.value)}
-              placeholder={texts.placeholder}
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder={auth.emailPlaceholder}
               className="mt-5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none focus-visible:border-accent"
             />
+
+            <p className="mt-3 text-[0.7rem] leading-relaxed text-muted">
+              {auth.promise}
+            </p>
+
+            {error && (
+              <p className="mt-3 text-xs text-ink" role="alert">
+                {error}
+              </p>
+            )}
 
             <div className="mt-5 flex items-center justify-between gap-3">
               <button
@@ -120,35 +188,118 @@ export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
                 onClick={onCancel}
                 className="text-sm text-muted hover:text-ink"
               >
-                {texts.cancel}
+                {access.cancel}
               </button>
               <button
                 type="submit"
-                disabled={code.trim().length === 0}
+                disabled={busy || email.trim().length === 0}
                 className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px disabled:opacity-40"
               >
-                {texts.submit}
+                {auth.sendCode}
+              </button>
+            </div>
+
+            <div className="mt-5 flex flex-wrap justify-between gap-3 border-t border-line pt-4 text-[0.7rem] text-muted">
+              <button
+                type="button"
+                onClick={() => {
+                  track("click_try_free", {
+                    step: "waitlist_opened",
+                    locale: lang,
+                  });
+                  setError(null);
+                  setPanel("waitlist");
+                }}
+                className="underline decoration-line underline-offset-4 hover:text-ink"
+              >
+                {list.prompt}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setError(null);
+                  setPanel("shared");
+                }}
+                className="underline decoration-line underline-offset-4 hover:text-ink"
+              >
+                {access.title}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* ---------- Registro: el código ---------- */}
+        {panel === "code" && (
+          <form onSubmit={submitCode}>
+            <h2 className="font-display text-xl tracking-tight">
+              {auth.codeTitle}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              {format(auth.codeBody, { email })}
+            </p>
+
+            <label htmlFor="auth-code" className="sr-only">
+              {auth.codeLabel}
+            </label>
+            <input
+              id="auth-code"
+              name="one-time-code"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="[0-9]{6}"
+              maxLength={6}
+              autoFocus
+              required
+              value={code}
+              onChange={(event) =>
+                setCode(event.target.value.replace(/\D/g, ""))
+              }
+              placeholder={auth.codePlaceholder}
+              className="mt-5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-center font-display text-2xl tracking-[0.4em] outline-none focus-visible:border-accent"
+            />
+
+            {error && (
+              <p className="mt-3 text-xs text-ink" role="alert">
+                {error}
+              </p>
+            )}
+
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setCode("");
+                  setError(null);
+                  setPanel("email");
+                }}
+                className="text-sm text-muted hover:text-ink"
+              >
+                {auth.useAnotherEmail}
+              </button>
+              <button
+                type="submit"
+                disabled={busy || code.length !== 6}
+                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px disabled:opacity-40"
+              >
+                {auth.verify}
               </button>
             </div>
 
             <button
               type="button"
-              onClick={() => {
-                track("click_try_free", {
-                  step: "waitlist_opened",
-                  locale: lang,
-                });
-                setPanel("waitlist");
-              }}
-              className="mt-5 w-full border-t border-line pt-4 text-xs text-muted underline decoration-line underline-offset-4 hover:text-ink"
+              onClick={sendCode}
+              disabled={busy}
+              className="mt-5 w-full border-t border-line pt-4 text-[0.7rem] text-muted underline decoration-line underline-offset-4 hover:text-ink"
             >
-              {list.prompt}
+              {auth.resend}
             </button>
           </form>
         )}
 
+        {/* ---------- Lista de espera ---------- */}
         {panel === "waitlist" && (
-          <form onSubmit={submitEmail}>
+          <form onSubmit={join}>
             <h2 className="font-display text-xl tracking-tight">
               {list.title}
             </h2>
@@ -173,28 +324,30 @@ export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
               className="mt-5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none focus-visible:border-accent"
             />
 
-            {/* La promesa, visible mientras decide. */}
             <p className="mt-3 text-[0.7rem] leading-relaxed text-muted">
               {list.promise}
             </p>
 
-            {errorText && (
+            {error && (
               <p className="mt-3 text-xs text-ink" role="alert">
-                {errorText}
+                {error}
               </p>
             )}
 
             <div className="mt-5 flex items-center justify-between gap-3">
               <button
                 type="button"
-                onClick={() => setPanel("code")}
+                onClick={() => {
+                  setError(null);
+                  setPanel("email");
+                }}
                 className="text-sm text-muted hover:text-ink"
               >
                 {dict.common.back}
               </button>
               <button
                 type="submit"
-                disabled={sending || email.trim().length === 0}
+                disabled={busy || email.trim().length === 0}
                 className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px disabled:opacity-40"
               >
                 {list.submit}
@@ -203,7 +356,7 @@ export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
           </form>
         )}
 
-        {panel === "done" && (
+        {panel === "joined" && (
           <div>
             <h2 className="font-display text-xl tracking-tight">
               {list.successTitle}
@@ -219,6 +372,50 @@ export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
               {dict.common.back}
             </button>
           </div>
+        )}
+
+        {/* ---------- Código compartido ---------- */}
+        {panel === "shared" && (
+          <form onSubmit={useSharedCode}>
+            <h2 className="font-display text-xl tracking-tight">
+              {access.title}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted">
+              {retry ? access.wrong : access.body}
+            </p>
+
+            <label htmlFor="shared-code" className="sr-only">
+              {access.placeholder}
+            </label>
+            <input
+              id="shared-code"
+              name="shared-code"
+              type="text"
+              autoComplete="off"
+              autoFocus
+              value={shared}
+              onChange={(event) => setShared(event.target.value)}
+              placeholder={access.placeholder}
+              className="mt-5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none focus-visible:border-accent"
+            />
+
+            <div className="mt-5 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setPanel("email")}
+                className="text-sm text-muted hover:text-ink"
+              >
+                {dict.common.back}
+              </button>
+              <button
+                type="submit"
+                disabled={shared.trim().length === 0}
+                className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px disabled:opacity-40"
+              >
+                {access.submit}
+              </button>
+            </div>
+          </form>
         )}
       </div>
     </div>

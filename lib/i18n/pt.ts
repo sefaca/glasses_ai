@@ -304,6 +304,30 @@ export const pt: Dictionary = {
     },
   },
 
+  auth: {
+    title: "Crie sua conta para experimentar",
+    body: "Sem senha: mandamos um código de seis dígitos para o seu e-mail e pronto. Você chegou até aqui sem dar nada, e o que viu continua grátis.",
+    emailLabel: "Seu e-mail",
+    emailPlaceholder: "voce@email.com",
+    sendCode: "Me enviar o código",
+    promise:
+      "Usamos seu e-mail só para você entrar. Sem newsletter, sem publicidade e não damos para ninguém. Você pode pedir para apagarmos sua conta quando quiser.",
+    codeTitle: "Olhe seu e-mail",
+    codeBody: "Enviamos um código de seis dígitos para {email}.",
+    codeLabel: "Código",
+    codePlaceholder: "000000",
+    verify: "Entrar",
+    resend: "Enviar outro código",
+    useAnotherEmail: "Usar outro e-mail",
+    signOut: "Sair",
+    errors: {
+      invalidEmail: "Esse endereço não parece válido. Confira.",
+      invalidCode: "Esse código está errado ou expirou. Peça outro.",
+      rateLimited: "Tentativas demais seguidas. Tente daqui a pouco.",
+      unavailable: "O cadastro não está disponível agora. Tente mais tarde.",
+      generic: "Não conseguimos concluir. Tente de novo.",
+    },
+  },
   waitlist: {
     prompt: "Não tenho código",
     title: "A gente avisa quando você puder testar",
@@ -421,7 +445,7 @@ export const pt: Dictionary = {
           heading: "O que será usado quando houver produto",
           paragraphs: [],
           items: [
-            "Um cookie técnico de sessão anônima, para não exigir cadastro e poder aplicar limites de uso. Sem ele o produto não funciona.",
+            "Se você criar uma conta, um cookie técnico para manter sua sessão. É estritamente necessário —sem ele não dá para saber que é você— e por isso não precisa de consentimento, mas fica declarado aqui. Dura 30 dias e some ao sair. Se você não se cadastrar, ele não é instalado.",
             "Armazenamento local no seu navegador para lembrar as preferências que você escolher, que nunca sai do seu dispositivo.",
             "Analytics de produto sem conteúdo de rosto e sem identificar você pessoalmente, para medir o funil.",
           ],

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { findFrameById } from "@/lib/catalog";
 import { canLabelAsProduct, canTryOn } from "@/lib/catalog/rights";
+import { SESSION_COOKIE, readSession } from "@/lib/auth/session";
 import { ACCESS_HEADER, checkAccess } from "@/lib/server/access";
 import { checkRateLimit, pruneRateLimits } from "@/lib/server/rate-limit";
 import { buildTryOnPrompt, PROMPT_VERSION } from "@/lib/tryon/prompt";
@@ -51,9 +52,26 @@ export async function POST(request: Request) {
     request.headers.get("x-real-ip") ??
     "unknown";
 
-  // La puerta va antes que nada: si hay código configurado y no viene, no se
-  // gasta ni una comprobación más, y desde luego no se llama al proveedor.
-  if (checkAccess(request.headers.get(ACCESS_HEADER)) === "denied") {
+  /**
+   * La puerta va antes que nada: si no está autorizado, no se gasta ni una
+   * comprobación más y desde luego no se llama al proveedor.
+   *
+   * Dos formas de pasar, y basta con una:
+   *
+   * - **Cuenta.** Es el camino normal desde que existe el registro.
+   * - **Código compartido.** Se mantiene porque es lo que permite enseñar el
+   *   producto a alguien sin pedirle que se registre, y porque si el envío
+   *   de correos falla, sin él nadie podría entrar.
+   */
+  const cookie = request.headers
+    .get("cookie")
+    ?.split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${SESSION_COOKIE}=`))
+    ?.slice(SESSION_COOKIE.length + 1);
+
+  const signedIn = (await readSession(cookie)) !== null;
+  if (!signedIn && checkAccess(request.headers.get(ACCESS_HEADER)) === "denied") {
     return NextResponse.json(
       { status: "failed", errorCode: "access_denied" },
       { status: 401 },
