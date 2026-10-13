@@ -103,6 +103,15 @@ Se marcan como heredados hasta que los confirme un dato nuestro.
 - `[X] 2026-10-11` **El `.com` internacional de este nicho está agotado.** ~190 dominios
   comprobados por RDAP, cero libres con raíz inglesa → [D-024](DECISION_LOG.md#d-024). Afecta
   al SEO de marca: la búsqueda «lookfit» competirá con lo que haya en `lookfit.com`.
+- `[X] 2026-10-12` **VisuTry bloquea a GitHub Actions, y eso deja ciego el tripwire.** El
+  primer snapshot devolvió **403 en sus ocho URLs**, incluida `visutry.com/it`, que desde un
+  navegador normal da 404. Es bloqueo por rango de datacenter: desde una IP doméstica
+  responden. Consecuencia práctica: **el tripwire de Italia no sirve tal cual** — un 403 no
+  distingue «sigue sin existir» de «ya existe». Hay que comprobar `/it` a mano cada semana
+  hasta resolverlo, o el día que entren en Italia nos enteraremos tarde. Chilli Beans y
+  Warby Parker hacen lo mismo. Lección general: **un competidor que no se deja rastrear no
+  es un competidor sin cambios**, y un informe lleno de 403 se lee como calma cuando es
+  ceguera.
 - `[X] 2026-10-11` **«Sin propagar» puede ser «sin registro».** Antes de esperar a la
   propagación, preguntar al **servidor autoritativo**:
   `nslookup -type=A lookfit.app dns1.registrar-servers.com`. Para `lookfit.app` no había ni
