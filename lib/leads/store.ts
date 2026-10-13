@@ -45,10 +45,19 @@ export const unavailableStore: LeadStore = {
 /**
  * Supabase a través de su API REST, sin cliente oficial.
  *
- * Una sola petición `POST` con `Prefer: resolution=merge-duplicates` hace el
- * upsert contra la clave única del correo. Traer `@supabase/supabase-js`
- * entero para esto añadiría una dependencia considerable a cambio de nada
- * → CLAUDE.md regla 2.
+ * Traer `@supabase/supabase-js` entero para una sola inserción añadiría una
+ * dependencia considerable a cambio de nada → CLAUDE.md regla 2.
+ *
+ * Dos detalles que costaron un fallo en producción y conviene no deshacer:
+ *
+ * - **`on_conflict=email`.** Sin esto PostgREST resuelve el conflicto contra
+ *   la clave primaria, que es el `id` generado, y como nunca choca, la
+ *   segunda alta del mismo correo revienta contra la restricción única.
+ * - **`ignore-duplicates`, no `merge-duplicates`.** Si alguien se apunta dos
+ *   veces, la fila existente se deja intacta. Lo importante es `consent_at`:
+ *   es la prueba de **cuándo consintió por primera vez**, y sobrescribirla
+ *   con la fecha de hoy borraría justo el dato que habría que enseñar si
+ *   alguien reclama.
  *
  * Usa la **clave de servicio**, que salta las políticas de fila. Por eso esta
  * ruta es de servidor y la clave no lleva prefijo `NEXT_PUBLIC_`: con ella en
@@ -60,21 +69,24 @@ function supabaseStore(url: string, key: string): LeadStore {
     ready: true,
     async save(lead) {
       try {
-        const response = await fetch(`${url}/rest/v1/waitlist`, {
-          method: "POST",
-          headers: {
-            apikey: key,
-            Authorization: `Bearer ${key}`,
-            "Content-Type": "application/json",
-            Prefer: "resolution=merge-duplicates,return=representation",
+        const response = await fetch(
+          `${url}/rest/v1/waitlist?on_conflict=email`,
+          {
+            method: "POST",
+            headers: {
+              apikey: key,
+              Authorization: `Bearer ${key}`,
+              "Content-Type": "application/json",
+              Prefer: "resolution=ignore-duplicates,return=representation",
+            },
+            body: JSON.stringify({
+              email: lead.email,
+              locale: lead.locale,
+              source: lead.source,
+              consent_at: lead.consentAt,
+            }),
           },
-          body: JSON.stringify({
-            email: lead.email,
-            locale: lead.locale,
-            source: lead.source,
-            consent_at: lead.consentAt,
-          }),
-        });
+        );
 
         if (!response.ok) {
           // Nunca se devuelve el cuerpo de Supabase al cliente → regla 5.
@@ -82,13 +94,10 @@ function supabaseStore(url: string, key: string): LeadStore {
           return { ok: false, reason: "error" };
         }
 
-        const rows = (await response.json()) as Array<{ consent_at?: string }>;
-        // Si la fecha de consentimiento que vuelve no es la que acabamos de
-        // mandar, la fila ya existía: la persona ya estaba en la lista.
-        const alreadyOnList =
-          rows.length > 0 && rows[0]?.consent_at !== lead.consentAt;
-
-        return { ok: true, alreadyOnList };
+        // Con `ignore-duplicates`, una fila ya existente no se devuelve.
+        // Un array vacío significa «ya estaba en la lista».
+        const rows = (await response.json()) as unknown[];
+        return { ok: true, alreadyOnList: rows.length === 0 };
       } catch {
         return { ok: false, reason: "error" };
       }
