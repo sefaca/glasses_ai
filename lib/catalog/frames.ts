@@ -124,7 +124,8 @@ export const FRAMES: FrameProfile[] = [
     notation: [50, 22, 150],
     lensHeightMm: 43,
     measurementsStatus: "indicative",
-    note: "Tallas citadas 47/50/54.",
+    note:
+      "Tallas citadas 47/50/54. Las tiendas dan 41 mm de altura en la talla 50, no 43. Reverificar en ficha oficial.",
   }),
   frame({
     id: "ray-ban-new-wayfarer-rb2132",
@@ -141,7 +142,8 @@ export const FRAMES: FrameProfile[] = [
     notation: [52, 18, 145],
     lensHeightMm: 41,
     measurementsStatus: "indicative",
-    note: "Fuentes en desacuerdo: 52/55 frente a 58. Reverificar en ficha oficial.",
+    note:
+      "Las tres tallas 52/55/58 existen; la nota anterior de «desacuerdo» era un malentendido. Altura por talla segun tiendas: 37,6 / 40,8 / 43,2 — no cuadra con la de aqui. Reverificar en ficha oficial.",
   }),
   frame({
     id: "ray-ban-clubmaster-rb3016",
@@ -158,7 +160,8 @@ export const FRAMES: FrameProfile[] = [
     notation: [51, 21, 145],
     lensHeightMm: 40,
     measurementsStatus: "indicative",
-    note: "Tallas 49/51, con 55 en alguna fuente.",
+    note:
+      "Tallas 49/51, con 55 en alguna fuente. Las tiendas dan 42-44 mm de altura, no 40. Reverificar en ficha oficial.",
   }),
   frame({
     id: "ray-ban-clubmaster-havana-rb3016",
@@ -208,7 +211,8 @@ export const FRAMES: FrameProfile[] = [
     notation: [54, 16, 145],
     lensHeightMm: 48,
     measurementsStatus: "indicative",
-    note: "Tallas citadas 51 y 54/55.",
+    note:
+      "Tallas citadas 51 y 54/55. Las tiendas dan 42 mm (talla 51) y 44 (54) de altura, no 48. Reverificar en ficha oficial.",
   }),
 
   // ── Persol ────────────────────────────────────────────────────────────

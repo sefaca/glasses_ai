@@ -4,6 +4,7 @@ import { DemoTriptych } from "@/components/landing/DemoTriptych";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { countByShape } from "@/lib/catalog";
+import { guidesFor } from "@/lib/content/guides";
 import type { FrameShape } from "@/lib/catalog/types";
 import { getDictionary, isLocale, localePath } from "@/lib/i18n";
 
@@ -30,6 +31,9 @@ export default async function HomePage({
 
   const dict = getDictionary(lang);
   const counts = countByShape();
+  // Solo existen en español. En los demás idiomas la sección no se pinta, en
+  // lugar de enlazar a páginas que no están traducidas.
+  const guides = guidesFor(lang);
   const shapes = (Object.keys(dict.frames.shapes) as FrameShape[]).filter(
     (shape) => (counts[shape] ?? 0) > 0,
   );
@@ -204,6 +208,40 @@ export default async function HomePage({
             </div>
           </div>
         </section>
+
+        {/* ---------- Guías ---------- */}
+        {guides.length > 0 && (
+          <section className="border-t border-line px-5 py-20 sm:px-8">
+            <div className="mx-auto max-w-6xl">
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <p className="rule-label text-[0.7rem] text-muted">Guías</p>
+                <Link
+                  href={localePath(lang, "/guias")}
+                  className="text-xs text-muted hover:text-ink"
+                >
+                  Ver todas
+                </Link>
+              </div>
+              <ul className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3">
+                {guides.map((guide) => (
+                  <li key={guide.slug}>
+                    <Link
+                      href={localePath(lang, `/guias/${guide.slug}`)}
+                      className="group flex h-full flex-col gap-2 bg-surface px-5 py-6 transition-colors hover:bg-paper"
+                    >
+                      <h3 className="font-display text-xl leading-tight tracking-tight transition-colors group-hover:text-accent">
+                        {guide.breadcrumb}
+                      </h3>
+                      <p className="text-xs leading-relaxed text-muted">
+                        {guide.description}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
 
         {/* ---------- Privacidad ---------- */}
         <section className="border-t border-line px-5 py-20 sm:px-8">
