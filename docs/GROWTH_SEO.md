@@ -36,10 +36,11 @@ sin nivel de evidencia; nada de contenido facial en material de marketing; no so
 
 - **Hosting real**: Vercel. Proyecto `lookfit`, producción en `lookfit-brown.vercel.app`
   `[X]` verificado 2026-10-11 (200, ~0,6 s).
-- **Dominio**: `lookfit.app` (Namecheap). **No es que el DNS no haya propagado: no hay
-  registro.** `[X]` 2026-10-11, `dns1.registrar-servers.com` no devuelve A para el apex y
-  `www` es NXDOMAIN; solo existe el TXT de SPF. Hay que crearlos. Todo el TLD `.app` está
-  en precarga HSTS → sin certificado el dominio no carga → [D-024](DECISION_LOG.md#d-024).
+- **Dominio**: `lookfit.app`, **en el aire** `[X]` verificado 2026-10-13 sobre el dominio
+  real: certificado emitido, apex 307 → `/es`, y los cinco idiomas sirviendo su `<html
+  lang>` y su H1 traducidos. A `@` → `216.198.79.1`; sin registro en `www` (se borró el
+  CNAME de la parking page, que bajo la precarga HSTS de `.app` habría dado error de
+  certificado) → [D-024](DECISION_LOG.md#d-024).
 - **Cómo se publica**: push a `main` → build automático en Vercel. `prebuild` descarga los
   activos de MediaPipe (~41 MB), por eso `public/mediapipe/` no está en git.
 - **Idiomas**: cinco, con prefijo de ruta — `/es`, `/en`, `/it`, `/pt`, `/de`; la raíz
