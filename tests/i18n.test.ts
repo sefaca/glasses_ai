@@ -5,7 +5,7 @@ import {
   LOCALES,
   LOCALE_HREFLANG,
   LOCALE_NAMES,
-  X_DEFAULT_LOCALE,
+  xDefaultLocale,
   getDictionary,
   isLocale,
   localePath,
@@ -40,7 +40,7 @@ describe("locales", () => {
   it("son los cinco acordados y el por defecto está entre ellos", () => {
     expect([...LOCALES]).toEqual(["es", "en", "it", "pt", "de"]);
     expect(LOCALES).toContain(DEFAULT_LOCALE);
-    expect(LOCALES).toContain(X_DEFAULT_LOCALE);
+    expect(LOCALES).toContain(xDefaultLocale());
   });
 
   it("cada uno tiene hreflang y un nombre en su propia lengua", () => {

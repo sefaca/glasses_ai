@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { Familjen_Grotesk, Instrument_Serif } from "next/font/google";
 import { notFound } from "next/navigation";
 import { SITE_URL } from "@/lib/site";
-import { LOCALES, LOCALE_HREFLANG, getDictionary, isLocale } from "@/lib/i18n";
+import {
+  LOCALES,
+  LOCALE_HREFLANG,
+  getDictionary,
+  isIndexable,
+  isLocale,
+} from "@/lib/i18n";
 import { localizedMetadata } from "@/lib/i18n/metadata";
 import "../globals.css";
 
@@ -48,13 +54,16 @@ export async function generateMetadata({
       description: dict.meta.description,
     }),
     /**
-     * Fase de validación: nada se indexa todavía → CLAUDE.md §35.
+     * Indexabilidad **por idioma**, no global → `INDEXABLE_LOCALES`.
      *
-     * El `noindex` **no se quita por tener la web en cinco idiomas**. Se quita
-     * cuando exista contenido que merezca tráfico y cada idioma haya pasado
-     * por una persona que lo lea → docs/GROWTH_SEO.md §4, gate G0.
+     * Hoy la lista está vacía y por tanto nada se indexa, que es lo correcto
+     * en fase de validación (CLAUDE.md §35). Se abre idioma a idioma cuando
+     * exista contenido que merezca tráfico y lo haya leído un nativo
+     * → docs/GROWTH_SEO.md §4, gate G0.
+     *
+     * `follow` acompaña a `index`: un idioma cerrado tampoco reparte señal.
      */
-    robots: { index: false, follow: false },
+    robots: { index: isIndexable(lang), follow: isIndexable(lang) },
   };
 }
 

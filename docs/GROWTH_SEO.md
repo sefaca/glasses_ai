@@ -81,6 +81,7 @@ volumen y mal encaje vale menos que una de volumen medio que coincide con quien 
 
 | Fecha | Acción | Resultado / siguiente paso |
 |---|---|---|
+| 2026-10-13 | **Plan de máximo sostenible** (pendiente de ratificar): techo ~45-55 páginas únicas en ES a 12 meses, con puertas de admisión por familia —forma ≥3 monturas verificadas de ≥2 marcas, marca ≥4, modelo y comparativa solo con demanda en Search Console—. Keywords ordenadas por intención, SERP y comisión, **sin volumen**: primero tallas y medidas de modelo, después forma + tamaño, después probar online. Declaradas **inalcanzables a 12 meses** las cabeceras: «gafas de sol», «ray ban», «oakley», outlet y graduadas. **Implementado el arreglo que señaló**: la indexabilidad pasa a ser **por idioma** (`INDEXABLE_LOCALES`), de forma que `robots` de página, `hreflang`, `x-default`, sitemap y `robots.txt` cambian a la vez y no pueden contradecirse | Abrir el español es añadir `"es"` a esa lista: `[X]` probado —`robots.txt` pasa a `Allow`, `/es` a `index`, `/de` sigue en `noindex`, sin `hreflang` falso y el sitemap emite solo las 8 URLs españolas. Pendiente del fundador: recolectar medidas de 17 monturas, cuenta de editor en Awin y 10 SERP a mano |
 | 2026-10-13 | **Primeras tres guías implementadas en español** (`/es/guias/tallas-ray-ban`, `.../ray-ban-wayfarer-vs-new-wayfarer`, `.../probar-gafas-online`) más su índice, con `Article` + `BreadcrumbList` + `FAQPage` desde un único array, canonical propio y **sin `hreflang`**: existen solo en español. Arreglado el fallo que señaló el agente: `sitemap.ts` emitía toda ruta en los cinco idiomas y ahora cada una declara en cuáles existe. **Corrección de hechos antes de publicar**: el contenido entregado describía un «esquema a escala sobre tu foto» que **ya no existe** —`computeFrameOverlay` se eliminó— y se reescribió por lo que el producto hace hoy | Siguen en `noindex`. Pendiente del fundador: verificar la tabla de tallas en la ficha oficial, decidir la firma, y las 17 monturas sin medidas que bloquean las páginas de forma |
 | 2026-10-13 | **Web publicada en los cinco idiomas** (es · en · it · pt · de): rutas con prefijo, `hreflang` recíproco con `x-default` → `/en`, canonical por idioma, `sitemap.xml` y `robots.txt`, selector de idioma sin redirección automática, y un test que falla si una clave se queda sin traducir. Decisión del fundador **contra la recomendación de abrir uno solo** → [D-026](DECISION_LOG.md#d-026) | El `noindex` sigue puesto: la web está en cinco idiomas, pero **no es indexable** hasta G0. Pendiente: revisor nativo por idioma, contenido real y retailer de destino por mercado |
 | 2026-10-11 | **Plan de posicionamiento multilingüe trazado** (pendiente de ratificar). Diagnóstico `[X]`: `lookfit.app` sin registro A en el servidor autoritativo y `www` NXDOMAIN; `robots.txt` y `sitemap.xml` 404; `noindex` global; VisuTry cubre 9 idiomas **sin italiano**, ~109 URLs por idioma y localización superficial (H1 en inglés). Propuesta: publicar **solo ES**, fontanería i18n para los cinco, segundo idioma por gate G1. `tracker.config.json` aplicado | Siguiente: crear A `@` y CNAME `www`; crear `sc-domain:lookfit.app`; ronda 1 de Keyword Planner en ES; decidir quién firma las guías y quién revisa italiano |
@@ -105,6 +106,9 @@ Se marcan como heredados hasta que los confirme un dato nuestro.
 - `[X] 2026-10-11` **El `.com` internacional de este nicho está agotado.** ~190 dominios
   comprobados por RDAP, cero libres con raíz inglesa → [D-024](DECISION_LOG.md#d-024). Afecta
   al SEO de marca: la búsqueda «lookfit» competirá con lo que haya en `lookfit.com`.
+- `[T] 2026-10-13` **La afiliación se firma con el retailer, no con la marca.** Desacopla el dinero de conseguir acuerdos con Ray-Ban u Oakley: cualquier marca que stockee un multimarca con programa abierto —Mister Spex ~10 %, SmartBuyGlasses ~12 %— es monetizable. Cambia la prioridad de marcas: vale más una con programa accesible que una famosa.
+- `[T] 2026-10-13` **Los términos de una tienda pueden prohibir lo que la ley permite.** Tras *Ryanair/PR Aviation* (C-30/14), una web cuya base no está protegida por la Directiva puede limitar el scraping por contrato y hacerlo valer. Las medidas se toman **a mano** de la ficha oficial, del estampado de la varilla o de un feed licenciado; nunca con un rastreador contra tiendas. Una medida es un hecho; una descripción o una foto, no.
+- `[T] 2026-10-13` **«Ancho de lente» y «ancho de frontal» no se mezclan en la misma columna.** Ray-Ban publica calibre-puente-varilla; Hawkers y Meller publican frontal-alto-varilla. El tipo ya los separa (`lensWidthMm` frente a `totalWidthMm`), pero una tabla que los junte compara cosas distintas. Además dos tiendas se contradicen en qué talla de la RB2140 lleva qué puente, con 4 mm de diferencia en el índice: hasta el estampado o la ficha oficial, es `indicative`.
 - `[X] 2026-10-13` **El contenido se escribe sobre el producto que existe, no sobre el del plan.** Las tres guías entregadas describían una previsualización a escala sobre la foto; esa función se había eliminado semanas antes a petición del fundador y lo que queda es una lectura de anchura en palabras. Nadie lo habría notado leyendo el texto: era coherente y estaba bien escrito. **Antes de publicar una página que describe el producto, hay que abrir el código y comprobar qué hace hoy.** Prometer una función que no existe es la misma clase de error que RULE #1 persigue, solo que en la dirección contraria.
 - `[T] 2026-10-13` **Un mismo calibre no es una misma talla.** Cruzando seis referencias Ray-Ban con puente y varilla, la talla 55 va de un índice de anchura de 124 (Aviator) a 131 (Clubmaster), porque el puente va de 14 a 21 mm. Es lo único propio que sostiene la guía de tallas: si una medida cambia, hay que recalcular el índice.
 - `[T] 2026-10-13` **Antes de llamar «conflicto» a un dato, comprobar si son tallas distintas.** La nota del catálogo sobre la RB2132 («52/55 frente a 58») no era un desacuerdo entre fuentes: las tres tallas existen.
@@ -166,6 +170,22 @@ verdades. Lectura de cualquiera: nunca por debajo de 10 impresiones por query.
 | E-07 | LATAM es una variante léxica, no un idioma nuevo (`es-mx`) | % de impresiones ES desde MX, AR, CO, CL | <25 % durante 4 semanas: no se abre |
 | E-08 | GEO: las páginas de medidas y de mecanismo se citan en buscadores de IA | Auditoría mensual, 10 preguntas reales en ES, cita sí/no por fuente | Sin citas tras 3 auditorías: revisar formato, no abandonar |
 | E-09 | pt-BR como apuesta tardía y contraestacional | Impresiones desde BR | Solo si G2 se cumple |
+
+### Keywords inalcanzables a 12 meses, para no quemar esfuerzo
+
+Declaradas así el 2026-10-13 `[T]`, con SERP vistas por una herramienta que no
+es Google España: **hay que confirmarlas a mano en incógnito** antes de darlas
+por cerradas.
+
+| Keyword | Por qué |
+|---|---|
+| «gafas de sol», «gafas de sol hombre/mujer» | SERP de retailers con stock, precios y reseñas. Sin vender nada, Google no tiene motivo para colocarnos en una consulta transaccional |
+| «gafas de sol redondas» como cabecera | Lo mismo: la SERP devuelve fichas y listados de tienda |
+| «ray ban», «comprar ray ban», «oakley» | Navegacionales y transaccionales puras |
+| «gafas baratas», «outlet», «ofertas» | Choca con [D-019](DECISION_LOG.md#d-019) y con que no vendemos |
+| «gafas graduadas online» | Donde mejor comisión hay y más concentrada está la SERP. El MVP lo aplaza ([D-003](DECISION_LOG.md#d-003)) |
+| «tendencias gafas de sol 2026» | Terreno de prensa de moda con autoridad, y estacional |
+| «probar Ray-Ban / Oakley online» | RULE #1: exigiría presentar una generación como ese producto |
 
 ### Oportunidades descartadas, para que conste que se valoraron
 

@@ -2,10 +2,11 @@ import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/site";
 import { GUIDES } from "@/lib/content/guides";
 import {
+  INDEXABLE_LOCALES,
   LOCALES,
   LOCALE_HREFLANG,
-  X_DEFAULT_LOCALE,
   localePath,
+  xDefaultLocale,
   type Locale,
 } from "@/lib/i18n";
 
@@ -48,7 +49,15 @@ const ROUTES: SitemapRoute[] = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return ROUTES.flatMap(({ path, priority, locales }) => {
+  return ROUTES.flatMap(({ path, priority, locales: declared }) => {
+    // Doble filtro: el idioma tiene que existir para esa ruta **y** estar
+    // abierto. Hoy no hay ninguno abierto, así que el sitemap sale vacío, y
+    // eso es lo correcto: anunciar una URL que dice `noindex` es pedirle a
+    // Google que decida cuál de las dos señales le creemos.
+    const locales = declared.filter((locale) =>
+      INDEXABLE_LOCALES.includes(locale),
+    );
+    if (locales.length === 0) return [];
     // Una página que existe en un solo idioma no lleva alternativas: hreflang
     // con una sola entrada no dice nada y apuntar a traducciones que no están
     // es peor que callarse.
@@ -61,7 +70,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
                 absoluteUrl(localePath(locale, path)),
               ]),
             ),
-            "x-default": absoluteUrl(localePath(X_DEFAULT_LOCALE, path)),
+            "x-default": absoluteUrl(localePath(xDefaultLocale(), path)),
           }
         : undefined;
 

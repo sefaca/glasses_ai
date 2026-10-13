@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { anyIndexable } from "@/lib/i18n";
 import { absoluteUrl } from "@/lib/site";
 
 /**
@@ -17,8 +18,14 @@ import { absoluteUrl } from "@/lib/site";
  * el día del cambio.
  */
 export default function robots(): MetadataRoute.Robots {
+  const open = anyIndexable();
+
   return {
-    rules: [{ userAgent: "*", disallow: "/" }],
+    rules: [
+      open
+        ? { userAgent: "*", allow: "/" }
+        : { userAgent: "*", disallow: "/" },
+    ],
     sitemap: absoluteUrl("/sitemap.xml"),
     host: absoluteUrl("/"),
   };
