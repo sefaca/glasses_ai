@@ -310,6 +310,27 @@ export const de: Dictionary = {
     },
   },
 
+  waitlist: {
+    prompt: "Ich habe keinen Code",
+    title: "Wir sagen dir Bescheid, sobald du es testen kannst",
+    body: "Wir öffnen nach und nach, weil jede Anprobe echtes Geld kostet. Lass uns deine E-Mail da, und wir schreiben dir, wenn du dran bist.",
+    emailLabel: "Deine E-Mail",
+    emailPlaceholder: "du@email.de",
+    submit: "Bescheid geben",
+    promise:
+      "Eine einzige E-Mail, wenn du hineinkommst. Sonst nichts: kein Newsletter, keine Werbung, und deine Adresse geht an niemanden. Du kannst jederzeit verlangen, dass wir sie löschen.",
+    successTitle: "Du stehst auf der Liste",
+    successBody:
+      "Wir schreiben an diese Adresse, sobald du an der Reihe bist. Du kannst das schließen und weiterschauen.",
+    errors: {
+      invalidEmail: "Diese Adresse sieht nicht gültig aus. Prüf sie bitte.",
+      rateLimited: "Zu viele Versuche hintereinander. Versuch es später.",
+      unavailable:
+        "Wir können deine E-Mail noch nicht speichern, deshalb fragen wir sie nicht halbherzig ab. Versuch es in ein paar Tagen.",
+      generic: "Wir konnten dich nicht eintragen. Versuch es noch einmal.",
+    },
+  },
+
   legal: {
     pendingReview: "Stand dieses Dokuments",
     privacy: {
@@ -330,6 +351,14 @@ export const de: Dictionary = {
           heading: "Virtuelle Anprobe",
           paragraphs: [
             "Wenn du eine Fassung anprobieren möchtest, muss das Bild zur Verarbeitung das Gerät verlassen. Dann geht es in einen privaten Speicher mit kurzlebigen signierten Links und wird zusammen mit den abgeleiteten Ergebnissen nach kurzer Zeit gelöscht. Vorher siehst du, welcher Anbieter es verarbeitet und wie lange es aufbewahrt wird.",
+          ],
+        },
+        {
+          heading: "Wenn du dich auf die Warteliste setzt",
+          paragraphs: [
+            "Das ist das Einzige, was wir von dir als identifizierbarer Person behalten, und nur wenn du darum bittest. Wir speichern deine E-Mail, die Sprache, in der du dich eingetragen hast, von welcher Stelle der Seite aus, und das Datum deiner Zustimmung. Sonst nichts: kein Name, keine IP, nichts aus deinem Foto oder deinem Gesicht.",
+            "Die Liste wird nie mit der Produktanalytik zusammengeführt. Was wir über die Nutzung messen, ist anonym und bleibt es: mit deiner E-Mail verknüpft wäre es identifiziertes Tracking.",
+            "Wir nutzen sie für eine einzige E-Mail, wenn wir dir den Zugang öffnen können. Wir verkaufen die Liste nicht und geben sie nicht weiter. Du kannst jederzeit verlangen, dass wir deine Adresse löschen, und wir tun es, ohne nach dem Grund zu fragen.",
           ],
         },
         {

@@ -295,6 +295,27 @@ export const es: Dictionary = {
     },
   },
 
+  waitlist: {
+    prompt: "No tengo código",
+    title: "Te avisamos cuando puedas probarlo",
+    body: "Estamos abriendo poco a poco porque cada prueba tiene un coste real. Déjanos tu correo y te escribimos cuando te toque.",
+    emailLabel: "Tu correo",
+    emailPlaceholder: "tu@correo.com",
+    submit: "Avisadme",
+    promise:
+      "Un único correo, cuando puedas entrar. Nada más: ni newsletter, ni publicidad, ni tu correo a terceros. Puedes pedir que lo borremos cuando quieras.",
+    successTitle: "Apuntado",
+    successBody:
+      "Te escribiremos a esa dirección cuando abramos tu turno. Puedes cerrar esto y seguir mirando.",
+    errors: {
+      invalidEmail: "Esa dirección no parece válida. Revísala.",
+      rateLimited: "Demasiados intentos seguidos. Prueba dentro de un rato.",
+      unavailable:
+        "Todavía no podemos guardar tu correo, así que no te lo pedimos a medias. Vuelve a intentarlo en unos días.",
+      generic: "No hemos podido apuntarte. Vuelve a intentarlo.",
+    },
+  },
+
   legal: {
     pendingReview: "Estado de este documento",
     privacy: {
@@ -315,6 +336,14 @@ export const es: Dictionary = {
           heading: "Prueba virtual",
           paragraphs: [
             "Si pides probarte una montura, la imagen sí tiene que salir del dispositivo para procesarse. En ese caso irá a un almacenamiento privado, con enlaces firmados de caducidad corta, y se eliminará junto con los resultados derivados pasado un plazo breve. Antes de que eso ocurra verás qué proveedor la procesa y durante cuánto tiempo se conserva.",
+          ],
+        },
+        {
+          heading: "Si te apuntas a la lista de espera",
+          paragraphs: [
+            "Es lo único que guardamos de ti como persona identificable, y solo si lo pides tú. Guardamos tu correo, el idioma en que te apuntaste, desde qué punto de la web lo hiciste y la fecha en que aceptaste. Nada más: ni tu nombre, ni tu IP, ni nada de tu foto o de tu rostro.",
+            "La lista no se cruza con la analítica del producto. Lo que medimos del uso es anónimo y así se queda: unirlo a tu correo lo convertiría en un seguimiento identificado.",
+            "Lo usamos para un único correo, cuando podamos abrirte el acceso. No vendemos ni cedemos la lista. Puedes pedirnos que borremos tu dirección cuando quieras y lo haremos sin preguntarte por qué.",
           ],
         },
         {

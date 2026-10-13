@@ -304,6 +304,27 @@ export const it: Dictionary = {
     },
   },
 
+  waitlist: {
+    prompt: "Non ho un codice",
+    title: "Ti avvisiamo quando potrai provarlo",
+    body: "Stiamo aprendo poco a poco perché ogni prova ha un costo reale. Lasciaci la tua email e ti scriviamo quando tocca a te.",
+    emailLabel: "La tua email",
+    emailPlaceholder: "tu@email.com",
+    submit: "Avvisami",
+    promise:
+      "Una sola email, quando potrai entrare. Nient'altro: niente newsletter, niente pubblicità e il tuo indirizzo non va a nessuno. Puoi chiederci di cancellarlo quando vuoi.",
+    successTitle: "Sei in lista",
+    successBody:
+      "Ti scriveremo a quell'indirizzo quando si apre il tuo turno. Puoi chiudere e continuare a guardare.",
+    errors: {
+      invalidEmail: "Questo indirizzo non sembra valido. Controllalo.",
+      rateLimited: "Troppi tentativi di seguito. Riprova tra un po'.",
+      unavailable:
+        "Non possiamo ancora salvare la tua email, quindi non te la chiediamo a metà. Riprova tra qualche giorno.",
+      generic: "Non siamo riusciti a iscriverti. Riprova.",
+    },
+  },
+
   legal: {
     pendingReview: "Stato di questo documento",
     privacy: {
@@ -324,6 +345,14 @@ export const it: Dictionary = {
           heading: "Prova virtuale",
           paragraphs: [
             "Se chiedi di provare una montatura, l'immagine deve uscire dal dispositivo per essere elaborata. In quel caso finisce in uno spazio privato, con link firmati a scadenza breve, e viene cancellata insieme ai risultati derivati dopo poco tempo. Prima che accada vedrai quale fornitore la elabora e per quanto tempo viene conservata.",
+          ],
+        },
+        {
+          heading: "Se ti iscrivi alla lista d'attesa",
+          paragraphs: [
+            "È l'unica cosa che conserviamo di te come persona identificabile, e solo se lo chiedi tu. Conserviamo la tua email, la lingua in cui ti sei iscritto, da quale punto del sito l'hai fatto e la data in cui hai acconsentito. Nient'altro: né il nome, né l'IP, né nulla della tua foto o del tuo viso.",
+            "La lista non viene mai incrociata con le analitiche di prodotto. Quello che misuriamo sull'uso è anonimo e resta tale: collegarlo alla tua email lo trasformerebbe in un tracciamento identificato.",
+            "La usiamo per una sola email, quando potremo aprirti l'accesso. Non vendiamo né cediamo la lista. Puoi chiederci di cancellare il tuo indirizzo quando vuoi e lo faremo senza chiederti perché.",
           ],
         },
         {

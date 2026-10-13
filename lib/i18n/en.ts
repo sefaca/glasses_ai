@@ -298,6 +298,27 @@ export const en: Dictionary = {
     },
   },
 
+  waitlist: {
+    prompt: "I don't have a code",
+    title: "We'll let you know when you can try it",
+    body: "We're opening up slowly because each try-on has a real cost. Leave us your email and we'll write when it's your turn.",
+    emailLabel: "Your email",
+    emailPlaceholder: "you@email.com",
+    submit: "Let me know",
+    promise:
+      "One single email, when you can get in. Nothing else: no newsletter, no ads, and your address goes to no one. You can ask us to delete it whenever you like.",
+    successTitle: "You're on the list",
+    successBody:
+      "We'll write to that address when your turn opens up. You can close this and carry on looking.",
+    errors: {
+      invalidEmail: "That address doesn't look valid. Check it.",
+      rateLimited: "Too many attempts in a row. Try again in a while.",
+      unavailable:
+        "We can't store your email yet, so we won't ask for it half-heartedly. Try again in a few days.",
+      generic: "We couldn't add you. Please try again.",
+    },
+  },
+
   legal: {
     pendingReview: "Status of this document",
     privacy: {
@@ -318,6 +339,14 @@ export const en: Dictionary = {
           heading: "Virtual try-on",
           paragraphs: [
             "If you ask to try a frame on, the image does have to leave your device to be processed. It goes to private storage with short-lived signed links, and is deleted along with any derived results after a brief period. Before that happens you'll see which provider processes it and how long it's kept.",
+          ],
+        },
+        {
+          heading: "If you join the waiting list",
+          paragraphs: [
+            "This is the only thing we keep about you as an identifiable person, and only if you ask us to. We store your email, the language you signed up in, where on the site you did it, and the date you agreed. Nothing else: no name, no IP, nothing from your photo or your face.",
+            "The list is never joined with product analytics. What we measure about usage is anonymous and stays that way: linking it to your email would turn it into identified tracking.",
+            "We use it for a single email, when we can open access to you. We don't sell or share the list. You can ask us to delete your address whenever you like and we will, without asking why.",
           ],
         },
         {

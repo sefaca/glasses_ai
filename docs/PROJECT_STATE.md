@@ -72,6 +72,7 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Puerta de acceso `ACCESS_CODE` en la ruta de generación | **HECHO y activa en producción** `[X]` 2026-10-13: `401 access_denied` sin código y con código incorrecto → [D-025](DECISION_LOG.md#d-025) |
 | **Analítica del embudo** (§17): 17 eventos, sin cookies ni datos personales | **HECHO** `[X]` verificado: el servidor descarta todo metadato fuera de la lista blanca |
 | Destino persistente de los eventos (hoy van al log de Vercel) | **pendiente** — el adaptador está, falta la tabla |
+| **Lista de espera** en la pared de acceso, con su tabla y su texto legal en 5 idiomas | **HECHO** — apagada hasta que existan las claves de Supabase |
 | Supabase, rate limiting persistente | pendiente — la puerta es un apaño de alfa, no la solución |
 | **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |
 | **Imágenes y marcas de terceros** | **bloqueado** — GA-1, [D-015](DECISION_LOG.md#d-015) |

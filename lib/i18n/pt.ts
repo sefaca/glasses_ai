@@ -304,6 +304,27 @@ export const pt: Dictionary = {
     },
   },
 
+  waitlist: {
+    prompt: "Não tenho código",
+    title: "A gente avisa quando você puder testar",
+    body: "Estamos abrindo aos poucos porque cada teste tem um custo real. Deixe seu e-mail e escrevemos quando chegar a sua vez.",
+    emailLabel: "Seu e-mail",
+    emailPlaceholder: "voce@email.com",
+    submit: "Me avise",
+    promise:
+      "Um único e-mail, quando você puder entrar. Só isso: sem newsletter, sem publicidade e seu endereço não vai para ninguém. Você pode pedir para apagarmos quando quiser.",
+    successTitle: "Você está na lista",
+    successBody:
+      "Vamos escrever para esse endereço quando abrir a sua vez. Pode fechar e continuar olhando.",
+    errors: {
+      invalidEmail: "Esse endereço não parece válido. Confira.",
+      rateLimited: "Tentativas demais seguidas. Tente daqui a pouco.",
+      unavailable:
+        "Ainda não conseguimos guardar seu e-mail, então não pedimos pela metade. Tente de novo em alguns dias.",
+      generic: "Não conseguimos inscrever você. Tente de novo.",
+    },
+  },
+
   legal: {
     pendingReview: "Situação deste documento",
     privacy: {
@@ -324,6 +345,14 @@ export const pt: Dictionary = {
           heading: "Prova virtual",
           paragraphs: [
             "Se você pedir para experimentar uma armação, a imagem precisa sair do dispositivo para ser processada. Nesse caso vai para um armazenamento privado, com links assinados de validade curta, e é apagada junto com os resultados derivados depois de pouco tempo. Antes disso você verá qual fornecedor a processa e por quanto tempo ela é mantida.",
+          ],
+        },
+        {
+          heading: "Se você entrar na lista de espera",
+          paragraphs: [
+            "É a única coisa que guardamos de você como pessoa identificável, e só se você pedir. Guardamos seu e-mail, o idioma em que se inscreveu, de que ponto do site fez isso e a data em que concordou. Mais nada: nem nome, nem IP, nem nada da sua foto ou do seu rosto.",
+            "A lista nunca é cruzada com o analytics do produto. O que medimos sobre o uso é anônimo e continua assim: ligá-lo ao seu e-mail transformaria isso em rastreamento identificado.",
+            "Usamos para um único e-mail, quando pudermos liberar seu acesso. Não vendemos nem cedemos a lista. Você pode pedir para apagarmos seu endereço quando quiser e apagamos, sem perguntar por quê.",
           ],
         },
         {

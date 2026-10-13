@@ -235,6 +235,30 @@ export interface Dictionary {
     };
   };
 
+  /**
+   * Lista de espera de la alfa. La promesa tiene que ser **exactamente** lo
+   * que vamos a hacer: un aviso, una vez. Cualquier adorno aquí es una
+   * promesa que luego hay que cumplir.
+   */
+  waitlist: {
+    prompt: string;
+    title: string;
+    body: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    submit: string;
+    /** Qué recibirá, literal. Va visible antes de enviar, no después. */
+    promise: string;
+    successTitle: string;
+    successBody: string;
+    errors: {
+      invalidEmail: string;
+      rateLimited: string;
+      unavailable: string;
+      generic: string;
+    };
+  };
+
   legal: {
     privacy: LegalDoc;
     terms: LegalDoc;

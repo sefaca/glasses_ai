@@ -225,6 +225,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
         <AccessGate
           retry={pendingAccess.retry}
           dict={dict}
+          lang={lang}
           onSubmit={() => {
             const { frameId } = pendingAccess;
             setPendingAccess(null);
