@@ -63,7 +63,10 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | **Web en cinco idiomas** (es · en · it · pt · de) con rutas, hreflang, sitemap y robots | **HECHO** → [D-026](DECISION_LOG.md#d-026). `[X]` verificado en build de producción |
 | Revisión nativa de las traducciones | **pendiente** — bloquea quitar el `noindex` |
 | **Primeras tres guías en español** + índice, con schema válido | **HECHO** `[X]` verificado: FAQ del marcado = FAQ visible, sin `Product`, canonical propio, 404 en los otros idiomas |
-| Verificar medidas en fichas oficiales (17 de 23 monturas sin medidas) | **pendiente** — bloquea las páginas de forma y de marca |
+| **Español indexable** `[X]` 2026-10-13, 33 URLs | **HECHO** → [D-027](DECISION_LOG.md#d-027). Los otros 4 idiomas, cerrados |
+| 125 páginas de catálogo (9 formas + 14 marcas + 2 hubs) × 5 idiomas | **HECHO** → [D-027](DECISION_LOG.md#d-027) |
+| Verificar medidas: 17 de 23 monturas sin ninguna, 6 sin confirmar | **pendiente** — es lo que convierte las páginas delgadas en tablas comparativas. Plantilla en [research/catalog/](../research/catalog/medidas-pendientes.md) |
+| Ampliar catálogo en cat-eye y oversized (1 montura cada una) | **pendiente** — esas dos páginas no tienen nada que comparar |
 | Sistema de growth/SEO (agente + tracker semanal) | **HECHO** → [GROWTH_SEO.md](GROWTH_SEO.md) |
 | Dominio `lookfit.app` sirviendo en producción, con certificado | **HECHO** `[X]` verificado 2026-10-13 → [D-024](DECISION_LOG.md#d-024) |
 | Puerta de acceso `ACCESS_CODE` en la ruta de generación | **HECHO y activa en producción** `[X]` 2026-10-13: `401 access_denied` sin código y con código incorrecto → [D-025](DECISION_LOG.md#d-025) |
