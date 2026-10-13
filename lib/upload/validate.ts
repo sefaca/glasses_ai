@@ -31,26 +31,23 @@ export type UploadIssue =
   | "too-many-pixels"
   | "empty";
 
+/**
+ * Resultado de una comprobación.
+ *
+ * Devuelve el **código** del problema, no el texto: el texto depende del
+ * idioma y vive en el diccionario. Así estas funciones siguen siendo puras y
+ * se testean sin tocar i18n.
+ */
 export interface UploadCheck {
   ok: boolean;
   issue: UploadIssue | null;
-  message: string | null;
 }
-
-const MESSAGES: Record<UploadIssue, string> = {
-  "unsupported-type": "Solo aceptamos imágenes JPG, PNG o WEBP.",
-  "too-large": "La imagen pesa demasiado. El máximo son 12 MB.",
-  "too-small":
-    "La imagen es muy pequeña. Necesitamos al menos 480 píxeles de lado.",
-  "too-many-pixels": "La imagen tiene demasiada resolución. Reduce su tamaño.",
-  empty: "El archivo está vacío.",
-};
 
 function fail(issue: UploadIssue): UploadCheck {
-  return { ok: false, issue, message: MESSAGES[issue] };
+  return { ok: false, issue };
 }
 
-const OK: UploadCheck = { ok: true, issue: null, message: null };
+const OK: UploadCheck = { ok: true, issue: null };
 
 /**
  * Comprueba tipo y tamaño **antes de decodificar**.

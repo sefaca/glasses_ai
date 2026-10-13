@@ -3,6 +3,7 @@ import { classifyFace, SHAPE_CENTROIDS } from "../lib/face/classify";
 import { NEUTRAL_FACE } from "../lib/face/neutral";
 import { EMPTY_PREFERENCES, type FaceProfile } from "../lib/face/types";
 import { explainRecommendation } from "../lib/recommendations/explain";
+import { DEFAULT_LOCALE, getDictionary } from "../lib/i18n";
 import { recommend, scoreFrame } from "../lib/recommendations/score";
 import { DEFAULT_WEIGHTS } from "../lib/recommendations/weights";
 import {
@@ -184,10 +185,13 @@ describe("recommend", () => {
 });
 
 describe("explicaciones", () => {
+  const dict = getDictionary(DEFAULT_LOCALE);
+
   it("no afirma ninguna medida concreta", () => {
     const face = faceOf("round");
     for (const frame of makeFrameSet()) {
       const text = explainRecommendation(
+        dict,
         frame,
         scoreFrame(face, EMPTY_PREFERENCES, frame),
       );
@@ -211,9 +215,10 @@ describe("explicaciones", () => {
 
     const frame = makeFrameWithoutMeasurements();
     const text = explainRecommendation(
+      dict,
       frame,
       scoreFrame(desconocida, EMPTY_PREFERENCES, frame),
     );
-    expect(text).toBe("Una opción equilibrada para empezar a comparar.");
+    expect(text).toBe(dict.explain.fallback);
   });
 });

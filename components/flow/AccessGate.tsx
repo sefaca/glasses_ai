@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { Dictionary } from "@/lib/i18n";
 import { saveAccessCode } from "@/lib/tryon/client";
 
 /**
@@ -18,12 +19,14 @@ import { saveAccessCode } from "@/lib/tryon/client";
 interface Props {
   /** `true` si ya se intentó un código y el servidor lo rechazó. */
   retry: boolean;
+  dict: Dictionary;
   onSubmit: () => void;
   onCancel: () => void;
 }
 
-export function AccessGate({ retry, onSubmit, onCancel }: Props) {
+export function AccessGate({ retry, dict, onSubmit, onCancel }: Props) {
   const [code, setCode] = useState("");
+  const texts = dict.tryOn.access;
 
   function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -39,17 +42,13 @@ export function AccessGate({ retry, onSubmit, onCancel }: Props) {
         onSubmit={submit}
         className="w-full max-w-sm rounded-2xl border border-line bg-surface p-6 shadow-xl"
       >
-        <h2 className="font-display text-xl tracking-tight">
-          Esto todavía es privado
-        </h2>
+        <h2 className="font-display text-xl tracking-tight">{texts.title}</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          {retry
-            ? "Ese código no es correcto. Comprueba que esté completo."
-            : "Cada generación tiene un coste real, así que de momento hace falta un código para probarlo."}
+          {retry ? texts.wrong : texts.body}
         </p>
 
         <label htmlFor="access-code" className="sr-only">
-          Código de acceso
+          {texts.placeholder}
         </label>
         <input
           id="access-code"
@@ -59,7 +58,7 @@ export function AccessGate({ retry, onSubmit, onCancel }: Props) {
           autoFocus
           value={code}
           onChange={(event) => setCode(event.target.value)}
-          placeholder="Código"
+          placeholder={texts.placeholder}
           className="mt-5 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none focus-visible:border-accent"
         />
 
@@ -69,14 +68,14 @@ export function AccessGate({ retry, onSubmit, onCancel }: Props) {
             onClick={onCancel}
             className="text-sm text-muted hover:text-ink"
           >
-            Cancelar
+            {texts.cancel}
           </button>
           <button
             type="submit"
             disabled={code.trim().length === 0}
             className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px disabled:opacity-40"
           >
-            Entrar
+            {texts.submit}
           </button>
         </div>
       </form>

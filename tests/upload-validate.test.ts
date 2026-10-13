@@ -24,7 +24,6 @@ describe("metadatos, antes de decodificar", () => {
   it("rechaza un tipo no soportado", () => {
     const result = checkUploadMetadata({ type: "image/gif", size: 1000 });
     expect(result.issue).toBe("unsupported-type");
-    expect(result.message).toMatch(/JPG/);
   });
 
   it("rechaza algo que no es una imagen", () => {

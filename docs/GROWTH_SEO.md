@@ -42,9 +42,13 @@ sin nivel de evidencia; nada de contenido facial en material de marketing; no so
   en precarga HSTS → sin certificado el dominio no carga → [D-024](DECISION_LOG.md#d-024).
 - **Cómo se publica**: push a `main` → build automático en Vercel. `prebuild` descarga los
   activos de MediaPipe (~41 MB), por eso `public/mediapipe/` no está en git.
-- **Sitemaps / robots.txt / llms.txt**: **no existen todavía.** El sitio entero está en
-  `noindex, nofollow` `[X]` verificado 2026-10-11, que es lo correcto mientras no haya
-  contenido, pero significa que **el SEO está a cero por decisión, no por accidente**.
+- **Idiomas**: cinco, con prefijo de ruta — `/es`, `/en`, `/it`, `/pt`, `/de`; la raíz
+  redirige 307 a `/es`. `hreflang` recíproco en las cinco y `x-default` → `/en`
+  → [D-026](DECISION_LOG.md#d-026). **Ninguna traducción la ha revisado una persona
+  nativa**, y eso es un bloqueante de G0, no un detalle.
+- **Sitemaps / robots.txt**: ya existen (`app/sitemap.ts`, `app/robots.ts`), pero
+  `robots.txt` **prohíbe todo** y las páginas siguen en `noindex, nofollow`, en
+  coherencia. El SEO está a cero **por decisión, no por accidente**. `llms.txt` pendiente.
 - **Search Console**: propiedad **sin crear** y cuenta de servicio pendiente. Pasos en
   [growth/README.md](../growth/README.md). Sin el secret `GSC_SA_KEY`, el tracker corre
   igual pero solo con la parte de competidores.
@@ -76,6 +80,7 @@ volumen y mal encaje vale menos que una de volumen medio que coincide con quien 
 
 | Fecha | Acción | Resultado / siguiente paso |
 |---|---|---|
+| 2026-10-13 | **Web publicada en los cinco idiomas** (es · en · it · pt · de): rutas con prefijo, `hreflang` recíproco con `x-default` → `/en`, canonical por idioma, `sitemap.xml` y `robots.txt`, selector de idioma sin redirección automática, y un test que falla si una clave se queda sin traducir. Decisión del fundador **contra la recomendación de abrir uno solo** → [D-026](DECISION_LOG.md#d-026) | El `noindex` sigue puesto: la web está en cinco idiomas, pero **no es indexable** hasta G0. Pendiente: revisor nativo por idioma, contenido real y retailer de destino por mercado |
 | 2026-10-11 | **Plan de posicionamiento multilingüe trazado** (pendiente de ratificar). Diagnóstico `[X]`: `lookfit.app` sin registro A en el servidor autoritativo y `www` NXDOMAIN; `robots.txt` y `sitemap.xml` 404; `noindex` global; VisuTry cubre 9 idiomas **sin italiano**, ~109 URLs por idioma y localización superficial (H1 en inglés). Propuesta: publicar **solo ES**, fontanería i18n para los cinco, segundo idioma por gate G1. `tracker.config.json` aplicado | Siguiente: crear A `@` y CNAME `www`; crear `sc-domain:lookfit.app`; ronda 1 de Keyword Planner en ES; decidir quién firma las guías y quién revisa italiano |
 | 2026-10-11 | Sistema de growth instalado (agente `growth-seo-expert` + tracker semanal + workflows) | Nada que medir todavía: sin dominio resuelto, sin Search Console y con el sitio en `noindex` |
 
@@ -164,9 +169,10 @@ verdades. Lectura de cualquiera: nunca por debajo de 10 impresiones por query.
 
 ## 8. Baseline (antes de empezar)
 
-**Cero, y conviene que quede escrito.** A 2026-10-11: sin dominio propagado, sin propiedad
-de Search Console, sin sitemap, sin una sola página indexable y sin contenido. Cualquier
-número futuro se mide contra este cero.
+**Cero, y conviene que quede escrito.** A 2026-10-13: el dominio **no resuelve** (no hay
+registro A), no hay propiedad de Search Console, y aunque ya existen sitemap, robots y
+cinco idiomas, **ni una sola página es indexable** y no hay contenido más allá de la
+interfaz. Cualquier número futuro se mide contra este cero.
 
 ## 9. Métricas norte
 

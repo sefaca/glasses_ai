@@ -59,7 +59,10 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Catálogo real: **23 monturas de 14 marcas**, con referencia | **HECHO** — sin imágenes suyas. Recuento `[X]` verificado 2026-10-11 contra `frames.ts`; antes decía 24/13 |
 | Registro de 34 marcas con grupo propietario y accesibilidad | **HECHO** → [brands.ts](../lib/catalog/brands.ts) |
 | Sugerencia de marcas según las proporciones del rostro | **HECHO** |
-| 141 tests · build, typecheck y lint en verde | **HECHO** |
+| 151 tests · build, typecheck y lint en verde | **HECHO** |
+| **Web en cinco idiomas** (es · en · it · pt · de) con rutas, hreflang, sitemap y robots | **HECHO** → [D-026](DECISION_LOG.md#d-026). `[X]` verificado en build de producción |
+| Revisión nativa de las traducciones | **pendiente** — bloquea quitar el `noindex` |
+| Sistema de growth/SEO (agente + tracker semanal) | **HECHO** → [GROWTH_SEO.md](GROWTH_SEO.md) |
 | Dominio `lookfit.app` y despliegue en Vercel | **HECHO** → [D-024](DECISION_LOG.md#d-024). DNS sin conectar |
 | Puerta de acceso `ACCESS_CODE` en la ruta de generación | **HECHO** → [D-025](DECISION_LOG.md#d-025) |
 | Analítica del embudo y outbound clicks | pendiente |

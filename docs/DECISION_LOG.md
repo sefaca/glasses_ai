@@ -51,6 +51,7 @@
 | [D-023](#d-023) | 2026-10-11 | La shortlist de nombres está entera ocupada; `.io` descartado | DECISIÓN | OPEN |
 | [D-024](#d-024) | 2026-10-11 | Nombre y dominio: **lookfit.app** | DECISIÓN | OPEN |
 | [D-025](#d-025) | 2026-10-11 | Código de acceso compartido, no rate limiting real, para abrir la alfa | DECISIÓN | OPEN |
+| [D-026](#d-026) | 2026-10-13 | Cinco idiomas a la vez, **contra la recomendación técnica** | DECISIÓN | OPEN |
 
 ---
 
@@ -373,6 +374,22 @@
 - **Lo que esto NO es** No es autenticación. No identifica a nadie, no caduca, no se revoca por usuario y quien tiene el código lo puede reenviar. No sustituye al **límite de gasto duro** del panel de OpenAI, que es la única red que no depende de nuestro código.
 - **Alternatives** (a) Upstash Redis para rate limiting persistente — la solución correcta, pero añade un servicio y una dependencia para enseñar el producto a diez personas, contra [CLAUDE.md §29.1](../CLAUDE.md); (b) Vercel Password Protection, que es de plan Pro; (c) dejar la URL abierta con el `noindex` como única defensa, que es apostar el saldo a que nadie encuentra la URL; (d) no desplegar con clave y quedarse en `mock`, que impide que alguien que no sea el fundador vea el producto real.
 - **Cuándo caduca esta decisión** Al abrir al público. Entonces hacen falta sesión anónima y rate limiting persistente, y la puerta estorba más de lo que protege. Queda escrito para que no se confunda con una solución de seguridad.
+
+<a id="d-026"></a>
+## D-026 · Cinco idiomas a la vez, contra la recomendación técnica
+
+- **Date** 2026-10-13 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El fundador pide posicionar en **es · en · it · pt · de** y, además, publicar la web en los cinco. El agente de growth recomendó lo contrario —publicar solo en español y abrir el segundo idioma por el gate G1— y se le expuso el argumento. El fundador lo reafirmó: «Hazlo en los 5 idiomas que te dije, y vamos a poner la web tb en los 5 idiomas igualmente». **Es su decisión y se ejecuta completa.**
+- **Decision** Rutas localizadas con prefijo para los cinco, `hreflang` recíproco con `x-default` → `/en`, `canonical` propio por idioma, diccionario tipado que obliga a traducir cada clave, y selector de idioma sin redirección automática.
+- **Evidence** `[X]` Verificado en local sobre el build de producción: los cinco sirven su `<html lang>` y su H1 traducidos **en el HTML**, no por JavaScript; `/de` enumera las cinco alternativas más `x-default`; la raíz redirige 307 a `/es`.
+- **Argumentos en contra, que siguen siendo ciertos** `[T]`/`[X]`
+  1. **No hay destino de compra fuera de España.** El único programa de afiliación localizado es Hawkers en Awin ES. Un usuario alemán que complete el embudo llega a un callejón sin salida.
+  2. **Ningún idioma lo ha leído una persona nativa.** Las cinco traducciones son mías. Están marcadas como pendientes de revisión en la cabecera de `it.ts`, `pt.ts` y `de.ts`.
+  3. **Los textos legales no son traducciones válidas.** Siguen pendientes de revisión jurídica (§14) y en Alemania falta Impressum.
+  4. **Con una persona y un dominio sin enlaces**, repartir el esfuerzo deja a los cinco por debajo de las 10 impresiones por query, que es el umbral de ruido: no se aprendería nada de ninguno.
+- **Mitigación aplicada** El `noindex` global **no se ha tocado**. Que la web esté en cinco idiomas no la hace indexable: eso sigue dependiendo del gate G0 de [GROWTH_SEO.md](GROWTH_SEO.md) §4, que exige contenido real y revisión por idioma. `robots.txt` prohíbe todo, en coherencia. Así el coste de esta decisión es sólo el trabajo ya hecho, y no un castigo de Google por contenido escalado sin valor.
+- **Alternatives** (a) Solo español con la fontanería lista, que era la recomendación; (b) español e italiano, aprovechando que VisuTry no cubre italiano `[X]`; (c) cinco idiomas pero con las páginas legales solo en español, descartado porque es peor que no traducirlas.
+- **Lo que haría falta para que esto rinda** Revisor nativo por idioma, un retailer de destino por mercado, y páginas de contenido —no solo la interfaz— en cada lengua. Queda escrito para que dentro de seis meses se sepa qué faltaba, y no se lea como que «el multiidioma no funcionó».
 
 ---
 

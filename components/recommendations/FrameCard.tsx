@@ -1,6 +1,7 @@
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { canTryOn, tryOnBlockedReason } from "@/lib/catalog/rights";
 import type { FrameProfile } from "@/lib/catalog/types";
+import type { Dictionary } from "@/lib/i18n";
 import { explainRecommendation, matchLabel } from "@/lib/recommendations/explain";
 import type { FrameScore } from "@/lib/recommendations/score";
 
@@ -21,6 +22,7 @@ interface FrameCardProps {
   score: FrameScore;
   position: number;
   shapeLabel: string;
+  dict: Dictionary;
   /** `true` si ya está en la comparación. */
   selected?: boolean;
   /** Sin foto analizada no hay nada sobre lo que superponer. */
@@ -28,23 +30,32 @@ interface FrameCardProps {
   onToggle?: (frameId: string) => void;
 }
 
-const BLOCKED_COPY: Record<string, string> = {
-  "derivative-rights-not-cleared": "Prueba no disponible para esta marca",
-  "trademark-not-cleared": "Pendiente de acuerdo con la marca",
-  "frame-inactive": "No disponible",
-  unknown: "No disponible",
-};
+/** Motivo técnico del muro de gates → clave del diccionario. */
+function blockedCopy(dict: Dictionary, reason: string | null): string {
+  const copy = dict.frameCard.unavailable;
+  switch (reason) {
+    case "derivative-rights-not-cleared":
+      return copy.derivative;
+    case "trademark-not-cleared":
+      return copy.trademark;
+    case "frame-inactive":
+      return copy.inactive;
+    default:
+      return copy.unknown;
+  }
+}
 
 export function FrameCard({
   frame,
   score,
   position,
   shapeLabel,
+  dict,
   selected = false,
   canSelect = false,
   onToggle,
 }: FrameCardProps) {
-  const label = matchLabel(score);
+  const label = matchLabel(dict, score);
   // El mock es lo único conectado hoy: el proveedor real está detrás del muro
   // de gates de D-017.
   const available = canTryOn(frame, "mock");
@@ -91,7 +102,7 @@ export function FrameCard({
       </h3>
 
       <p className="mt-3 grow text-sm leading-relaxed text-muted">
-        {explainRecommendation(frame, score)}
+        {explainRecommendation(dict, frame, score)}
       </p>
 
       <div className="mt-5">
@@ -100,7 +111,7 @@ export function FrameCard({
             className="w-full rounded-full border border-dashed border-line px-5 py-2.5 text-center text-xs text-muted"
             title={blocked ?? undefined}
           >
-            {BLOCKED_COPY[blocked ?? "unknown"]}
+            {blockedCopy(dict, blocked)}
           </p>
         ) : canSelect ? (
           <button
@@ -114,7 +125,7 @@ export function FrameCard({
                 : "border-ink hover:bg-ink hover:text-paper",
             ].join(" ")}
           >
-            {selected ? "Quitar" : "Ver en mi cara"}
+            {selected ? dict.frameCard.remove : dict.frameCard.cta}
           </button>
         ) : (
           // Sin foto no hay nada sobre lo que superponer. El botón lo dice en
@@ -123,7 +134,7 @@ export function FrameCard({
             href="#foto"
             className="block w-full rounded-full border border-dashed border-line px-5 py-2.5 text-center text-xs text-muted transition-colors hover:border-ink hover:text-ink"
           >
-            Sube una foto para verla puesta
+            {dict.frameCard.needsPhoto}
           </a>
         )}
       </div>

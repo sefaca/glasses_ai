@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { DemoTriptych } from "@/components/landing/DemoTriptych";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { countByShape } from "@/lib/catalog";
 import type { FrameShape } from "@/lib/catalog/types";
-import { DEFAULT_LOCALE, getDictionary } from "@/lib/i18n";
+import { getDictionary, isLocale, localePath } from "@/lib/i18n";
 
 /**
  * Landing — CLAUDE.md §8.1.
@@ -18,9 +20,15 @@ import { DEFAULT_LOCALE, getDictionary } from "@/lib/i18n";
  * competidores que piden cuenta.
  */
 
-const dict = getDictionary(DEFAULT_LOCALE);
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  if (!isLocale(lang)) notFound();
 
-export default function HomePage() {
+  const dict = getDictionary(lang);
   const counts = countByShape();
   const shapes = (Object.keys(dict.frames.shapes) as FrameShape[]).filter(
     (shape) => (counts[shape] ?? 0) > 0,
@@ -30,16 +38,21 @@ export default function HomePage() {
     <div className="min-h-dvh">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
         {/* Sin nombre de marca: D-010 está aplazada y no se inventa uno. */}
-        <Link href="/" aria-label="Inicio" className="text-accent">
+        <Link
+          href={localePath(lang)}
+          aria-label={dict.common.home}
+          className="text-accent"
+        >
           <FrameGlyph shape="round" thickness={0.3} className="h-6 w-auto" />
         </Link>
-        <nav className="flex items-center gap-6 text-sm text-muted">
-          <a href="#catalogo" className="hover:text-ink">
+        <nav className="flex items-center gap-5 text-sm text-muted sm:gap-6">
+          <a href="#catalogo" className="hidden hover:text-ink sm:inline">
             {dict.nav.styles}
           </a>
-          <a href="#como-funciona" className="hover:text-ink">
+          <a href="#como-funciona" className="hidden hover:text-ink sm:inline">
             {dict.nav.howItWorks}
           </a>
+          <LanguageSwitcher current={lang} label={dict.common.language} />
         </nav>
       </header>
 
@@ -84,7 +97,7 @@ export default function HomePage() {
               style={{ animationDelay: "320ms" }}
             >
               <Link
-                href="/probar"
+                href={localePath(lang, "/probar")}
                 className="group inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-on-accent shadow-[0_8px_20px_-8px_rgba(0,0,0,0.45)] transition-transform active:translate-y-px active:shadow-[0_3px_10px_-6px_rgba(0,0,0,0.45)]"
               >
                 {dict.hero.ctaPrimary}
@@ -115,7 +128,7 @@ export default function HomePage() {
               recuerda de la página, y lo que pide §8.1.
             */}
             <div className="mt-14 sm:mt-20 lg:max-w-3xl">
-              <DemoTriptych />
+              <DemoTriptych dict={dict} />
             </div>
           </div>
         </section>
@@ -208,7 +221,7 @@ export default function HomePage() {
                 {dict.privacy.body}
               </p>
               <Link
-                href="/legal/privacidad"
+                href={localePath(lang, "/legal/privacy")}
                 className="mt-5 inline-block border-b border-accent pb-0.5 text-sm text-accent"
               >
                 {dict.privacy.link}
@@ -222,13 +235,22 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-muted">{dict.footer.tagline}</p>
           <nav className="flex gap-6 text-xs text-muted">
-            <Link href="/legal/privacidad" className="hover:text-ink">
+            <Link
+              href={localePath(lang, "/legal/privacy")}
+              className="hover:text-ink"
+            >
               {dict.footer.privacy}
             </Link>
-            <Link href="/legal/terminos" className="hover:text-ink">
+            <Link
+              href={localePath(lang, "/legal/terms")}
+              className="hover:text-ink"
+            >
               {dict.footer.terms}
             </Link>
-            <Link href="/legal/cookies" className="hover:text-ink">
+            <Link
+              href={localePath(lang, "/legal/cookies")}
+              className="hover:text-ink"
+            >
               {dict.footer.cookies}
             </Link>
           </nav>

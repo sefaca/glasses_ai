@@ -19,7 +19,7 @@ import type { FrameShape } from "@/lib/catalog/types";
 import type { FaceSession } from "@/lib/face/analyze";
 import { NEUTRAL_FACE } from "@/lib/face/neutral";
 import type { UserPreferences } from "@/lib/face/types";
-import { getDictionary } from "@/lib/i18n";
+import { format, type Dictionary, type Locale, localePath } from "@/lib/i18n";
 import {
   suggestBrands,
   suggestionsAreMeaningful,
@@ -40,25 +40,19 @@ import { readAccessCode, requestTryOn } from "@/lib/tryon/client";
  * dispara desde un manejador y no desde un efecto.
  */
 
-const dict = getDictionary("es");
+const STEP_IDS = ["photo", "brands", "choose", "result"] as const;
 
-const STEPS = [
-  { id: "photo", label: "Tu foto" },
-  { id: "brands", label: "Marcas" },
-  { id: "choose", label: "Elegir" },
-  { id: "result", label: "Resultado" },
-];
-
-const STYLE_OPTIONS = [
-  { id: "clasicas", label: "Clásicas" },
-  { id: "modernas", label: "Modernas" },
-  { id: "oversized", label: "Oversized" },
-  { id: "minimalistas", label: "Minimalistas" },
-  { id: "retro", label: "Retro" },
-  { id: "deportivas", label: "Deportivas" },
+const STYLE_IDS = [
+  "clasicas",
+  "modernas",
+  "oversized",
+  "minimalistas",
+  "retro",
+  "deportivas",
 ] as const;
 
-export default function ProbarPage() {
+export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
+  const steps = STEP_IDS.map((id, i) => ({ id, label: dict.flow.steps[i]! }));
   const [step, setStep] = useState(0);
   const [reached, setReached] = useState(0);
   // Avanzar y retroceder tienen que sentirse distintos, o se pierde la noción
@@ -131,7 +125,11 @@ export default function ProbarPage() {
 
       // Si había código guardado y aun así se rechaza, es que está mal.
       const hadCode = Boolean(readAccessCode());
-      const result = await requestTryOn(frameId, session.photo);
+      const result = await requestTryOn(
+        frameId,
+        session.photo,
+        dict.tryOn.errors,
+      );
 
       if (result.status === "needs-access") {
         // Sin estado de fallo: no ha fallado nada, falta un paso. La tarjeta
@@ -157,7 +155,7 @@ export default function ProbarPage() {
             : { phase: "failed", message: result.message },
       }));
     },
-    [session],
+    [session, dict],
   );
 
   function handleAnalysis(next: FaceSession | null) {
@@ -204,6 +202,7 @@ export default function ProbarPage() {
       {pendingAccess && (
         <AccessGate
           retry={pendingAccess.retry}
+          dict={dict}
           onSubmit={() => {
             const { frameId } = pendingAccess;
             setPendingAccess(null);
@@ -214,36 +213,43 @@ export default function ProbarPage() {
       )}
 
       <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-6 sm:px-8">
-        <Link href="/" aria-label="Inicio" className="text-accent">
+        <Link
+          href={localePath(lang)}
+          aria-label={dict.common.home}
+          className="text-accent"
+        >
           <FrameGlyph shape="round" thickness={0.3} className="h-6 w-auto" />
         </Link>
-        <Link href="/" className="text-sm text-muted hover:text-ink">
-          Salir
+        <Link
+          href={localePath(lang)}
+          className="text-sm text-muted hover:text-ink"
+        >
+          {dict.common.exit}
         </Link>
       </header>
 
       <main className="mx-auto max-w-5xl px-5 pb-24 sm:px-8">
         <div className="rounded-2xl border border-line bg-surface p-6 sm:p-9">
           <StepHeader
-            steps={STEPS}
+            steps={steps}
             currentIndex={step}
             reachedIndex={reached}
             onNavigate={goTo}
           />
 
           <div className="mt-8">
-            <StepPanel stepKey={STEPS[step]!.id} direction={direction}>
+            <StepPanel stepKey={steps[step]!.id} direction={direction}>
             {/* ---------- 1 · Foto ---------- */}
             {step === 0 && (
               <section>
                 <h1 className="max-w-lg font-display text-3xl leading-tight tracking-tight text-balance sm:text-4xl">
-                  Sube una foto y te decimos qué probarte.
+                  {dict.flow.photo.title}
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted">
-                  El análisis de proporciones se ejecuta en tu navegador.
+                  {dict.flow.photo.subtitle}
                 </p>
                 <div className="mt-7">
-                  <PhotoAnalyzer onAnalysis={handleAnalysis} />
+                  <PhotoAnalyzer onAnalysis={handleAnalysis} dict={dict} />
                 </div>
               </section>
             )}
@@ -252,11 +258,10 @@ export default function ProbarPage() {
             {step === 1 && (
               <section>
                 <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
-                  ¿Alguna marca en mente?
+                  {dict.flow.brands.title}
                 </h2>
                 <p className="mt-3 max-w-xl text-sm text-muted">
-                  Elige las que te interesen, o sigue sin elegir ninguna y
-                  miramos todo el catálogo.
+                  {dict.flow.brands.subtitle}
                 </p>
 
                 <div className="mt-7">
@@ -267,22 +272,23 @@ export default function ProbarPage() {
                     onToggle={(id) => toggleIn(setBrandIds, id)}
                     onClear={() => setBrandIds([])}
                     shapeLabels={shapeLabels}
+                    dict={dict}
                   />
                 </div>
 
                 <fieldset className="mt-9">
                   <legend className="rule-label text-[0.7rem] text-muted">
-                    Estilo, si tienes preferencia
+                    {dict.flow.brands.styleLegend}
                   </legend>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {STYLE_OPTIONS.map((option) => {
-                      const active = styles.includes(option.id);
+                    {STYLE_IDS.map((styleId) => {
+                      const active = styles.includes(styleId);
                       return (
                         <button
-                          key={option.id}
+                          key={styleId}
                           type="button"
                           aria-pressed={active}
-                          onClick={() => toggleIn(setStyles, option.id)}
+                          onClick={() => toggleIn(setStyles, styleId)}
                           className={[
                             "rounded-full border px-4 py-2 text-sm transition-all active:translate-y-px",
                             active
@@ -290,7 +296,7 @@ export default function ProbarPage() {
                               : "border-line hover:border-ink",
                           ].join(" ")}
                         >
-                          {option.label}
+                          {dict.flow.styles[styleId]}
                         </button>
                       );
                     })}
@@ -303,14 +309,14 @@ export default function ProbarPage() {
                     onClick={() => goTo(0)}
                     className="text-sm text-muted hover:text-ink"
                   >
-                    ← Cambiar la foto
+                    {dict.flow.brands.changePhoto}
                   </button>
                   <button
                     type="button"
                     onClick={() => goTo(2)}
                     className="rounded-full bg-accent px-7 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px"
                   >
-                    Ver mis seis →
+                    {dict.flow.brands.next}
                   </button>
                 </div>
               </section>
@@ -322,19 +328,18 @@ export default function ProbarPage() {
                 <div className="flex flex-wrap items-baseline justify-between gap-3">
                   <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
                     {recommendations.length === 0
-                      ? "Nada encaja con ese filtro"
-                      : "Tus seis"}
+                      ? dict.flow.choose.empty
+                      : dict.flow.choose.title}
                   </h2>
-                  <p className="text-xs text-muted">
-                    Elige una y la generamos sobre tu cara
-                  </p>
+                  <p className="text-xs text-muted">{dict.flow.choose.hint}</p>
                 </div>
 
                 {recommendations.length === 0 ? (
                   <p className="py-12 text-sm text-muted">
-                    Vuelve atrás y quita alguna marca o algún estilo. El
-                    catálogo tiene {allFrames.length} monturas de{" "}
-                    {allBrands.length} marcas.
+                    {format(dict.flow.choose.emptyBody, {
+                      frames: allFrames.length,
+                      brands: allBrands.length,
+                    })}
                   </p>
                 ) : (
                   <div className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -347,6 +352,7 @@ export default function ProbarPage() {
                           shapeLabel={
                             shapeLabels[rec.frame.shape as FrameShape]!
                           }
+                          dict={dict}
                           selected={chosenIds.includes(rec.frame.id)}
                           canSelect
                           onToggle={chooseFrame}
@@ -362,7 +368,7 @@ export default function ProbarPage() {
                     onClick={() => goTo(1)}
                     className="text-sm text-muted hover:text-ink"
                   >
-                    ← Marcas
+                    {dict.flow.choose.back}
                   </button>
                   {chosenIds.length > 0 && (
                     <button
@@ -370,7 +376,9 @@ export default function ProbarPage() {
                       onClick={() => goTo(3)}
                       className="rounded-full border border-ink px-6 py-3 text-sm font-medium transition-colors hover:bg-ink hover:text-paper"
                     >
-                      Ver resultados ({chosenIds.length}) →
+                      {format(dict.flow.choose.seeResults, {
+                        count: chosenIds.length,
+                      })}
                     </button>
                   )}
                 </div>
@@ -382,10 +390,15 @@ export default function ProbarPage() {
               <section>
                 <div className="flex flex-wrap items-baseline justify-between gap-3">
                   <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
-                    {chosenFrames.length > 1 ? "Compáralas" : "Sobre tu cara"}
+                    {chosenFrames.length > 1
+                      ? dict.flow.result.titleMany
+                      : dict.flow.result.titleOne}
                   </h2>
                   <p className="text-xs text-muted">
-                    {chosenFrames.length} de {MAX_COMPARE}
+                    {format(dict.flow.result.counter, {
+                      chosen: chosenFrames.length,
+                      max: MAX_COMPARE,
+                    })}
                   </p>
                 </div>
 
@@ -396,6 +409,7 @@ export default function ProbarPage() {
                     frames={chosenFrames}
                     states={generations}
                     shapeLabels={shapeLabels}
+                    dict={dict}
                     onRetry={(id) => void startGeneration(id)}
                     onRemove={removeFrame}
                   />
@@ -403,7 +417,7 @@ export default function ProbarPage() {
 
                 {chosenFrames.length === 0 && (
                   <p className="py-12 text-sm text-muted">
-                    No queda ninguna montura seleccionada.
+                    {dict.flow.result.empty}
                   </p>
                 )}
 
@@ -413,7 +427,7 @@ export default function ProbarPage() {
                     onClick={() => goTo(2)}
                     className="text-sm text-muted hover:text-ink"
                   >
-                    ← Volver a las seis
+                    {dict.flow.result.back}
                   </button>
                   {chosenFrames.length < MAX_COMPARE && (
                     <button
@@ -421,7 +435,7 @@ export default function ProbarPage() {
                       onClick={() => goTo(2)}
                       className="rounded-full border border-ink px-6 py-3 text-sm font-medium transition-colors hover:bg-ink hover:text-paper"
                     >
-                      Probar otra
+                      {dict.flow.result.another}
                     </button>
                   )}
                 </div>
@@ -432,10 +446,7 @@ export default function ProbarPage() {
         </div>
 
         <p className="mx-auto mt-6 max-w-5xl px-1 text-xs leading-relaxed text-muted">
-          Catálogo en construcción: tenemos marca, modelo y referencia, pero
-          todavía no sus imágenes oficiales ni sus precios. Para generar la
-          simulación tu foto se envía a nuestro servidor y de ahí al proveedor,
-          y no se guarda en ningún sitio.
+          {dict.flow.disclaimer}
         </p>
       </main>
     </div>

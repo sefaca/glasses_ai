@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { FrameProfile } from "../lib/catalog/types";
 import { extractPlacement } from "../lib/face/landmarks";
-import { assessWidthFit, WIDTH_FIT_LABEL } from "../lib/face/overlay";
+import { assessWidthFit, widthFitLabel } from "../lib/face/overlay";
+import { DEFAULT_LOCALE, getDictionary } from "../lib/i18n";
 import { POPULATION_PD_MM } from "../lib/recommendations/weights";
 import { makeFrame, makeFrameWithoutMeasurements } from "./helpers/frame";
 import { buildSyntheticFace } from "./helpers/synthetic-face";
+
+const LABELS = getDictionary(DEFAULT_LOCALE).results.widthFit;
 
 /**
  * Posición de la cara y lectura de ajuste por anchura.
@@ -107,12 +110,12 @@ describe("ajuste por anchura", () => {
 
   it("sin medidas no se pronuncia, y no hay etiqueta que mostrar", () => {
     expect(assessWidthFit(makeFrameWithoutMeasurements(), p)).toBe("unknown");
-    expect(WIDTH_FIT_LABEL.unknown).toBeNull();
+    expect(widthFitLabel("unknown", LABELS)).toBeNull();
   });
 
   it("la etiqueta nunca afirma milímetros", () => {
     // La escala viene de una media de población, no de medir a esta persona.
-    for (const label of Object.values(WIDTH_FIT_LABEL)) {
+    for (const label of Object.values(LABELS)) {
       if (label) expect(label).not.toMatch(/\d/);
     }
   });

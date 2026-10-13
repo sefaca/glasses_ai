@@ -117,28 +117,6 @@ function headTilt(landmarks: Landmark[], image: ImageSize): number {
   return (Math.atan2(dy, dx) * 180) / Math.PI;
 }
 
-/**
- * Mensaje accionable por problema, en orden de prioridad.
- *
- * Se devuelve **uno solo**: una lista de seis correcciones a la vez no se lee,
- * y arreglar la primera suele arreglar varias.
- */
-const ISSUE_MESSAGE: Record<QualityIssue, string> = {
-  "no-face": "No reconocemos una cara en la foto. Prueba con una foto frontal.",
-  "multiple-faces":
-    "Hay más de una persona. Necesitamos una foto en la que salgas solo tú.",
-  "incomplete-landmarks":
-    "No vemos bien los ojos. Prueba con una foto más frontal y sin nada que los tape.",
-  "head-turned":
-    "La cara está girada. Necesitamos que mires de frente a la cámara.",
-  "head-tilted": "Endereza un poco la cabeza y repite la foto.",
-  "eyes-closed": "Tienes los ojos cerrados o entornados. Prueba otra foto.",
-  "face-too-small":
-    "La cara sale muy pequeña. Acércate o recorta la foto alrededor de tu cara.",
-  "resolution-too-low":
-    "La foto tiene poca resolución. Necesitamos una imagen de al menos 480 píxeles de lado.",
-};
-
 /** Prioridad: primero lo que invalida todo, luego lo que se corrige fácil. */
 const ISSUE_PRIORITY: QualityIssue[] = [
   "no-face",
@@ -151,12 +129,30 @@ const ISSUE_PRIORITY: QualityIssue[] = [
   "head-tilted",
 ];
 
-export function primaryIssueMessage(result: QualityResult): string | null {
+/**
+ * El problema **más importante** de los detectados, o `null` si la foto vale.
+ *
+ * Se devuelve uno solo: una lista de seis correcciones a la vez no se lee, y
+ * arreglar la primera suele arreglar varias.
+ *
+ * Devuelve el código, no el texto. El texto depende del idioma y vive en el
+ * diccionario; este módulo es lógica pura y se testea sin tocar i18n.
+ */
+export function primaryIssue(result: QualityResult): QualityIssue | null {
   if (result.ok) return null;
   for (const issue of ISSUE_PRIORITY) {
-    if (result.issues.includes(issue)) return ISSUE_MESSAGE[issue];
+    if (result.issues.includes(issue)) return issue;
   }
   return null;
+}
+
+/** Atajo para la UI: el código resuelto contra los textos de un idioma. */
+export function primaryIssueMessage(
+  result: QualityResult,
+  messages: Record<QualityIssue, string>,
+): string | null {
+  const issue = primaryIssue(result);
+  return issue ? messages[issue] : null;
 }
 
 /**

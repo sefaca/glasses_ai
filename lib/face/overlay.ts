@@ -48,9 +48,14 @@ export function assessWidthFit(
   return "good";
 }
 
-export const WIDTH_FIT_LABEL: Record<WidthFit, string | null> = {
-  narrow: "Puede quedarte estrecha",
-  good: "Anchura equilibrada",
-  wide: "Puede quedarte ancha",
-  unknown: null,
-};
+/**
+ * Los textos viven en el diccionario, no aquí: este módulo es geometría pura
+ * y tiene que decir lo mismo en los cinco idiomas. `unknown` no tiene texto a
+ * propósito — cuando no se puede estimar, lo honesto es no decir nada.
+ */
+export function widthFitLabel(
+  fit: WidthFit,
+  labels: { narrow: string; good: string; wide: string },
+): string | null {
+  return fit === "unknown" ? null : labels[fit];
+}

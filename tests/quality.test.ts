@@ -2,9 +2,23 @@ import { describe, expect, it } from "vitest";
 import {
   QUALITY_THRESHOLDS,
   checkQuality,
-  primaryIssueMessage,
+  primaryIssue,
+  type QualityIssue,
 } from "../lib/face/quality";
+import { LOCALES, getDictionary } from "../lib/i18n";
 import { buildSyntheticFace } from "./helpers/synthetic-face";
+
+/** Todos los problemas que el check sabe detectar. */
+const ALL_ISSUES: QualityIssue[] = [
+  "no-face",
+  "multiple-faces",
+  "incomplete-landmarks",
+  "head-turned",
+  "head-tilted",
+  "eyes-closed",
+  "face-too-small",
+  "resolution-too-low",
+];
 
 /**
  * El quality check tiene dos trabajos: no analizar una foto inservible y
@@ -95,13 +109,13 @@ describe("quality check", () => {
   });
 });
 
-describe("mensaje al usuario", () => {
-  it("una foto correcta no genera mensaje", () => {
+describe("problema que se le cuenta al usuario", () => {
+  it("una foto correcta no genera ningún problema", () => {
     const { landmarks, image } = buildSyntheticFace();
-    expect(primaryIssueMessage(checkQuality([landmarks], image))).toBeNull();
+    expect(primaryIssue(checkQuality([landmarks], image))).toBeNull();
   });
 
-  it("devuelve un solo mensaje, el de mayor prioridad", () => {
+  it("devuelve un solo problema, el de mayor prioridad", () => {
     // Ojos cerrados y cara pequeña a la vez: se dice lo primero, porque una
     // lista de seis correcciones no se lee y arreglar la primera suele
     // arreglar varias.
@@ -113,12 +127,23 @@ describe("mensaje al usuario", () => {
 
     expect(result.issues).toContain("eyes-closed");
     expect(result.issues).toContain("face-too-small");
-    expect(primaryIssueMessage(result)).toMatch(/ojos/i);
+    // Ojos cerrados gana a cara pequeña: está antes en la prioridad.
+    expect(primaryIssue(result)).toBe("eyes-closed");
   });
 
-  it("el mensaje dice qué hacer, no qué ha fallado", () => {
+  it("sin cara, el problema es la cara y no otra cosa", () => {
     const { image } = buildSyntheticFace();
-    const message = primaryIssueMessage(checkQuality([], image))!;
-    expect(message).toMatch(/prueba|necesitamos/i);
+    expect(primaryIssue(checkQuality([], image))).toBe("no-face");
+  });
+
+  it("los cinco idiomas tienen texto para cada problema", () => {
+    // Es la red que evita que a un usuario alemán le salga un error vacío:
+    // si se añade un problema nuevo, esto falla hasta que esté traducido.
+    for (const locale of LOCALES) {
+      const texts = getDictionary(locale).upload.quality;
+      for (const issue of ALL_ISSUES) {
+        expect(texts[issue]?.length ?? 0).toBeGreaterThan(0);
+      }
+    }
   });
 });

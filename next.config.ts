@@ -8,6 +8,25 @@ const nextConfig: NextConfig = {
   // del proyecto es CLAUDE.md y D-014 es precisamente sobre no mantener dos
   // versiones de la verdad.
   agentRules: false,
+  async redirects() {
+    return [
+      {
+        /**
+         * La raíz no es una página: todos los idiomas llevan prefijo, el
+         * español incluido. Se manda al español porque es el mercado
+         * inicial.
+         *
+         * **Temporal (307) a propósito.** Un 308 lo cachean los navegadores
+         * para siempre, y el día que esta redirección dependa del idioma del
+         * visitante, o que cambie el idioma por defecto, habría gente
+         * atrapada en `/es` sin forma de arreglarlo desde el servidor.
+         */
+        source: "/",
+        destination: "/es",
+        permanent: false,
+      },
+    ];
+  },
   turbopack: {
     // Fijado explícitamente: hay un package-lock.json suelto en el directorio
     // de usuario y, sin esto, Turbopack infiere ahí la raíz del workspace.

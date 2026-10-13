@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getDictionary, DEFAULT_LOCALE } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/i18n";
 
 /**
  * La demostración del producto en la landing — CLAUDE.md §8.1, que pide
@@ -15,15 +15,13 @@ import { getDictionary, DEFAULT_LOCALE } from "@/lib/i18n";
  * ambigüedad que RULE #1 existe para evitar.
  */
 
-const dict = getDictionary(DEFAULT_LOCALE);
-
 const PANELS = [
   { src: "/demo/original.jpg", kind: "original" as const },
   { src: "/demo/clubmaster.jpg", kind: "result" as const, index: 0 },
   { src: "/demo/round-metal.jpg", kind: "result" as const, index: 1 },
 ];
 
-export function DemoTriptych() {
+export function DemoTriptych({ dict }: { dict: Dictionary }) {
   return (
     <figure>
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
@@ -42,8 +40,8 @@ export function DemoTriptych() {
                   src={panel.src}
                   alt={
                     frame
-                      ? `Simulación de unas ${frame.model} sobre la misma foto`
-                      : "Foto de partida de una persona generada"
+                      ? `${dict.demo.simulationBadge} — ${frame.model} (${frame.reference})`
+                      : dict.demo.photoAlt
                   }
                   fill
                   sizes="(max-width: 640px) 33vw, 240px"
@@ -52,7 +50,7 @@ export function DemoTriptych() {
                 />
                 {/* El original se marca para que la comparación se lea sola. */}
                 <span className="absolute bottom-2 left-2 rounded-full bg-black/45 px-2.5 py-1 text-[0.6rem] text-white backdrop-blur-sm">
-                  {frame ? "Simulación" : dict.demo.original}
+                  {frame ? dict.demo.simulationBadge : dict.demo.original}
                 </span>
               </div>
 
@@ -61,7 +59,7 @@ export function DemoTriptych() {
                   {frame ? frame.model : dict.demo.original}
                 </p>
                 <p className="mt-0.5 truncate text-[0.65rem] text-muted">
-                  {frame ? frame.reference : "Sin gafas"}
+                  {frame ? frame.reference : dict.demo.noGlasses}
                 </p>
               </div>
             </div>

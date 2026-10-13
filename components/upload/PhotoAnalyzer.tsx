@@ -8,6 +8,7 @@ import {
   type FaceSession,
 } from "@/lib/face/analyze";
 import type { FaceProfile } from "@/lib/face/types";
+import type { Dictionary } from "@/lib/i18n";
 import { describeFaceProfile } from "@/lib/recommendations/explain";
 import { prepareUpload } from "@/lib/upload/prepare";
 import {
@@ -32,9 +33,11 @@ type Phase = "idle" | "decoding" | "analyzing" | "rejected" | "done";
 
 interface PhotoAnalyzerProps {
   onAnalysis: (session: FaceSession | null) => void;
+  dict: Dictionary;
 }
 
-export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
+export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
+  const texts = dict.upload;
   const [phase, setPhase] = useState<Phase>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -77,7 +80,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
       if (!meta.ok) {
         setPreview(null);
         setPhase("rejected");
-        setMessage(meta.message);
+        setMessage(texts.issues[meta.issue!]);
         return;
       }
 
@@ -91,7 +94,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
         bitmap = await createImageBitmap(file);
       } catch {
         setPhase("rejected");
-        setMessage("No hemos podido abrir esa imagen. Prueba con otra.");
+        setMessage(texts.errorDecode);
         return;
       }
 
@@ -99,12 +102,12 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
       if (!dimensions.ok) {
         bitmap.close();
         setPhase("rejected");
-        setMessage(dimensions.message);
+        setMessage(texts.issues[dimensions.issue!]);
         return;
       }
 
       setPhase("analyzing");
-      const outcome = await analyzeFaceImage(bitmap);
+      const outcome = await analyzeFaceImage(bitmap, texts);
       bitmap.close();
 
       if (outcome.status === "ok") {
@@ -116,7 +119,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
           photo = await prepareUpload(file);
         } catch {
           setPhase("rejected");
-          setMessage("No hemos podido preparar esa imagen. Prueba con otra.");
+          setMessage(texts.errorPrepare);
           return;
         }
 
@@ -135,7 +138,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
       setPhase("rejected");
       setMessage(outcome.message);
     },
-    [onAnalysis, setPreview],
+    [onAnalysis, setPreview, texts],
   );
 
   function reset() {
@@ -170,15 +173,13 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
             onClick={() => inputRef.current?.click()}
             className="rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-on-accent shadow-[0_8px_20px_-8px_rgba(0,0,0,0.45)] transition-transform active:translate-y-px"
           >
-            Elegir una foto
+            {texts.cta}
           </button>
           <ul className="mt-6 grid gap-1.5 text-xs text-muted sm:grid-cols-2">
-            <li>De frente y con buena luz</li>
-            <li>Los ojos visibles</li>
-            <li>Sin filtros</li>
-            <li>Mejor sin gafas puestas</li>
-            <li>Solo tú en la foto</li>
-            <li>JPG, PNG o WEBP</li>
+            {texts.hints.map((hint) => (
+              <li key={hint}>{hint}</li>
+            ))}
+            <li>{texts.formats}</li>
           </ul>
         </>
       )}
@@ -190,7 +191,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
               {/* eslint-disable-next-line @next/next/no-img-element -- blob local, nunca se sube; next/image no aplica */}
               <img
                 src={previewUrl}
-                alt="La foto que has elegido"
+                alt={texts.chosenPhotoAlt}
                 className="h-32 w-32 rounded-xl border border-line object-cover"
               />
             </div>
@@ -203,9 +204,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
                   aria-hidden
                   className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent"
                 />
-                {phase === "decoding"
-                  ? "Abriendo la foto…"
-                  : "Analizando proporciones en tu navegador…"}
+                {phase === "decoding" ? texts.opening : texts.analyzing}
               </p>
             )}
 
@@ -217,7 +216,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
                   onClick={() => inputRef.current?.click()}
                   className="mt-4 rounded-full border border-ink px-5 py-2.5 text-sm font-medium transition-colors hover:bg-ink hover:text-paper active:translate-y-px"
                 >
-                  Probar con otra foto
+                  {texts.tryAnother}
                 </button>
               </>
             )}
@@ -225,15 +224,14 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
             {phase === "done" && profile && (
               <>
                 <p className="rule-label text-[0.7rem] text-accent">
-                  Tu perfil
+                  {texts.yourProfile}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed">
-                  {describeFaceProfile(profile)}
+                  {describeFaceProfile(dict, profile)}
                 </p>
                 {profile.confidence < 0.5 && (
                   <p className="mt-2 text-xs text-muted">
-                    La estimación es poco firme con esta foto. Una más frontal
-                    daría una lectura mejor.
+                    {texts.lowConfidence}
                   </p>
                 )}
                 <button
@@ -241,7 +239,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
                   onClick={reset}
                   className="mt-4 text-xs text-muted underline decoration-line underline-offset-4 hover:text-ink"
                 >
-                  Quitar la foto
+                  {texts.removePhoto}
                 </button>
               </>
             )}
@@ -251,9 +249,7 @@ export function PhotoAnalyzer({ onAnalysis }: PhotoAnalyzerProps) {
 
       {phase !== "idle" && (
         <p className="mt-6 border-t border-line pt-4 text-xs leading-relaxed text-muted">
-          La foto no se ha subido a ningún servidor. El análisis se ejecuta en
-          tu navegador y lo único que guardamos en memoria son proporciones, sin
-          imagen.
+          {texts.notStored}
         </p>
       )}
     </div>

@@ -3,7 +3,8 @@
 import type { FrameProfile } from "@/lib/catalog/types";
 import { outboundUrl } from "@/lib/catalog/rights";
 import type { FacePlacement } from "@/lib/face/landmarks";
-import { assessWidthFit, WIDTH_FIT_LABEL } from "@/lib/face/overlay";
+import { assessWidthFit, widthFitLabel } from "@/lib/face/overlay";
+import { format, type Dictionary } from "@/lib/i18n";
 
 /**
  * Las simulaciones generadas, hasta cuatro sobre la misma cara.
@@ -35,6 +36,7 @@ interface ResultGridProps {
   frames: FrameProfile[];
   states: Record<string, GenerationState | undefined>;
   shapeLabels: Record<string, string>;
+  dict: Dictionary;
   onRetry: (frameId: string) => void;
   onRemove: (frameId: string) => void;
 }
@@ -45,9 +47,11 @@ export function ResultGrid({
   frames,
   states,
   shapeLabels,
+  dict,
   onRetry,
   onRemove,
 }: ResultGridProps) {
+  const texts = dict.results;
   if (frames.length === 0) return null;
 
   return (
@@ -59,7 +63,7 @@ export function ResultGrid({
       {frames.map((frame) => {
         const state = states[frame.id] ?? { phase: "generating" as const };
         const fit = assessWidthFit(frame, placement);
-        const fitLabel = WIDTH_FIT_LABEL[fit];
+        const fitLabel = widthFitLabel(fit, texts.widthFit);
         const buyUrl = outboundUrl(frame);
 
         return (
@@ -75,8 +79,8 @@ export function ResultGrid({
                 src={state.phase === "done" ? state.url : photoUrl}
                 alt={
                   state.phase === "done"
-                    ? `Simulación de ${frame.model} sobre tu foto`
-                    : "Tu foto"
+                    ? format(texts.simulationAlt, { model: frame.model })
+                    : texts.yourPhoto
                 }
                 className={`absolute inset-0 h-full w-full object-cover transition-opacity ${
                   state.phase === "done" ? "opacity-100" : "opacity-55"
@@ -90,7 +94,7 @@ export function ResultGrid({
                       aria-hidden
                       className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent"
                     />
-                    Generando… unos 30 s
+                    {texts.generating}
                   </p>
                 </div>
               )}
@@ -103,7 +107,7 @@ export function ResultGrid({
                     onClick={() => onRetry(frame.id)}
                     className="rounded-full border border-ink bg-paper px-4 py-2 text-xs font-medium transition-colors hover:bg-ink hover:text-paper"
                   >
-                    Reintentar
+                    {texts.retry}
                   </button>
                 </div>
               )}
@@ -115,14 +119,14 @@ export function ResultGrid({
               */}
               {state.phase === "done" && (
                 <span className="absolute bottom-2 left-2 rounded-full bg-black/45 px-2.5 py-1 text-[0.65rem] text-white backdrop-blur-sm">
-                  Simulación
+                  {texts.simulationBadge}
                 </span>
               )}
 
               <button
                 type="button"
                 onClick={() => onRemove(frame.id)}
-                aria-label={`Quitar ${frame.model}`}
+                aria-label={format(texts.removeLabel, { model: frame.model })}
                 className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/45 text-sm text-white backdrop-blur-sm transition-colors hover:bg-black/70"
               >
                 ×
@@ -166,7 +170,7 @@ export function ResultGrid({
                   rel="noopener noreferrer nofollow"
                   className="text-xs text-accent underline decoration-line underline-offset-4"
                 >
-                  Dónde comprar
+                  {texts.whereToBuy}
                 </a>
               )}
             </div>

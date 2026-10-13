@@ -1,3 +1,4 @@
+import type { Dictionary } from "../i18n/types";
 import { ACCESS_HEADER } from "../server/access";
 import type { UploadPayload } from "../upload/prepare";
 
@@ -45,23 +46,38 @@ export type TryOnClientResult =
   | { status: "needs-access" }
   | { status: "failed"; message: string };
 
-/** Códigos del servidor → algo que una persona pueda hacer al respecto. */
-const MESSAGES: Record<string, string> = {
-  rate_limited:
-    "Has hecho muchas pruebas seguidas. Espera unos minutos y vuelve a intentarlo.",
-  provider_timeout: "El proveedor ha tardado demasiado. Vuelve a intentarlo.",
-  provider_unavailable:
-    "El proveedor no está disponible ahora mismo. Vuelve a intentarlo en un momento.",
-  content_rejected:
-    "No hemos podido generar esta prueba. Prueba con otra montura u otra foto.",
-  invalid_input: "Algo falla con la imagen. Prueba con otra foto.",
-  no_face_detected: "No reconocemos una cara en la foto.",
-  unknown: "No hemos podido generar la prueba. Vuelve a intentarlo.",
-};
+/**
+ * Códigos del servidor → algo que una persona pueda hacer al respecto.
+ *
+ * El servidor habla en códigos estables y el idioma lo pone el cliente: así
+ * la ruta no tiene que saber en qué idioma está el navegador, y un código
+ * nuevo falla al compilar en lugar de salir en inglés a un usuario alemán.
+ */
+type TryOnErrors = Dictionary["tryOn"]["errors"];
+
+function messageFor(errors: TryOnErrors, code: string): string {
+  switch (code) {
+    case "rate_limited":
+      return errors.rateLimited;
+    case "provider_timeout":
+      return errors.providerTimeout;
+    case "provider_unavailable":
+      return errors.providerUnavailable;
+    case "content_rejected":
+      return errors.contentRejected;
+    case "invalid_input":
+      return errors.invalidInput;
+    case "no_face_detected":
+      return errors.noFaceDetected;
+    default:
+      return errors.unknown;
+  }
+}
 
 export async function requestTryOn(
   frameId: string,
   photo: UploadPayload,
+  errors: TryOnErrors,
   signal?: AbortSignal,
 ): Promise<TryOnClientResult> {
   const accessCode = readAccessCode();
@@ -82,7 +98,7 @@ export async function requestTryOn(
       }),
     });
   } catch {
-    return { status: "failed", message: MESSAGES.provider_unavailable! };
+    return { status: "failed", message: errors.providerUnavailable };
   }
 
   let payload: {
@@ -95,7 +111,7 @@ export async function requestTryOn(
   try {
     payload = await response.json();
   } catch {
-    return { status: "failed", message: MESSAGES.unknown! };
+    return { status: "failed", message: errors.unknown };
   }
 
   if (payload.status === "completed" && payload.resultUrl) {
@@ -111,5 +127,5 @@ export async function requestTryOn(
   // La puerta no es un error del usuario: es un paso que falta. La UI pide el
   // código en lugar de enseñar un fallo.
   if (code === "access_denied") return { status: "needs-access" };
-  return { status: "failed", message: MESSAGES[code] ?? MESSAGES.unknown! };
+  return { status: "failed", message: messageFor(errors, code) };
 }

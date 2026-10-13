@@ -1,5 +1,6 @@
 "use client";
 
+import { format, type Dictionary } from "@/lib/i18n";
 import type { BrandSuggestion } from "@/lib/recommendations/brands";
 
 /**
@@ -24,6 +25,7 @@ interface BrandPickerProps {
   onToggle: (brandId: string) => void;
   onClear: () => void;
   shapeLabels: Record<string, string>;
+  dict: Dictionary;
 }
 
 /** Cuántas se destacan como sugeridas antes del resto. */
@@ -36,7 +38,9 @@ export function BrandPicker({
   onToggle,
   onClear,
   shapeLabels,
+  dict,
 }: BrandPickerProps) {
+  const texts = dict.brandPicker;
   const highlighted = personalised ? suggestions.slice(0, HIGHLIGHTED) : [];
   const rest = personalised ? suggestions.slice(HIGHLIGHTED) : suggestions;
   const allSelected = selectedIds.length === 0;
@@ -46,7 +50,7 @@ export function BrandPicker({
       {personalised && highlighted.length > 0 && (
         <div className="mb-8">
           <p className="rule-label text-[0.7rem] text-accent">
-            Encajan con tus proporciones
+            {texts.suggestedPersonalised}
           </p>
           <ul className="mt-4 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
             {highlighted.map((suggestion) => {
@@ -71,11 +75,12 @@ export function BrandPicker({
                       className={`text-xs ${active ? "opacity-80" : "text-muted"}`}
                     >
                       {/* El porqué, no solo el qué: la forma con la que destaca. */}
-                      Sobre todo{" "}
-                      {suggestion.topShapes
-                        .slice(0, 2)
-                        .map((s) => shapeLabels[s]?.toLowerCase() ?? s)
-                        .join(" y ")}
+                      {format(texts.mostly, {
+                        shapes: suggestion.topShapes
+                          .slice(0, 2)
+                          .map((s) => shapeLabels[s]?.toLowerCase() ?? s)
+                          .join(` ${texts.and} `),
+                      })}
                     </span>
                   </button>
                 </li>
@@ -87,7 +92,7 @@ export function BrandPicker({
 
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <p className="rule-label text-[0.7rem] text-muted">
-          {personalised ? "Y el resto" : "Marcas"}
+          {personalised ? texts.rest : texts.suggestedGeneric}
         </p>
         {!allSelected && (
           <button
@@ -95,7 +100,7 @@ export function BrandPicker({
             onClick={onClear}
             className="text-xs text-muted underline decoration-line underline-offset-4 hover:text-ink"
           >
-            Ver todas
+            {texts.clear}
           </button>
         )}
       </div>
@@ -129,10 +134,7 @@ export function BrandPicker({
       </div>
 
       {!personalised && (
-        <p className="mt-4 text-xs text-muted">
-          Sube una foto y te decimos cuáles encajan mejor con tus proporciones.
-          Sin ella solo podemos ordenarlas alfabéticamente.
-        </p>
+        <p className="mt-4 text-xs text-muted">{texts.note}</p>
       )}
     </div>
   );

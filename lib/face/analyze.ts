@@ -8,7 +8,11 @@ import {
 } from "./landmarks";
 import { checkQuality, primaryIssueMessage, type QualityResult } from "./quality";
 import type { FaceProfile } from "./types";
+import type { Dictionary } from "../i18n/types";
 import type { UploadPayload } from "../upload/prepare";
+
+/** Los textos que este módulo necesita, inyectados por quien lo llama. */
+export type AnalysisTexts = Dictionary["upload"];
 
 /**
  * Análisis facial **en el navegador**.
@@ -131,6 +135,7 @@ export function warmUpFaceAnalysis(): void {
  */
 export async function analyzeFaceImage(
   source: ImageBitmap,
+  texts: AnalysisTexts,
 ): Promise<AnalysisOutcome> {
   const image: ImageSize = { width: source.width, height: source.height };
 
@@ -143,8 +148,7 @@ export async function analyzeFaceImage(
     landmarkerPromise = null;
     return {
       status: "error",
-      message:
-        "No hemos podido cargar el analizador. Comprueba tu conexión y vuelve a intentarlo.",
+      message: texts.errorLoader,
     };
   }
 
@@ -154,7 +158,7 @@ export async function analyzeFaceImage(
   } catch {
     return {
       status: "error",
-      message: "No hemos podido procesar la imagen. Prueba con otra foto.",
+      message: texts.errorProcess,
     };
   }
 
@@ -164,8 +168,7 @@ export async function analyzeFaceImage(
       status: "rejected",
       quality,
       message:
-        primaryIssueMessage(quality) ??
-        "Necesitamos una foto más frontal y con mejor luz.",
+        primaryIssueMessage(quality, texts.quality) ?? texts.rejectedGeneric,
     };
   }
 
@@ -175,7 +178,7 @@ export async function analyzeFaceImage(
     return {
       status: "rejected",
       quality,
-      message: "No vemos bien los ojos. Prueba con una foto más frontal.",
+      message: texts.quality["incomplete-landmarks"],
     };
   }
 
