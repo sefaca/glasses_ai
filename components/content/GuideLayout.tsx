@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageView } from "@/components/analytics/PageView";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import type { Guide } from "@/lib/content/guides";
 import { guideSchema } from "@/lib/content/schema";
@@ -30,6 +31,10 @@ export function GuideLayout({ guide, lang, children }: Props) {
 
   return (
     <div className="min-h-dvh">
+      <PageView
+        name="guide_view"
+        props={{ locale: lang, step: guide.slug }}
+      />
       <script
         type="application/ld+json"
         // El contenido lo generamos nosotros desde datos tipados, no viene de

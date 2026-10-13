@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageView } from "@/components/analytics/PageView";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { catalogCopy } from "@/lib/content/catalog-copy";
 import { getDictionary, localePath, type Locale } from "@/lib/i18n";
@@ -38,6 +39,7 @@ export function CatalogLayout({
 
   return (
     <div className="min-h-dvh">
+      <PageView name="catalog_view" props={{ locale: lang }} />
       {schema && (
         <script
           type="application/ld+json"

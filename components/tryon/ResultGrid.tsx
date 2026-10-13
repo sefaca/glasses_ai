@@ -4,6 +4,7 @@ import type { FrameProfile } from "@/lib/catalog/types";
 import { outboundUrl } from "@/lib/catalog/rights";
 import type { FacePlacement } from "@/lib/face/landmarks";
 import { assessWidthFit, widthFitLabel } from "@/lib/face/overlay";
+import { track } from "@/lib/analytics/client";
 import { format, type Dictionary } from "@/lib/i18n";
 
 /**
@@ -168,6 +169,12 @@ export function ResultGrid({
                   href={buyUrl}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
+                  onClick={() =>
+                    track("outbound_product_click", {
+                      frameId: frame.id,
+                      brandId: frame.brandId,
+                    })
+                  }
                   className="text-xs text-accent underline decoration-line underline-offset-4"
                 >
                   {texts.whereToBuy}

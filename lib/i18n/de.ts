@@ -390,7 +390,8 @@ export const de: Dictionary = {
       label: "Cookies",
       title: "Cookies und Speicherung",
       intro: [
-        "Heute setzt diese Seite keine Cookies und nutzt keine Analytik Dritter. Es gibt auch kein Consent-Banner, weil es nichts zu bewilligen gäbe.",
+        "Diese Seite setzt keine Cookies und nutzt keine Analytik Dritter. Es gibt auch kein Consent-Banner, weil es nichts zu bewilligen gibt.",
+        "Wir messen aber, wie das Produkt genutzt wird, mit eigener Analytik: welche Schritte abgeschlossen werden und was fehlschlägt. Sie nutzt keine Cookies, identifiziert niemanden und enthält nie dein Foto oder Maße deines Gesichts. Um die Schritte eines Besuchs zu gruppieren, verwenden wir eine zufällige Kennung im Speicher des Tabs, die beim Schließen verschwindet.",
       ],
       sections: [
         {

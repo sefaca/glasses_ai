@@ -8,6 +8,7 @@ import {
   type FaceSession,
 } from "@/lib/face/analyze";
 import type { FaceProfile } from "@/lib/face/types";
+import { track } from "@/lib/analytics/client";
 import type { Dictionary } from "@/lib/i18n";
 import { describeFaceProfile } from "@/lib/recommendations/explain";
 import { prepareUpload } from "@/lib/upload/prepare";
@@ -74,6 +75,7 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
       // primero, lo que esté mostrando esa foto se quedaría con una URL muerta.
       setProfile(null);
       onAnalysis(null);
+      track("upload_started");
 
       // Metadatos antes de decodificar: lo caro y lo peligroso es decodificar.
       const meta = checkUploadMetadata(file);
@@ -81,6 +83,7 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
         setPreview(null);
         setPhase("rejected");
         setMessage(texts.issues[meta.issue!]);
+        track("upload_failed", { errorCode: meta.issue! });
         return;
       }
 
@@ -103,10 +106,12 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
         bitmap.close();
         setPhase("rejected");
         setMessage(texts.issues[dimensions.issue!]);
+        track("upload_failed", { errorCode: dimensions.issue! });
         return;
       }
 
       setPhase("analyzing");
+      track("upload_completed");
       const outcome = await analyzeFaceImage(bitmap, texts);
       bitmap.close();
 
@@ -124,6 +129,13 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
         }
 
         setProfile(outcome.profile);
+        track("face_detected");
+        // El perfil no viaja: solo la forma estimada, que es una etiqueta de
+        // catalogo, y la confianza redondeada. Sin medidas faciales -> regla 15.
+        track("face_analysis_completed", {
+          shape: outcome.profile.shapePrimary,
+          count: Math.round(outcome.profile.confidence * 100),
+        });
         onAnalysis({
           profile: outcome.profile,
           placement: outcome.placement,
@@ -137,6 +149,9 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
 
       setPhase("rejected");
       setMessage(outcome.message);
+      track("upload_failed", {
+        errorCode: outcome.status === "rejected" ? "quality" : "analysis",
+      });
     },
     [onAnalysis, setPreview, texts],
   );

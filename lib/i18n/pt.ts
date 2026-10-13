@@ -384,7 +384,8 @@ export const pt: Dictionary = {
       label: "Cookies",
       title: "Cookies e armazenamento",
       intro: [
-        "Hoje este site não instala nenhum cookie e não usa analytics de terceiros. Também não há banner de consentimento, porque não haveria nada a consentir.",
+        "Este site não instala nenhum cookie e não usa analytics de terceiros. Também não há banner de consentimento, porque não há nada a consentir.",
+        "Mas medimos como o produto é usado, com analytics próprio: quais passos são concluídos e o que falha. Não usa cookies, não identifica ninguém e nunca inclui a sua foto nem medidas do seu rosto. Para agrupar os passos de uma mesma visita usamos um identificador aleatório guardado na memória da aba, que some ao fechá-la.",
       ],
       sections: [
         {

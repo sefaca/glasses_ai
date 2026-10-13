@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageView } from "@/components/analytics/PageView";
 import { DemoTriptych } from "@/components/landing/DemoTriptych";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
@@ -40,6 +41,7 @@ export default async function HomePage({
 
   return (
     <div className="min-h-dvh">
+      <PageView name="landing_view" props={{ locale: lang }} />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
         {/* Sin nombre de marca: D-010 está aplazada y no se inventa uno. */}
         <Link

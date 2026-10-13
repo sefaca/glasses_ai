@@ -384,7 +384,8 @@ export const it: Dictionary = {
       label: "Cookie",
       title: "Cookie e archiviazione",
       intro: [
-        "Oggi questo sito non installa nessun cookie e non usa analitiche di terzi. Non c'è nemmeno un banner di consenso, perché non ci sarebbe nulla da consentire.",
+        "Questo sito non installa nessun cookie e non usa analitiche di terzi. Non c'è nemmeno un banner di consenso, perché non c'è nulla da consentire.",
+        "Misuriamo però come viene usato il prodotto, con analitiche nostre: quali passaggi si completano e cosa non funziona. Non usa cookie, non identifica nessuno e non include mai la tua foto né misure del tuo viso. Per raggruppare i passaggi di una stessa visita usiamo un identificatore casuale tenuto nella memoria della scheda, che sparisce quando la chiudi.",
       ],
       sections: [
         {

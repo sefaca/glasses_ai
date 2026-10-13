@@ -378,7 +378,8 @@ export const en: Dictionary = {
       label: "Cookies",
       title: "Cookies and storage",
       intro: [
-        "Today this site sets no cookies and uses no third-party analytics. There's no consent banner either, because there would be nothing to consent to.",
+        "This site sets no cookies and uses no third-party analytics. There is no consent banner either, because there is nothing to consent to.",
+        "We do measure how the product is used, with our own analytics: which steps get completed and what fails. It uses no cookies, identifies nobody, and never includes your photo or measurements of your face. To group the steps of a single visit we use a random identifier held in the tab's memory, which disappears when you close it.",
       ],
       sections: [
         {

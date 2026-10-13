@@ -375,7 +375,8 @@ export const es: Dictionary = {
       label: "Cookies",
       title: "Cookies y almacenamiento",
       intro: [
-        "Hoy este sitio no instala ninguna cookie y no usa analítica de terceros. Tampoco hay un banner de consentimiento, porque no habría nada que consentir.",
+        "Este sitio no instala ninguna cookie y no usa analítica de terceros. Tampoco hay un banner de consentimiento, porque no hay nada que consentir.",
+        "Sí medimos cómo se usa el producto, con analítica propia: qué pasos se completan y qué falla. No lleva cookies, no identifica a nadie y nunca incluye tu foto ni medidas de tu cara. Para agrupar los pasos de una misma visita usamos un identificador aleatorio guardado en la memoria de la pestaña, que desaparece al cerrarla.",
       ],
       sections: [
         {

@@ -19,6 +19,7 @@ import type { FrameShape } from "@/lib/catalog/types";
 import type { FaceSession } from "@/lib/face/analyze";
 import { NEUTRAL_FACE } from "@/lib/face/neutral";
 import type { UserPreferences } from "@/lib/face/types";
+import { track } from "@/lib/analytics/client";
 import { format, type Dictionary, type Locale, localePath } from "@/lib/i18n";
 import {
   suggestBrands,
@@ -113,6 +114,14 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
     setDirection(index >= step ? 1 : -1);
     setStep(index);
     setReached((current) => Math.max(current, index));
+    // Se emiten aqui, en el manejador, y no en un efecto: un efecto se
+    // dispararia tambien al volver atras y al rehidratar.
+    if (index === 2 && reached < 2) {
+      track("recommendations_viewed", { count: recommendations.length });
+    }
+    if (index === 3 && chosenIds.length > 1) {
+      track("compare_opened", { count: chosenIds.length });
+    }
   }
 
   const startGeneration = useCallback(
@@ -122,6 +131,8 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
         ...current,
         [frameId]: { phase: "generating" },
       }));
+      track("try_on_started", { frameId });
+      const startedAt = Date.now();
 
       // Si había código guardado y aun así se rechaza, es que está mal.
       const hadCode = Boolean(readAccessCode());
@@ -140,8 +151,18 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
           return next;
         });
         setPendingAccess({ frameId, retry: hadCode });
+        track("try_on_failed", { frameId, errorCode: "access_denied" });
         return;
       }
+
+      track(
+        result.status === "completed" ? "try_on_completed" : "try_on_failed",
+        {
+          frameId,
+          durationMs: Date.now() - startedAt,
+          ...(result.status === "failed" ? { errorCode: "provider" } : {}),
+        },
+      );
 
       setGenerations((current) => ({
         ...current,
@@ -169,6 +190,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
 
   /** Elegir una montura genera directamente y lleva al resultado. */
   function chooseFrame(frameId: string) {
+    track("recommendation_clicked", { frameId });
     setChosenIds((current) => {
       if (current.includes(frameId)) return current;
       return [...current, frameId].slice(-MAX_COMPARE);

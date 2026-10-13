@@ -70,7 +70,8 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | Sistema de growth/SEO (agente + tracker semanal) | **HECHO** → [GROWTH_SEO.md](GROWTH_SEO.md) |
 | Dominio `lookfit.app` sirviendo en producción, con certificado | **HECHO** `[X]` verificado 2026-10-13 → [D-024](DECISION_LOG.md#d-024) |
 | Puerta de acceso `ACCESS_CODE` en la ruta de generación | **HECHO y activa en producción** `[X]` 2026-10-13: `401 access_denied` sin código y con código incorrecto → [D-025](DECISION_LOG.md#d-025) |
-| Analítica del embudo y outbound clicks | pendiente |
+| **Analítica del embudo** (§17): 17 eventos, sin cookies ni datos personales | **HECHO** `[X]` verificado: el servidor descarta todo metadato fuera de la lista blanca |
+| Destino persistente de los eventos (hoy van al log de Vercel) | **pendiente** — el adaptador está, falta la tabla |
 | Supabase, rate limiting persistente | pendiente — la puerta es un apaño de alfa, no la solución |
 | **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |
 | **Imágenes y marcas de terceros** | **bloqueado** — GA-1, [D-015](DECISION_LOG.md#d-015) |
