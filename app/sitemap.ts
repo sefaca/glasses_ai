@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/site";
+import { brandsWithFrames, countByShape } from "@/lib/catalog";
+import type { FrameShape } from "@/lib/catalog/types";
 import { GUIDES } from "@/lib/content/guides";
+import { brandPath, sectionSlug, shapePath } from "@/lib/content/sections";
 import {
   INDEXABLE_LOCALES,
   LOCALES,
@@ -35,6 +38,34 @@ interface SitemapRoute {
   locales: readonly Locale[];
 }
 
+/**
+ * Las páginas de catálogo existen en los cinco idiomas, **con el slug de cada
+ * uno**: `/de/sonnenbrillen/pilotenbrillen`, no la ruta española traducida a
+ * medias. Por eso se emiten por idioma en lugar de con una ruta común.
+ */
+function catalogRoutes(): SitemapRoute[] {
+  const counts = countByShape();
+  const shapes = (Object.keys(counts) as FrameShape[]).filter(
+    (shape) => (counts[shape] ?? 0) > 0,
+  );
+  const brands = brandsWithFrames();
+  const routes: SitemapRoute[] = [];
+
+  for (const locale of LOCALES) {
+    routes.push(
+      { path: `/${sectionSlug("sunglasses", locale)}`, priority: 0.7, locales: [locale] },
+      { path: `/${sectionSlug("brands", locale)}`, priority: 0.6, locales: [locale] },
+    );
+    for (const shape of shapes) {
+      routes.push({ path: shapePath(shape, locale), priority: 0.8, locales: [locale] });
+    }
+    for (const brand of brands) {
+      routes.push({ path: brandPath(brand.slug, locale), priority: 0.6, locales: [locale] });
+    }
+  }
+  return routes;
+}
+
 const ROUTES: SitemapRoute[] = [
   { path: "/", priority: 1, locales: LOCALES },
   { path: "/legal/privacy", priority: 0.3, locales: LOCALES },
@@ -46,6 +77,7 @@ const ROUTES: SitemapRoute[] = [
     priority: 0.8,
     locales: guide.locales,
   })),
+  ...catalogRoutes(),
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

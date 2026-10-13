@@ -52,6 +52,7 @@
 | [D-024](#d-024) | 2026-10-11 | Nombre y dominio: **lookfit.app** | DECISIÓN | OPEN |
 | [D-025](#d-025) | 2026-10-11 | Código de acceso compartido, no rate limiting real, para abrir la alfa | DECISIÓN | OPEN |
 | [D-026](#d-026) | 2026-10-13 | Cinco idiomas a la vez, **contra la recomendación técnica** | DECISIÓN | OPEN |
+| [D-027](#d-027) | 2026-10-13 | Máximo de páginas sin esperar a verificar medidas | DECISIÓN | OPEN |
 
 ---
 
@@ -390,6 +391,19 @@
 - **Mitigación aplicada** El `noindex` global **no se ha tocado**. Que la web esté en cinco idiomas no la hace indexable: eso sigue dependiendo del gate G0 de [GROWTH_SEO.md](GROWTH_SEO.md) §4, que exige contenido real y revisión por idioma. `robots.txt` prohíbe todo, en coherencia. Así el coste de esta decisión es sólo el trabajo ya hecho, y no un castigo de Google por contenido escalado sin valor.
 - **Alternatives** (a) Solo español con la fontanería lista, que era la recomendación; (b) español e italiano, aprovechando que VisuTry no cubre italiano `[X]`; (c) cinco idiomas pero con las páginas legales solo en español, descartado porque es peor que no traducirlas.
 - **Lo que haría falta para que esto rinda** Revisor nativo por idioma, un retailer de destino por mercado, y páginas de contenido —no solo la interfaz— en cada lengua. Queda escrito para que dentro de seis meses se sepa qué faltaba, y no se lea como que «el multiidioma no funcionó».
+
+<a id="d-027"></a>
+## D-027 · Máximo de páginas sin esperar a verificar medidas
+
+- **Date** 2026-10-13 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El fundador pide «crear todas las páginas posibles o necesarias», dice expresamente que **las medidas le dan igual** y que el objetivo es atraer el máximo tráfico de Google, en varios idiomas. Se le expuso antes el argumento contrario —que el agente fijaba un techo de ~45-55 páginas y puertas de admisión por familia— y lo reafirmó.
+- **Esto deroga una regla de [CLAUDE.md §0](../CLAUDE.md)**, que dice «NO generar páginas SEO vacías o programáticas sin contenido/valor real», y relaja las puertas de admisión que el propio agente propuso (forma ≥3 monturas verificadas, marca ≥4). Queda escrito porque es el fundador quien cambia su propia regla, no el agente quien la ignora.
+- **Decision** 125 páginas de catálogo: 2 hubs + 9 formas + 14 marcas, en los cinco idiomas. Total del sitio, 154 páginas.
+- **Cómo se evita que sean clones** (lo único que se negoció) Las de forma llevan **texto editorial propio por forma y por idioma** —45 textos escritos uno a uno, con un test que falla si dos coinciden o si alguno se quedó en español—. Las de marca se componen con **hechos que difieren de verdad**: grupo propietario, país, segmento y qué formas hace esa marca. Los slugs están traducidos al término que se busca en cada mercado, no a la traducción literal: `pilotenbrillen`, no `aviador`.
+- **Riesgo asumido, y es real** Google define el abuso de contenido escalado por intención y valor, no por cómo se produce `[D]`. Estas páginas no tienen medidas verificadas, imágenes de producto ni precios, así que su valor frente a la SERP de un retailer es bajo. El riesgo no es que no posicionen: es que arrastren al dominio entero. El propio agente había declarado inalcanzables a 12 meses las cabeceras de categoría.
+- **Mitigación** El `noindex` **no se toca**. Las 154 páginas existen y no son visibles para Google. Abrirlas es añadir un idioma a `INDEXABLE_LOCALES`, y esa es una decisión aparte que toma el fundador viendo las páginas. Recomendación mía: abrir **solo español** primero y mirar a las 6 semanas qué porcentaje queda en «Rastreada, actualmente sin indexar»; por encima del 30 % es la señal de que Google no les ve valor, y entonces conviene enriquecer antes de abrir más.
+- **Alternatives** (a) El techo de 45-55 páginas con puertas de admisión, que era la recomendación; (b) publicar solo español y traducir por demanda; (c) esperar a verificar las medidas de 17 monturas —2-3 horas de trabajo— y publicar con datos, que habría hecho estas mismas páginas mucho más defendibles.
+- **Qué lo convertiría en acierto** Verificar las medidas. Las páginas ya están construidas para mostrarlas: en cuanto `measurementsStatus` pase a `verified`, cada página de forma gana una tabla comparativa multimarca que hoy no tiene ninguna SERP. Es el mismo trabajo de siempre, pero ahora con el continente ya hecho.
 
 ---
 
