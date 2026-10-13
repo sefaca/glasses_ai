@@ -65,7 +65,7 @@ export const LOCALE_HREFLANG: Record<Locale, string> = {
  * `noindex`, o un `x-default` hacia una versiÃ³n no indexable. Si solo se abre
  * un idioma, las anotaciones tienen que hablar Ãºnicamente de ese.
  */
-export const INDEXABLE_LOCALES: readonly Locale[] = [];
+export const INDEXABLE_LOCALES: readonly Locale[] = ["es"];
 
 export function isIndexable(locale: Locale): boolean {
   return INDEXABLE_LOCALES.includes(locale);
