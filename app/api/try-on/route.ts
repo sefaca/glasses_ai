@@ -81,12 +81,25 @@ export async function POST(request: Request) {
 
   const session = await readSession(cookieValue(SESSION_COOKIE));
   const signedIn = session !== null;
-  if (!signedIn && checkAccess(request.headers.get(ACCESS_HEADER)) === "denied") {
-    return NextResponse.json(
-      { status: "failed", errorCode: "access_denied" },
-      { status: 401 },
-    );
-  }
+
+  /**
+   * Quién puede generar, y bajo qué cuenta.
+   *
+   * Hasta ahora el código compartido era un **muro**: sin él no pasaba nadie,
+   * ni siquiera para su primera prueba. Eso tenía sentido mientras no había
+   * forma de contar el gasto, y dejó de tenerla al existir la contabilidad
+   * → D-032.
+   *
+   * Ahora el código es un **salvoconducto**, no una puerta: salta el cupo
+   * gratuito —sirve para enseñar el producto sin agotarlo— pero **no salta el
+   * tope diario**. Ni nosotros podemos vaciar la cuenta por descuido.
+   *
+   * Y el anónimo entra sin nada, con su generación gratis, **siempre que se
+   * pueda contar**. Si no hay contabilidad configurada se vuelve al régimen
+   * de alfa privada: código o nada. Nunca se abre a ciegas.
+   */
+  const access = checkAccess(request.headers.get(ACCESS_HEADER));
+  const hasSharedCode = access === "open" || access === "granted";
 
   pruneRateLimits();
   const limit = checkRateLimit(`try-on:${ip}`, RATE_LIMIT);
@@ -151,9 +164,12 @@ export async function POST(request: Request) {
       ? { type: "anon", id: anonId }
       : null;
 
-  // Sin contabilidad configurada no se abre la barra libre: se exige el
-  // código compartido, que es el régimen de alfa privada de D-025.
   const quotaReady = usageIsConfigured() && subject !== null;
+
+  // Sin contabilidad y sin código no hay forma segura de dejar pasar a nadie.
+  if (!quotaReady && !hasSharedCode) {
+    return quotaDenied("access_denied", 401, freshAnon);
+  }
 
   if (quotaReady) {
     const counts = await readCounts(subject);
@@ -162,9 +178,12 @@ export async function POST(request: Request) {
     }
 
     const verdict = decide(subject, counts.counts);
-    if (!verdict.allowed) {
-      const status = verdict.reason === "daily_cap" ? 503 : 402;
-      return quotaDenied(verdict.reason, status, freshAnon);
+    // El tope diario no lo salta nadie, ni con código.
+    if (!verdict.allowed && verdict.reason === "daily_cap") {
+      return quotaDenied("daily_cap", 503, freshAnon);
+    }
+    if (!verdict.allowed && !hasSharedCode) {
+      return quotaDenied(verdict.reason, 402, freshAnon);
     }
   }
 
