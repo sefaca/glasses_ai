@@ -92,7 +92,7 @@ export class MockTryOnProvider implements TryOnProvider {
       : {
           ...job,
           status: "completed",
-          resultUrl: `mock/${job.frameId}/${job.id}.svg`,
+          resultUrl: mockImage(job.frameId, job.id),
           errorCode: null,
           completedAt: new Date(this.now()).toISOString(),
         };
@@ -124,4 +124,38 @@ export class MockTryOnProvider implements TryOnProvider {
     this.jobs.set(id, job);
     return job;
   }
+}
+
+/**
+ * Una imagen que **se ve de verdad**.
+ *
+ * Antes devolvía una ruta inventada —`mock/<montura>/<id>.svg`— que no existe
+ * en ningún sitio, así que la pantalla de resultados mostraba el icono de
+ * imagen rota. Nadie lo notó durante semanas porque las pruebas automáticas
+ * miran el código de respuesta y el `resultUrl`, no si el navegador puede
+ * pintarlo.
+ *
+ * Ahora es un `data:` con un SVG, así que no depende de que exista ningún
+ * fichero ni de ninguna red. Lleva el identificador de la montura escrito
+ * encima, que es lo que hace útil al proveedor de prueba: ver de un vistazo
+ * que cada tarjeta recibió **su** generación y no la de al lado.
+ */
+function mockImage(frameId: string, jobId: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400">
+  <rect width="300" height="400" fill="#e3ded5"/>
+  <g fill="none" stroke="#7e4420" stroke-width="7" stroke-linecap="round">
+    <circle cx="112" cy="170" r="42"/>
+    <circle cx="208" cy="170" r="42"/>
+    <path d="M154 163c6-5 12-5 18 0"/>
+    <path d="M70 158c-6-4-10-10-10-17"/>
+    <path d="M250 158c6-4 10-10 10-17"/>
+  </g>
+  <text x="150" y="268" text-anchor="middle" font-family="sans-serif" font-size="15" fill="#1c1a17">simulación de prueba</text>
+  <text x="150" y="292" text-anchor="middle" font-family="monospace" font-size="12" fill="#6b6258">${frameId}</text>
+  <text x="150" y="312" text-anchor="middle" font-family="monospace" font-size="11" fill="#6b6258">${jobId}</text>
+</svg>`;
+
+  // `encodeURIComponent` y no base64: el SVG queda legible en las
+  // herramientas de desarrollo, que es justo lo que se quiere de un mock.
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }

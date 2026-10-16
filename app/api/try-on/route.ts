@@ -9,6 +9,11 @@ import {
   readAnonId,
 } from "@/lib/usage/anon";
 import { decide, type Subject } from "@/lib/usage/quota";
+import {
+  memoryUsageAvailable,
+  readMemoryCounts,
+  recordMemoryGeneration,
+} from "@/lib/usage/memory";
 import { readCounts, recordGeneration, usageIsConfigured } from "@/lib/usage/store";
 import { ACCESS_HEADER, checkAccess } from "@/lib/server/access";
 import { checkRateLimit, pruneRateLimits } from "@/lib/server/rate-limit";
@@ -99,7 +104,15 @@ export async function POST(request: Request) {
    * de alfa privada: código o nada. Nunca se abre a ciegas.
    */
   const access = checkAccess(request.headers.get(ACCESS_HEADER));
-  const hasSharedCode = access === "open" || access === "granted";
+  /**
+   * El salvoconducto es **presentar el código correcto**, no que no haya
+   * código configurado. Si `ACCESS_CODE` está vacío —como en local— lo que
+   * pasa es que no hay alfa privada, no que todo el mundo tenga barra libre:
+   * el cupo sigue aplicándose. Si no, en desarrollo nunca se vería la
+   * pantalla que decide la conversión.
+   */
+  const hasSharedCode = access === "granted";
+  const alphaWall = access === "denied";
 
   pruneRateLimits();
   const limit = checkRateLimit(`try-on:${ip}`, RATE_LIMIT);
@@ -164,15 +177,21 @@ export async function POST(request: Request) {
       ? { type: "anon", id: anonId }
       : null;
 
-  const quotaReady = usageIsConfigured() && subject !== null;
+  // En local, sin Supabase, se cuenta en memoria para poder ver el embudo
+  // entero. Nunca en producción → `memory.ts`.
+  const useMemoryCounts = !usageIsConfigured() && memoryUsageAvailable();
+  const quotaReady = (usageIsConfigured() || useMemoryCounts) && subject !== null;
 
-  // Sin contabilidad y sin código no hay forma segura de dejar pasar a nadie.
-  if (!quotaReady && !hasSharedCode) {
+  // Sin forma de contar, el muro de la alfa privada vuelve a mandar: solo
+  // pasa quien trae el código.
+  if (!quotaReady && (alphaWall || !hasSharedCode)) {
     return quotaDenied("access_denied", 401, freshAnon);
   }
 
   if (quotaReady) {
-    const counts = await readCounts(subject);
+    const counts = useMemoryCounts
+      ? ({ ok: true, counts: readMemoryCounts(subject) } as const)
+      : await readCounts(subject);
     if (!counts.ok) {
       return quotaDenied("usage_unavailable", 503, freshAnon);
     }
@@ -224,12 +243,16 @@ export async function POST(request: Request) {
   }
 
   if (quotaReady && result.billable) {
-    await recordGeneration({
-      subject,
-      frameId: frame.id,
-      provider: provider.name,
-      costCents: result.costEstimateCents,
-    });
+    if (useMemoryCounts) {
+      recordMemoryGeneration(subject);
+    } else {
+      await recordGeneration({
+        subject,
+        frameId: frame.id,
+        provider: provider.name,
+        costCents: result.costEstimateCents,
+      });
+    }
   }
 
   const response = NextResponse.json({
