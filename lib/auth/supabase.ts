@@ -10,11 +10,13 @@
  * → CLAUDE.md regla 2. Son dos peticiones.
  */
 
-export type OtpResult = "sent" | "rate_limited" | "unavailable" | "error";
-
-export type VerifyResult =
+export type PasswordResult =
   | { ok: true; userId: string }
-  | { ok: false; reason: "invalid_code" | "rate_limited" | "unavailable" | "error" };
+  /** El correo existe y la contraseña no es esa. */
+  | { ok: false; reason: "wrong_password" }
+  /** La contraseña no cumple el mínimo que exige Supabase. */
+  | { ok: false; reason: "weak_password" }
+  | { ok: false; reason: "rate_limited" | "unavailable" | "error" };
 
 function config(): { url: string; key: string } | null {
   const url = process.env.SUPABASE_URL?.trim().replace(/\/$/, "");
@@ -27,72 +29,113 @@ export function authAvailable(): boolean {
 }
 
 /**
- * Pide el envío de un código de seis dígitos.
+ * Entrar o registrarse, que aquí son el mismo gesto.
  *
- * `should_create_user: true` hace que registrarse y entrar sean el mismo
- * gesto. Es deliberado: distinguirlos obligaría a la persona a recordar si ya
- * tenía cuenta, que es una pregunta que no debería tener que responder.
+ * Se intenta **iniciar sesión primero** y, si no cuadra, se crea la cuenta.
+ * Es el orden correcto por una razón concreta: Supabase devuelve el mismo
+ * error para «no existe» y para «contraseña incorrecta», a propósito, para
+ * que nadie pueda averiguar qué direcciones están registradas. Si el alta
+ * falla porque ya existe, entonces —y solo entonces— sabemos que lo que
+ * había era una contraseña incorrecta.
  */
-export async function requestOtp(email: string): Promise<OtpResult> {
-  const conf = config();
-  if (!conf) return "unavailable";
-
-  try {
-    const response = await fetch(`${conf.url}/auth/v1/otp`, {
-      method: "POST",
-      headers: {
-        apikey: conf.key,
-        Authorization: `Bearer ${conf.key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, create_user: true }),
-    });
-
-    if (response.ok) return "sent";
-    // Supabase limita los envíos; su 429 se traduce al nuestro.
-    if (response.status === 429) return "rate_limited";
-
-    // Nunca se devuelve su cuerpo al cliente → regla 5.
-    console.error("[auth] otp", response.status);
-    return "error";
-  } catch {
-    return "error";
-  }
-}
-
-/** Comprueba el código y devuelve el identificador de usuario. */
-export async function verifyOtp(
+export async function signInOrUp(
   email: string,
-  code: string,
-): Promise<VerifyResult> {
+  password: string,
+): Promise<PasswordResult> {
   const conf = config();
   if (!conf) return { ok: false, reason: "unavailable" };
 
+  const signedIn = await post(conf, "/auth/v1/token?grant_type=password", {
+    email,
+    password,
+  });
+  if (signedIn.status === 200) {
+    const userId = (signedIn.body as { user?: { id?: string } })?.user?.id;
+    return userId ? { ok: true, userId } : { ok: false, reason: "error" };
+  }
+  if (signedIn.status === 429) return { ok: false, reason: "rate_limited" };
+
+  const signedUp = await post(conf, "/auth/v1/signup", { email, password });
+  if (signedUp.status === 200) {
+    const body = signedUp.body as { user?: { id?: string }; id?: string };
+    const userId = body?.user?.id ?? body?.id;
+    return userId ? { ok: true, userId } : { ok: false, reason: "error" };
+  }
+  if (signedUp.status === 429) return { ok: false, reason: "rate_limited" };
+
+  const message = String(
+    (signedUp.body as { msg?: string; error_description?: string })?.msg ??
+      (signedUp.body as { error_description?: string })?.error_description ??
+      "",
+  ).toLowerCase();
+
+  // Ya existía: lo que falló antes era la contraseña.
+  if (message.includes("already") || message.includes("registered")) {
+    return { ok: false, reason: "wrong_password" };
+  }
+  if (message.includes("password")) return { ok: false, reason: "weak_password" };
+
+  console.error("[auth] signup", signedUp.status);
+  return { ok: false, reason: "error" };
+}
+
+/** URL a la que mandar a alguien para que elija su cuenta de Google. */
+export function googleAuthorizeUrl(
+  redirectTo: string,
+  challenge: string,
+): string | null {
+  const conf = config();
+  if (!conf) return null;
+
+  const params = new URLSearchParams({
+    provider: "google",
+    redirect_to: redirectTo,
+    code_challenge: challenge,
+    code_challenge_method: "s256",
+  });
+  return `${conf.url}/auth/v1/authorize?${params.toString()}`;
+}
+
+/** Canjea el código de la vuelta por el usuario. */
+export async function exchangeCode(
+  code: string,
+  verifier: string,
+): Promise<{ ok: true; userId: string } | { ok: false }> {
+  const conf = config();
+  if (!conf) return { ok: false };
+
+  const result = await post(conf, "/auth/v1/token?grant_type=pkce", {
+    auth_code: code,
+    code_verifier: verifier,
+  });
+  if (result.status !== 200) {
+    console.error("[auth] pkce", result.status);
+    return { ok: false };
+  }
+
+  const userId = (result.body as { user?: { id?: string } })?.user?.id;
+  return userId ? { ok: true, userId } : { ok: false };
+}
+
+/** Una sola forma de hablar con Supabase, para no repetir cabeceras. */
+async function post(
+  conf: { url: string; key: string },
+  path: string,
+  body: unknown,
+): Promise<{ status: number; body: unknown }> {
   try {
-    const response = await fetch(`${conf.url}/auth/v1/verify`, {
+    const response = await fetch(`${conf.url}${path}`, {
       method: "POST",
       headers: {
         apikey: conf.key,
         Authorization: `Bearer ${conf.key}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ type: "email", email, token: code }),
+      body: JSON.stringify(body),
     });
-
-    if (response.status === 429) return { ok: false, reason: "rate_limited" };
-    if (!response.ok) {
-      // Un código mal tecleado o caducado llega como 400/403. No se
-      // distingue entre «no existe» y «ha caducado»: decirlo permitiría
-      // averiguar qué direcciones están registradas.
-      return { ok: false, reason: "invalid_code" };
-    }
-
-    const payload = (await response.json()) as { user?: { id?: string } };
-    const userId = payload.user?.id;
-    if (!userId) return { ok: false, reason: "error" };
-
-    return { ok: true, userId };
+    // Nunca se devuelve este cuerpo al cliente → regla 5.
+    return { status: response.status, body: await response.json().catch(() => null) };
   } catch {
-    return { ok: false, reason: "error" };
+    return { status: 0, body: null };
   }
 }

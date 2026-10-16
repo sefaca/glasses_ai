@@ -261,21 +261,18 @@ export interface Dictionary {
     bodyAfterFree: string;
     emailLabel: string;
     emailPlaceholder: string;
-    sendCode: string;
+    passwordLabel: string;
+    passwordPlaceholder: string;
+    submit: string;
+    google: string;
+    or: string;
     /** Qué implica registrarse. Visible antes de dar el correo. */
     promise: string;
-    codeTitle: string;
-    /** `{email}`. */
-    codeBody: string;
-    codeLabel: string;
-    codePlaceholder: string;
-    verify: string;
-    resend: string;
-    useAnotherEmail: string;
     signOut: string;
     errors: {
       invalidEmail: string;
-      invalidCode: string;
+      weakPassword: string;
+      wrongPassword: string;
       rateLimited: string;
       unavailable: string;
       generic: string;

@@ -11,62 +11,42 @@
  * script de terceros se la lleve.
  */
 
-export type RequestCodeResult =
-  | "sent"
-  | "invalid_email"
-  | "rate_limited"
-  | "unavailable"
-  | "error";
-
-export type VerifyCodeResult =
+export type SignInResult =
   | "ok"
-  | "invalid_code"
+  | "invalid_email"
+  | "weak_password"
+  | "wrong_password"
   | "rate_limited"
   | "unavailable"
   | "error";
 
-async function post(body: unknown): Promise<{ status?: string } | null> {
+/** Entrar o registrarse: el servidor decide cuál de las dos. */
+export async function signIn(
+  email: string,
+  password: string,
+): Promise<SignInResult> {
   try {
     const response = await fetch("/api/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ email, password }),
     });
-    return (await response.json()) as { status?: string };
+    const payload = (await response.json()) as { status?: string };
+    const status = payload.status;
+    if (
+      status === "ok" ||
+      status === "invalid_email" ||
+      status === "weak_password" ||
+      status === "wrong_password" ||
+      status === "rate_limited" ||
+      status === "unavailable"
+    ) {
+      return status;
+    }
+    return "error";
   } catch {
-    return null;
+    return "error";
   }
-}
-
-export async function requestCode(email: string): Promise<RequestCodeResult> {
-  const payload = await post({ action: "request", email });
-  const status = payload?.status;
-  if (
-    status === "sent" ||
-    status === "invalid_email" ||
-    status === "rate_limited" ||
-    status === "unavailable"
-  ) {
-    return status;
-  }
-  return "error";
-}
-
-export async function verifyCode(
-  email: string,
-  code: string,
-): Promise<VerifyCodeResult> {
-  const payload = await post({ action: "verify", email, code });
-  const status = payload?.status;
-  if (
-    status === "ok" ||
-    status === "invalid_code" ||
-    status === "rate_limited" ||
-    status === "unavailable"
-  ) {
-    return status;
-  }
-  return "error";
 }
 
 export async function isSignedIn(): Promise<boolean> {

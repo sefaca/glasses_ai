@@ -58,6 +58,7 @@
 | [D-030](#d-030) | 2026-10-16 | Paddle como pasarela, y EE. UU. sube a $9,99 | DECISIÓN | OPEN |
 | [D-031](#d-031) | 2026-10-16 | Tercer pack caro, como ancla de precio | DECISIÓN | OPEN |
 | [D-032](#d-032) | 2026-10-16 | Contabilidad de uso con tres topes, y falla cerrado | DECISIÓN | OPEN |
+| [D-033](#d-033) | 2026-10-16 | Registro con contraseña y Google, en vez de código por correo | DECISIÓN | OPEN |
 
 ---
 
@@ -530,6 +531,23 @@
 - **Lo que no hace** No gestiona créditos comprados: eso llega con la pasarela. Hoy solo cuenta gratis. La tabla ya guarda proveedor y coste estimado por fila, que es lo que permitirá **comparar la estimación con la factura real** a fin de mes.
 - **Alternatives** (a) Upstash Redis, que era la opción que se barajó al detectar la deuda: más rápido, pero añade un servicio más cuando Supabase ya está puesto y el volumen es ínfimo; (b) contador agregado en vez de una fila por generación, descartado porque un contador desincronizado es un fallo silencioso que se descubre leyendo la factura; (c) solo tope por IP, descartado porque §15 avisa de que la IP no puede ser el único mecanismo; (d) fallar abierto, descartado arriba.
 - **Impact** Desbloquea abrir la generación sin código compartido, que es el paso 2 del flujo acordado y la condición para que haya datos de uso con los que fijar el precio de verdad.
+
+<a id="d-033"></a>
+## D-033 · Registro con contraseña y Google, en vez de código por correo
+
+- **Date** 2026-10-16 · **Type** DECISIÓN · **Status** OPEN
+- **Context** [D-028](#d-028) eligió código de seis dígitos por correo. Al llevarlo a producción apareció el problema que lo hace inviable hoy: **el correo integrado de Supabase no entrega a direcciones ajenas al equipo**, y montar SMTP propio es media hora de trabajo que además depende de verificar un dominio. El fundador pide un registro normal con opción de Google.
+- **Decision** Se sustituye el código por: **contraseña** (entrar y registrarse en el mismo gesto) y **Google**.
+- **Por qué estoy de acuerdo, y no solo porque lo pida** **Google resuelve exactamente el bloqueo**: no hay que enviar nada. La contraseña sola no lo resolvería —la confirmación y el restablecimiento vuelven a necesitar correo—, así que Google no es un extra: es el camino que funciona hoy.
+- **Esto se desvía de [CLAUDE.md §24](../CLAUDE.md)**, que excluye el *social login* de la fase 1. Queda escrito: el motivo es operativo, no de producto.
+- **Cómo está hecho, y por qué así**
+  - **PKCE, con el intercambio en el servidor.** Supabase devuelve un código en la URL y lo canjeamos nosotros. La alternativa —flujo implícito— devuelve los tokens en el fragmento de la URL y obligaría a leerlos en el navegador, y con ellos a meter el cliente de Supabase y su clave pública en la página. **Ni un token de Supabase llega al navegador.**
+  - El `verifier` va en cookie `httpOnly` de cinco minutos: es lo que ata la vuelta de Google a la ida que salió de aquí.
+  - **Entrar y registrarse son el mismo gesto.** Se intenta entrar y, si no, se crea la cuenta. Ese orden importa: Supabase devuelve el mismo error para «no existe» y «contraseña incorrecta» —a propósito, para que nadie averigüe qué direcciones están registradas— así que solo cuando el alta falla por duplicado sabemos que lo que había era una contraseña mal puesta.
+  - **El origen sale de la petición**, no de una constante, para que funcione igual en local, en previsualización y en producción.
+- **Lo que hace falta configurar, y no es código** Credenciales OAuth en Google Cloud, el proveedor Google activado en Supabase, y los orígenes permitidos en Authentication → URL Configuration. Con los ámbitos básicos de correo y perfil **no hace falta pasar la verificación de Google**.
+- **Riesgo asumido** Google ve quién usa el producto. Es el precio de no depender de nuestro correo, y por eso la contraseña se mantiene como alternativa para quien no quiera.
+- **Alternatives** (a) Mantener el código y montar SMTP, que es lo correcto a medio plazo y sigue pendiente para avisos de la lista de espera; (b) solo contraseña, que no resuelve el bloqueo porque el restablecimiento necesita correo; (c) enlace mágico, descartado ya en D-028 por el problema del móvil.
 
 ---
 
