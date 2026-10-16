@@ -31,6 +31,12 @@ import { saveAccessCode } from "@/lib/tryon/client";
 type Panel = "email" | "code" | "waitlist" | "joined" | "shared";
 
 interface Props {
+  /**
+   * Por qué aparece. Cambia el titular, y eso cambia la conversión: no es lo
+   * mismo pedirle una cuenta a alguien que no ha visto nada que a alguien que
+   * acaba de ver su cara con unas gafas puestas.
+   */
+  reason: "no_code" | "free_used";
   retry: boolean;
   dict: Dictionary;
   lang: Locale;
@@ -39,7 +45,14 @@ interface Props {
   onCancel: () => void;
 }
 
-export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
+export function AccessGate({
+  reason,
+  retry,
+  dict,
+  lang,
+  onSubmit,
+  onCancel,
+}: Props) {
   const [panel, setPanel] = useState<Panel>("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -48,6 +61,7 @@ export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const auth = dict.auth;
+  const afterFree = reason === "free_used";
   const list = dict.waitlist;
   const access = dict.tryOn.access;
 
@@ -149,10 +163,10 @@ export function AccessGate({ retry, dict, lang, onSubmit, onCancel }: Props) {
         {panel === "email" && (
           <form onSubmit={sendCode}>
             <h2 className="font-display text-xl tracking-tight">
-              {auth.title}
+              {afterFree ? auth.titleAfterFree : auth.title}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted">
-              {auth.body}
+              {afterFree ? auth.bodyAfterFree : auth.body}
             </p>
 
             <label htmlFor="auth-email" className="sr-only">

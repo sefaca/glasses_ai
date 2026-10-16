@@ -316,6 +316,9 @@ export const pt: Dictionary = {
   auth: {
     title: "Crie sua conta para experimentar",
     body: "Sem senha: mandamos um código de seis dígitos para o seu e-mail e pronto. Você chegou até aqui sem dar nada, e o que viu continua grátis.",
+    titleAfterFree: "Você já viu. Mais uma?",
+    bodyAfterFree:
+      "Esse era o seu teste grátis. Crie sua conta em dez segundos e damos mais um, para você comparar duas armações na mesma foto.",
     emailLabel: "Seu e-mail",
     emailPlaceholder: "voce@email.com",
     sendCode: "Me enviar o código",

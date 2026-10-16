@@ -256,6 +256,9 @@ export interface Dictionary {
   auth: {
     title: string;
     body: string;
+    /** Cuando ya gastó su generación gratis. El momento que más convierte. */
+    titleAfterFree: string;
+    bodyAfterFree: string;
     emailLabel: string;
     emailPlaceholder: string;
     sendCode: string;

@@ -81,6 +81,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const [pendingAccess, setPendingAccess] = useState<{
     frameId: string;
     retry: boolean;
+    reason: "no_code" | "free_used";
   } | null>(null);
 
   const profile = session?.profile ?? null;
@@ -163,7 +164,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
           delete next[frameId];
           return next;
         });
-        setPendingAccess({ frameId, retry: hadCode });
+        setPendingAccess({ frameId, retry: hadCode, reason: result.reason });
         track("try_on_failed", { frameId, errorCode: "access_denied" });
         return;
       }
@@ -237,6 +238,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
     <div className="min-h-dvh">
       {pendingAccess && (
         <AccessGate
+          reason={pendingAccess.reason}
           retry={pendingAccess.retry}
           dict={dict}
           lang={lang}

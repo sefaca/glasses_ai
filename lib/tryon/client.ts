@@ -42,8 +42,14 @@ export type TryOnClientResult =
       /** `true` ⇒ no hay proveedor real detrás; es el mock. */
       simulated: boolean;
     }
-  /** Hace falta código de acceso. La UI debe pedirlo, no mostrar un error. */
-  | { status: "needs-access" }
+  /**
+   * Hace falta pasar por la pantalla de acceso. **No es un error**: es el
+   * momento de conversión del producto, y la UI invita en vez de avisar.
+   *
+   * - `no_code`: no hay forma de identificar a quien pide.
+   * - `free_used`: gastó su gratis. Es el momento de registrarse.
+   */
+  | { status: "needs-access"; reason: "no_code" | "free_used" }
   | { status: "failed"; message: string };
 
 /**
@@ -131,6 +137,11 @@ export async function requestTryOn(
   const code = payload.errorCode ?? "unknown";
   // La puerta no es un error del usuario: es un paso que falta. La UI pide el
   // código en lugar de enseñar un fallo.
-  if (code === "access_denied") return { status: "needs-access" };
+  if (code === "access_denied") {
+    return { status: "needs-access", reason: "no_code" };
+  }
+  if (code === "free_exhausted") {
+    return { status: "needs-access", reason: "free_used" };
+  }
   return { status: "failed", message: messageFor(errors, code) };
 }
