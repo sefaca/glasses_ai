@@ -291,6 +291,10 @@ export const en: Dictionary = {
         "We couldn't generate this try-on. Try a different frame or photo.",
       invalidInput: "Something's wrong with the image. Try another photo.",
       noFaceDetected: "We can't find a face in that photo.",
+      freeExhausted:
+        "You've used your free try-ons. You'll be able to get more soon.",
+      dailyCap:
+        "We've hit today's try-on limit. Come back tomorrow and we'll try again.",
       unknown: "We couldn't generate the try-on. Please try again.",
     },
     access: {

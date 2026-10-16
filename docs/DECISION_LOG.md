@@ -57,6 +57,7 @@
 | [D-029](#d-029) | 2026-10-16 | Precio de arranque: 2 gratis, packs de 4,99 €/10 y 9,99 €/25 | DECISIÓN | OPEN |
 | [D-030](#d-030) | 2026-10-16 | Paddle como pasarela, y EE. UU. sube a $9,99 | DECISIÓN | OPEN |
 | [D-031](#d-031) | 2026-10-16 | Tercer pack caro, como ancla de precio | DECISIÓN | OPEN |
+| [D-032](#d-032) | 2026-10-16 | Contabilidad de uso con tres topes, y falla cerrado | DECISIÓN | OPEN |
 
 ---
 
@@ -510,6 +511,25 @@
 - **Alternatives** (a) Dos packs, que era [D-029](#d-029) y sigue siendo lo que recomienda §24; (b) un premium más pequeño, 75 generaciones a ~29,99 €, más creíble como cantidad de consumidor pero peor como ancla; (c) suscripción en ese escalón, descartada por [D-001](#d-001).
 - **Cómo se sabrá si el ancla funciona** No por sus ventas. Por el **reparto entre el pack de entrada y el de 9,99 €** antes y después de añadirlo: si el de 9,99 € gana cuota tras introducir el premium, el ancla está haciendo su trabajo. Esa comparación exige medir el reparto **desde el primer día**, porque después no se puede reconstruir.
 - **Status note** OPEN. Sin un solo dato de uso propio detrás, como el resto del pricing.
+
+<a id="d-032"></a>
+## D-032 · Contabilidad de uso con tres topes, y falla cerrado
+
+- **Date** 2026-10-16 · **Type** DECISIÓN · **Status** OPEN
+- **Context** Hasta hoy el único freno a la generación era `checkRateLimit`, un contador **en memoria del proceso**. En serverless cada instancia lleva la suya, así que contra un script no servía de nada. Era deuda conocida y anotada desde el principio, y lo que impedía abrir la generación más allá del código compartido de [D-025](#d-025).
+- **Decision** Tres topes, con una tabla en Supabase (`generations`, una fila por generación cobrable):
+  1. **Por sesión anónima**: 1 gratis. Identificador firmado con HMAC en cookie `httpOnly`.
+  2. **Por cuenta**: 2 gratis en total → [D-029](#d-029).
+  3. **Global diario**: `DAILY_GENERATION_CAP`, 50 por defecto.
+- **El tercero es el único que protege la factura** Los dos primeros se saltan tirando la cookie o creando cuentas. Eso está asumido: firmar el identificador anónimo no lo hace infalible, solo evita que baste con editar un valor. **Lo que acota el gasto es el tope global**, y por eso se comprueba el primero: si el sitio llegó a su límite del día, da igual que a esta persona le queden gratis.
+  - A 0,10 €/generación, 50 son **5 € al día como máximo absoluto**.
+- **Falla cerrado, y es deliberado** Si no se puede consultar el contador, se **deniega**. La alternativa —seguir adelante— es exactamente el fallo que vacía una cuenta de proveedor: basta con que la base esté caída para que el tope desaparezca. **Denegar deja a alguien sin probar un rato; permitir deja la factura abierta.** No es simétrico.
+- **Una generación fallida no gasta cupo** → regla 11. La fila se escribe solo cuando el proveedor devolvió algo cobrable.
+- **Y si no se pudo anotar una que sí se hizo, se regala.** El error se registra, pero no se le niega nada a quien ya esperó treinta segundos. Es la única asimetría que va en favor del usuario, y es barata.
+- **Sin contabilidad configurada no hay barra libre** Si falta Supabase, la ruta vuelve al régimen de alfa privada: se exige el código compartido. Nunca se abre «por defecto».
+- **Lo que no hace** No gestiona créditos comprados: eso llega con la pasarela. Hoy solo cuenta gratis. La tabla ya guarda proveedor y coste estimado por fila, que es lo que permitirá **comparar la estimación con la factura real** a fin de mes.
+- **Alternatives** (a) Upstash Redis, que era la opción que se barajó al detectar la deuda: más rápido, pero añade un servicio más cuando Supabase ya está puesto y el volumen es ínfimo; (b) contador agregado en vez de una fila por generación, descartado porque un contador desincronizado es un fallo silencioso que se descubre leyendo la factura; (c) solo tope por IP, descartado porque §15 avisa de que la IP no puede ser el único mecanismo; (d) fallar abierto, descartado arriba.
+- **Impact** Desbloquea abrir la generación sin código compartido, que es el paso 2 del flujo acordado y la condición para que haya datos de uso con los que fijar el precio de verdad.
 
 ---
 

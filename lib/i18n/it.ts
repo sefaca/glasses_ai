@@ -297,6 +297,10 @@ export const it: Dictionary = {
         "Non siamo riusciti a generare questa prova. Prova con un'altra montatura o un'altra foto.",
       invalidInput: "C'è qualcosa che non va nell'immagine. Prova un'altra foto.",
       noFaceDetected: "Non riconosciamo un volto nella foto.",
+      freeExhausted:
+        "Hai usato le tue prove gratuite. Presto potrai averne altre.",
+      dailyCap:
+        "Abbiamo raggiunto il limite di prove di oggi. Torna domani e riproviamo.",
       unknown: "Non siamo riusciti a generare la prova. Riprova.",
     },
     access: {

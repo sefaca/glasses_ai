@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { findFrameById } from "@/lib/catalog";
 import { canLabelAsProduct, canTryOn } from "@/lib/catalog/rights";
 import { SESSION_COOKIE, readSession } from "@/lib/auth/session";
+import {
+  ANON_COOKIE,
+  anonCookieOptions,
+  createAnonId,
+  readAnonId,
+} from "@/lib/usage/anon";
+import { decide, type Subject } from "@/lib/usage/quota";
+import { readCounts, recordGeneration, usageIsConfigured } from "@/lib/usage/store";
 import { ACCESS_HEADER, checkAccess } from "@/lib/server/access";
 import { checkRateLimit, pruneRateLimits } from "@/lib/server/rate-limit";
 import { buildTryOnPrompt, PROMPT_VERSION } from "@/lib/tryon/prompt";
@@ -63,14 +71,16 @@ export async function POST(request: Request) {
    *   producto a alguien sin pedirle que se registre, y porque si el envío
    *   de correos falla, sin él nadie podría entrar.
    */
-  const cookie = request.headers
-    .get("cookie")
-    ?.split(";")
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${SESSION_COOKIE}=`))
-    ?.slice(SESSION_COOKIE.length + 1);
+  const cookies = (request.headers.get("cookie") ?? "")
+    .split(";")
+    .map((part) => part.trim());
+  const cookieValue = (name: string) =>
+    cookies
+      .find((part) => part.startsWith(`${name}=`))
+      ?.slice(name.length + 1);
 
-  const signedIn = (await readSession(cookie)) !== null;
+  const session = await readSession(cookieValue(SESSION_COOKIE));
+  const signedIn = session !== null;
   if (!signedIn && checkAccess(request.headers.get(ACCESS_HEADER)) === "denied") {
     return NextResponse.json(
       { status: "failed", errorCode: "access_denied" },
@@ -115,6 +125,49 @@ export async function POST(request: Request) {
   const frame = findFrameById(frameId);
   if (!frame) return badRequest("invalid_input");
 
+  /**
+   * El cupo, **antes** de llamar al proveedor.
+   *
+   * Es lo único que convierte el gasto en acotado: hasta ahora el freno era
+   * un contador en memoria del proceso, y en serverless cada instancia lleva
+   * la suya. Aquí hay tres topes —por sesión, por cuenta y global diario— y
+   * el que de verdad protege la factura es el tercero.
+   *
+   * **Falla cerrado**: si no se puede consultar el contador, se deniega.
+   * Denegar deja a alguien sin probar un rato; permitir deja la factura
+   * abierta. No es simétrico.
+   */
+  let anonId = await readAnonId(cookieValue(ANON_COOKIE));
+  let freshAnon: Awaited<ReturnType<typeof createAnonId>> = null;
+
+  if (!signedIn && !anonId) {
+    freshAnon = await createAnonId();
+    anonId = freshAnon?.id ?? null;
+  }
+
+  const subject: Subject | null = signedIn
+    ? { type: "user", id: session.userId }
+    : anonId
+      ? { type: "anon", id: anonId }
+      : null;
+
+  // Sin contabilidad configurada no se abre la barra libre: se exige el
+  // código compartido, que es el régimen de alfa privada de D-025.
+  const quotaReady = usageIsConfigured() && subject !== null;
+
+  if (quotaReady) {
+    const counts = await readCounts(subject);
+    if (!counts.ok) {
+      return quotaDenied("usage_unavailable", 503, freshAnon);
+    }
+
+    const verdict = decide(subject, counts.counts);
+    if (!verdict.allowed) {
+      const status = verdict.reason === "daily_cap" ? 503 : 402;
+      return quotaDenied(verdict.reason, status, freshAnon);
+    }
+  }
+
   const provider = getTryOnProvider();
   // El muro de gates también aquí: que el cliente pida algo no autoriza nada.
   if (!canTryOn(frame, provider.assetOwnership)) {
@@ -144,13 +197,23 @@ export async function POST(request: Request) {
   });
 
   if (result.status !== "completed" || !result.resultUrl) {
+    // Una generación fallida no gasta cupo → regla 11.
     return NextResponse.json(
       { status: "failed", errorCode: result.errorCode ?? "unknown" },
       { status: 502 },
     );
   }
 
-  return NextResponse.json({
+  if (quotaReady && result.billable) {
+    await recordGeneration({
+      subject,
+      frameId: frame.id,
+      provider: provider.name,
+      costCents: result.costEstimateCents,
+    });
+  }
+
+  const response = NextResponse.json({
     status: "completed",
     resultUrl: result.resultUrl,
     /**
@@ -160,6 +223,34 @@ export async function POST(request: Request) {
     labelAsProduct: canLabelAsProduct(frame, provider.assetOwnership),
     simulated: !hasRealProvider(),
   });
+
+  // La cookie anónima se emite con la respuesta, no antes: si la petición se
+  // hubiera rechazado, no tiene sentido haber marcado el navegador.
+  if (freshAnon) {
+    response.cookies.set(ANON_COOKIE, freshAnon.value, anonCookieOptions());
+  }
+  return response;
+}
+
+/**
+ * Respuesta de cupo agotado.
+ *
+ * Lleva la cookie anónima aunque deniegue: si no, cada intento crearía un
+ * sujeto nuevo y el cupo no contaría nada.
+ */
+function quotaDenied(
+  errorCode: string,
+  status: number,
+  freshAnon: { value: string } | null,
+) {
+  const response = NextResponse.json(
+    { status: "failed", errorCode },
+    { status },
+  );
+  if (freshAnon) {
+    response.cookies.set(ANON_COOKIE, freshAnon.value, anonCookieOptions());
+  }
+  return response;
 }
 
 function badRequest(errorCode: string) {

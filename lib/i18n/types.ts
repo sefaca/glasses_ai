@@ -231,6 +231,10 @@ export interface Dictionary {
       contentRejected: string;
       invalidInput: string;
       noFaceDetected: string;
+      /** Se le acabaron las gratis. No es un error: es el momento de pagar. */
+      freeExhausted: string;
+      /** El sitio llegó a su tope del día. No es culpa suya, y se dice. */
+      dailyCap: string;
       unknown: string;
     };
     access: {

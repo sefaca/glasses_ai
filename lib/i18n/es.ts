@@ -288,6 +288,10 @@ export const es: Dictionary = {
         "No hemos podido generar esta prueba. Prueba con otra montura u otra foto.",
       invalidInput: "Algo falla con la imagen. Prueba con otra foto.",
       noFaceDetected: "No reconocemos una cara en la foto.",
+      freeExhausted:
+        "Has usado tus pruebas gratuitas. Pronto podrás conseguir más.",
+      dailyCap:
+        "Hemos llegado al límite de pruebas de hoy. Vuelve mañana y lo intentamos de nuevo.",
       unknown: "No hemos podido generar la prueba. Vuelve a intentarlo.",
     },
     access: {

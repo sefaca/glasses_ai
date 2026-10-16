@@ -69,6 +69,11 @@ function messageFor(errors: TryOnErrors, code: string): string {
       return errors.invalidInput;
     case "no_face_detected":
       return errors.noFaceDetected;
+    case "free_exhausted":
+      return errors.freeExhausted;
+    case "daily_cap":
+    case "usage_unavailable":
+      return errors.dailyCap;
     default:
       return errors.unknown;
   }

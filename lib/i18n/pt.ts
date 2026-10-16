@@ -297,6 +297,10 @@ export const pt: Dictionary = {
         "Não conseguimos gerar este teste. Tente outra armação ou outra foto.",
       invalidInput: "Tem algo errado com a imagem. Tente outra foto.",
       noFaceDetected: "Não reconhecemos um rosto na foto.",
+      freeExhausted:
+        "Você usou seus testes gratuitos. Em breve poderá conseguir mais.",
+      dailyCap:
+        "Chegamos ao limite de testes de hoje. Volte amanhã e tentamos de novo.",
       unknown: "Não conseguimos gerar o teste. Tente de novo.",
     },
     access: {

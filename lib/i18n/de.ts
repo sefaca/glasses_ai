@@ -303,6 +303,10 @@ export const de: Dictionary = {
         "Wir konnten diese Anprobe nicht erzeugen. Versuch eine andere Fassung oder ein anderes Foto.",
       invalidInput: "Mit dem Bild stimmt etwas nicht. Versuch ein anderes Foto.",
       noFaceDetected: "Wir erkennen auf dem Foto kein Gesicht.",
+      freeExhausted:
+        "Du hast deine kostenlosen Anproben aufgebraucht. Bald kannst du mehr bekommen.",
+      dailyCap:
+        "Wir haben das heutige Anprobe-Limit erreicht. Komm morgen wieder, dann versuchen wir es erneut.",
       unknown: "Wir konnten die Anprobe nicht erzeugen. Versuch es noch einmal.",
     },
     access: {
