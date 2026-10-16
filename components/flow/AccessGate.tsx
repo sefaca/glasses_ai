@@ -44,6 +44,8 @@ export function AccessGate({
   const [panel, setPanel] = useState<Panel>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [visible, setVisible] = useState(false);
   const [shared, setShared] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +60,14 @@ export function AccessGate({
     if (busy) return;
     setBusy(true);
     setError(null);
+
+    // Se comprueba antes de salir a la red: es un error del formulario, no
+    // del servidor, y no merece un viaje de ida y vuelta.
+    if (!visible && password !== confirm) {
+      setBusy(false);
+      setError(auth.errors.passwordMismatch);
+      return;
+    }
 
     const result = await signIn(email, password);
     setBusy(false);
@@ -169,21 +179,60 @@ export function AccessGate({
                 className="w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none focus-visible:border-accent"
               />
 
-              <label htmlFor="auth-password" className="sr-only">
-                {auth.passwordLabel}
-              </label>
-              <input
-                id="auth-password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder={auth.passwordPlaceholder}
-                className="mt-3 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none focus-visible:border-accent"
-              />
+              {/*
+                El interruptor de ver la contraseña no es un adorno: evita la
+                mitad de los errores de tecleo, que es precisamente lo que la
+                segunda casilla intenta atrapar después.
+              */}
+              <div className="relative mt-3">
+                <label htmlFor="auth-password" className="sr-only">
+                  {auth.passwordLabel}
+                </label>
+                <input
+                  id="auth-password"
+                  name="password"
+                  type={visible ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  minLength={8}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder={auth.passwordPlaceholder}
+                  className="w-full rounded-xl border border-line bg-paper px-4 py-3 pr-24 text-sm outline-none focus-visible:border-accent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setVisible((current) => !current)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-[0.7rem] text-muted underline decoration-line underline-offset-4 hover:text-ink"
+                >
+                  {visible ? auth.hidePassword : auth.showPassword}
+                </button>
+              </div>
+
+              {/*
+                La segunda casilla desaparece al mostrar la contraseña: si ya
+                se ve lo que se ha escrito, repetirlo no comprueba nada y solo
+                añade un campo más al formulario que peor convierte.
+              */}
+              {!visible && (
+                <>
+                  <label htmlFor="auth-confirm" className="sr-only">
+                    {auth.confirmLabel}
+                  </label>
+                  <input
+                    id="auth-confirm"
+                    name="password-confirm"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    minLength={8}
+                    value={confirm}
+                    onChange={(event) => setConfirm(event.target.value)}
+                    placeholder={auth.confirmPlaceholder}
+                    className="mt-3 w-full rounded-xl border border-line bg-paper px-4 py-3 text-sm outline-none focus-visible:border-accent"
+                  />
+                </>
+              )}
 
               <p className="mt-3 text-[0.7rem] leading-relaxed text-muted">
                 {auth.promise}
@@ -205,7 +254,12 @@ export function AccessGate({
                 </button>
                 <button
                   type="submit"
-                  disabled={busy || !email.trim() || password.length < 8}
+                  disabled={
+                    busy ||
+                    !email.trim() ||
+                    password.length < 8 ||
+                    (!visible && confirm.length < 8)
+                  }
                   className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px disabled:opacity-40"
                 >
                   {auth.submit}

@@ -329,6 +329,10 @@ export const de: Dictionary = {
     emailPlaceholder: "du@email.de",
     passwordLabel: "Passwort",
     passwordPlaceholder: "Mindestens 8 Zeichen",
+    confirmLabel: "Passwort wiederholen",
+    confirmPlaceholder: "Noch einmal dasselbe",
+    showPassword: "Passwort anzeigen",
+    hidePassword: "Passwort verbergen",
     submit: "Weiter",
     google: "Weiter mit Google",
     or: "oder",
@@ -338,6 +342,7 @@ export const de: Dictionary = {
     errors: {
       invalidEmail: "Diese Adresse sieht nicht gültig aus. Prüf sie bitte.",
       weakPassword: "Das Passwort braucht mindestens 8 Zeichen.",
+      passwordMismatch: "Die beiden Passwörter stimmen nicht überein.",
       wrongPassword: "Dieses Passwort passt nicht zu dieser E-Mail.",
       rateLimited: "Zu viele Versuche hintereinander. Versuch es später.",
       unavailable: "Die Registrierung ist gerade nicht verfügbar. Versuch es später.",

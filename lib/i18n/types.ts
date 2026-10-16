@@ -263,6 +263,12 @@ export interface Dictionary {
     emailPlaceholder: string;
     passwordLabel: string;
     passwordPlaceholder: string;
+    /** Segunda casilla, para que un dedazo no deje a nadie fuera. */
+    confirmLabel: string;
+    confirmPlaceholder: string;
+    /** Ver u ocultar lo escrito. Evita la mitad de los errores. */
+    showPassword: string;
+    hidePassword: string;
     submit: string;
     google: string;
     or: string;
@@ -272,6 +278,7 @@ export interface Dictionary {
     errors: {
       invalidEmail: string;
       weakPassword: string;
+      passwordMismatch: string;
       wrongPassword: string;
       rateLimited: string;
       unavailable: string;
