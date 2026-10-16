@@ -83,7 +83,10 @@ export interface Dictionary {
 
   /** Pantalla `/probar`: los cuatro pasos. */
   flow: {
-    steps: readonly [string, string, string, string];
+    /** Tres, no cuatro: las marcas dejaron de ser un paso aparte. */
+    steps: readonly [string, string, string];
+    /** Abre los filtros de marca y estilo dentro de las recomendaciones. */
+    filtersLabel: string;
     photo: { title: string; subtitle: string };
     brands: {
       title: string;
@@ -120,6 +123,11 @@ export interface Dictionary {
 
   upload: {
     cta: string;
+    /** Zona de arrastre: lo que hace cualquier generador de imágenes. */
+    dropTitle: string;
+    dropAction: string;
+    dropPaste: string;
+    dropActive: string;
     changePhoto: string;
     formats: string;
     hints: readonly string[];

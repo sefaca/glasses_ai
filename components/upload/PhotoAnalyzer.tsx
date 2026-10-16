@@ -42,6 +42,7 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
   const [profile, setProfile] = useState<FaceProfile | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<string | null>(null);
@@ -156,6 +157,33 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
     [onAnalysis, setPreview, texts],
   );
 
+  /**
+   * Pegar con Ctrl+V.
+   *
+   * Es la mitad del gesto que la gente ya tiene aprendido de cualquier
+   * generador de imágenes: recortas una foto, la copias y la pegas. Se
+   * escucha en la ventana y no en un campo porque no hay dónde enfocar, y
+   * solo mientras no hay foto, para no secuestrar el portapapeles del resto
+   * del flujo.
+   */
+  useEffect(() => {
+    if (phase !== "idle") return;
+
+    function onPaste(event: ClipboardEvent) {
+      const file = [...(event.clipboardData?.items ?? [])]
+        .filter((item) => item.kind === "file")
+        .map((item) => item.getAsFile())
+        .find((candidate) => candidate?.type.startsWith("image/"));
+      if (file) {
+        event.preventDefault();
+        void handleFile(file);
+      }
+    }
+
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  });
+
   function reset() {
     // Mismo orden que arriba: primero se desengancha el padre, luego se revoca.
     setProfile(null);
@@ -183,14 +211,72 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
 
       {phase === "idle" && (
         <>
+          {/*
+            Zona de arrastre, no un botón. Es el gesto que la gente trae
+            aprendido de cualquier generador de imágenes, y hacerle buscar un
+            botón para abrir un diálogo de archivos es fricción gratuita justo
+            en el primer paso.
+
+            Es un `button` de verdad y no un `div` con un manejador: así
+            funciona con teclado y lo anuncian los lectores de pantalla sin
+            tener que fingirlo con atributos.
+          */}
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="rounded-full bg-accent px-7 py-3.5 text-sm font-medium text-on-accent shadow-[0_8px_20px_-8px_rgba(0,0,0,0.45)] transition-transform active:translate-y-px"
+            onDragEnter={(event) => {
+              event.preventDefault();
+              setDragging(true);
+            }}
+            onDragOver={(event) => event.preventDefault()}
+            onDragLeave={(event) => {
+              // Solo al salir del contenedor: los hijos disparan `leave` al
+              // pasar de uno a otro y el borde parpadearía.
+              if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+                setDragging(false);
+              }
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              setDragging(false);
+              const file = [...event.dataTransfer.files].find((candidate) =>
+                candidate.type.startsWith("image/"),
+              );
+              if (file) void handleFile(file);
+            }}
+            className={[
+              "flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center transition-colors",
+              dragging
+                ? "border-accent bg-accent-soft"
+                : "border-line bg-surface hover:border-ink",
+            ].join(" ")}
           >
-            {texts.cta}
+            <span className="text-accent">
+              <svg
+                viewBox="0 0 40 20"
+                className="h-7 w-auto"
+                fill="none"
+                aria-hidden
+              >
+                <circle cx="9" cy="10" r="8" stroke="currentColor" strokeWidth="2.2" />
+                <circle cx="31" cy="10" r="8" stroke="currentColor" strokeWidth="2.2" />
+                <path
+                  d="M17 9.2c2.6-1.6 4.4-1.6 6 0"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+
+            <span className="mt-4 font-display text-xl tracking-tight">
+              {dragging ? texts.dropActive : texts.dropTitle}
+            </span>
+            <span className="mt-1 text-sm text-muted">{texts.dropAction}</span>
+            <span className="mt-4 text-xs text-muted">{texts.dropPaste}</span>
           </button>
-          <ul className="mt-6 grid gap-1.5 text-xs text-muted sm:grid-cols-2">
+
+          <ul className="mt-5 grid gap-1.5 text-xs text-muted sm:grid-cols-2">
             {texts.hints.map((hint) => (
               <li key={hint}>{hint}</li>
             ))}

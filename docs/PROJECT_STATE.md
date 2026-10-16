@@ -75,7 +75,9 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | **Lista de espera** en la pared de acceso, con su tabla y su texto legal en 5 idiomas | **HECHO y funcionando** `[X]` verificado en producción |
 | **Registro por código de 6 dígitos** (Supabase Auth), sin contraseña ni redes sociales | **HECHO** — falta `SESSION_SECRET` en Vercel para encenderlo |
 | Contabilidad de uso y créditos | **pendiente** — es lo que falta para abrir la generación sin código |
-| Pasarela de pago | **no empezado** → [D-028](DECISION_LOG.md#d-028): el precio se decide con datos de uso, no antes |
+| **Precio de arranque fijado** (2 gratis, 4,99 €/10, 9,99 €/25) | **HECHO** → [D-029](DECISION_LOG.md#d-029). Es el número del experimento, no el definitivo |
+| Pasarela de pago | **no empezado** — decisión pendiente: Merchant of Record o Stripe |
+| Contabilidad de uso y topes de gasto | **pendiente** — bloquea abrir la generación gratis |
 | Supabase, rate limiting persistente | pendiente — la puerta es un apaño de alfa, no la solución |
 | **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |
 | **Imágenes y marcas de terceros** | **bloqueado** — GA-1, [D-015](DECISION_LOG.md#d-015) |

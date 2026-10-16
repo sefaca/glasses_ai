@@ -41,7 +41,16 @@ import { readAccessCode, requestTryOn } from "@/lib/tryon/client";
  * dispara desde un manejador y no desde un efecto.
  */
 
-const STEP_IDS = ["photo", "brands", "choose", "result"] as const;
+/**
+ * Tres pasos, no cuatro.
+ *
+ * Las marcas eran un paso propio entre subir la foto y ver nada, y eso es un
+ * peaje: obligaba a decidir algo antes de haber recibido el primer resultado.
+ * Ahora las recomendaciones salen en cuanto hay análisis, y marca y estilo
+ * son un filtro plegado dentro de esa misma pantalla, para quien quiera
+ * afinar después de ver.
+ */
+const STEP_IDS = ["photo", "choose", "result"] as const;
 
 const STYLE_IDS = [
   "clasicas",
@@ -64,6 +73,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const [brandIds, setBrandIds] = useState<string[]>([]);
   const [styles, setStyles] = useState<string[]>([]);
   const [chosenIds, setChosenIds] = useState<string[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [generations, setGenerations] = useState<
     Record<string, GenerationState | undefined>
   >({});
@@ -106,6 +116,9 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
     [profile, prefs, frames],
   );
 
+  /** Cuántos filtros hay puestos, para avisarlo en el plegable cerrado. */
+  const activeFilters = brandIds.length + styles.length;
+
   const chosenFrames = chosenIds
     .map((id) => allFrames.find((frame) => frame.id === id))
     .filter((frame): frame is NonNullable<typeof frame> => Boolean(frame));
@@ -116,10 +129,10 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
     setReached((current) => Math.max(current, index));
     // Se emiten aqui, en el manejador, y no en un efecto: un efecto se
     // dispararia tambien al volver atras y al rehidratar.
-    if (index === 2 && reached < 2) {
+    if (index === 1 && reached < 1) {
       track("recommendations_viewed", { count: recommendations.length });
     }
-    if (index === 3 && chosenIds.length > 1) {
+    if (index === 2 && chosenIds.length > 1) {
       track("compare_opened", { count: chosenIds.length });
     }
   }
@@ -183,8 +196,9 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
     setSession(next);
     setChosenIds([]);
     setGenerations({});
-    // Al completar el paso 1 se avanza solo: es lo que hace que el flujo se
-    // sienta de una sola pantalla y no de una página con secciones.
+    // Al completar el paso 1 se avanza solo, y ahora va directo a las
+    // recomendaciones: es lo que hace que el flujo se sienta de una sola
+    // pantalla y que el primer resultado llegue sin pedir nada a cambio.
     if (next) goTo(1);
   }
 
@@ -196,7 +210,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
       return [...current, frameId].slice(-MAX_COMPARE);
     });
     void startGeneration(frameId);
-    goTo(3);
+    goTo(2);
   }
 
   function removeFrame(frameId: string) {
@@ -277,76 +291,8 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
               </section>
             )}
 
-            {/* ---------- 2 · Marcas ---------- */}
+            {/* ---------- 2 · Tus seis ---------- */}
             {step === 1 && (
-              <section>
-                <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
-                  {dict.flow.brands.title}
-                </h2>
-                <p className="mt-3 max-w-xl text-sm text-muted">
-                  {dict.flow.brands.subtitle}
-                </p>
-
-                <div className="mt-7">
-                  <BrandPicker
-                    suggestions={suggestions}
-                    personalised={personalised}
-                    selectedIds={brandIds}
-                    onToggle={(id) => toggleIn(setBrandIds, id)}
-                    onClear={() => setBrandIds([])}
-                    shapeLabels={shapeLabels}
-                    dict={dict}
-                  />
-                </div>
-
-                <fieldset className="mt-9">
-                  <legend className="rule-label text-[0.7rem] text-muted">
-                    {dict.flow.brands.styleLegend}
-                  </legend>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {STYLE_IDS.map((styleId) => {
-                      const active = styles.includes(styleId);
-                      return (
-                        <button
-                          key={styleId}
-                          type="button"
-                          aria-pressed={active}
-                          onClick={() => toggleIn(setStyles, styleId)}
-                          className={[
-                            "rounded-full border px-4 py-2 text-sm transition-all active:translate-y-px",
-                            active
-                              ? "border-accent bg-accent text-on-accent"
-                              : "border-line hover:border-ink",
-                          ].join(" ")}
-                        >
-                          {dict.flow.styles[styleId]}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-
-                <div className="mt-9 flex items-center justify-between border-t border-line pt-6">
-                  <button
-                    type="button"
-                    onClick={() => goTo(0)}
-                    className="text-sm text-muted hover:text-ink"
-                  >
-                    {dict.flow.brands.changePhoto}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => goTo(2)}
-                    className="rounded-full bg-accent px-7 py-3 text-sm font-medium text-on-accent transition-transform active:translate-y-px"
-                  >
-                    {dict.flow.brands.next}
-                  </button>
-                </div>
-              </section>
-            )}
-
-            {/* ---------- 3 · Elegir ---------- */}
-            {step === 2 && (
               <section>
                 <div className="flex flex-wrap items-baseline justify-between gap-3">
                   <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
@@ -356,6 +302,74 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                   </h2>
                   <p className="text-xs text-muted">{dict.flow.choose.hint}</p>
                 </div>
+
+                {/*
+                  Marca y estilo, plegados. Antes eran un paso obligatorio
+                  antes de ver nada; ahora están aquí para quien quiera
+                  afinar DESPUÉS de haber recibido algo. Es un `details`
+                  nativo: se abre con teclado, funciona sin JavaScript y no
+                  necesita estado nuestro para la animación.
+                */}
+                <details
+                  open={filtersOpen}
+                  onToggle={(event) =>
+                    setFiltersOpen(event.currentTarget.open)
+                  }
+                  className="mt-6 rounded-2xl border border-line bg-surface"
+                >
+                  <summary className="cursor-pointer list-none px-5 py-3.5 text-sm text-muted transition-colors hover:text-ink">
+                    <span className="inline-flex items-center gap-2">
+                      <span aria-hidden className="text-[0.65rem]">
+                        {filtersOpen ? "\u25be" : "\u25b8"}
+                      </span>
+                      {dict.flow.filtersLabel}
+                      {activeFilters > 0 && (
+                        <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[0.65rem] text-accent tabular-nums">
+                          {activeFilters}
+                        </span>
+                      )}
+                    </span>
+                  </summary>
+
+                  <div className="border-t border-line px-5 py-6">
+                    <BrandPicker
+                      suggestions={suggestions}
+                      personalised={personalised}
+                      selectedIds={brandIds}
+                      onToggle={(id) => toggleIn(setBrandIds, id)}
+                      onClear={() => setBrandIds([])}
+                      shapeLabels={shapeLabels}
+                      dict={dict}
+                    />
+
+                    <fieldset className="mt-8">
+                      <legend className="rule-label text-[0.7rem] text-muted">
+                        {dict.flow.brands.styleLegend}
+                      </legend>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {STYLE_IDS.map((styleId) => {
+                          const active = styles.includes(styleId);
+                          return (
+                            <button
+                              key={styleId}
+                              type="button"
+                              aria-pressed={active}
+                              onClick={() => toggleIn(setStyles, styleId)}
+                              className={[
+                                "rounded-full border px-4 py-2 text-sm transition-all active:translate-y-px",
+                                active
+                                  ? "border-accent bg-accent text-on-accent"
+                                  : "border-line hover:border-ink",
+                              ].join(" ")}
+                            >
+                              {dict.flow.styles[styleId]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </fieldset>
+                  </div>
+                </details>
 
                 {recommendations.length === 0 ? (
                   <p className="py-12 text-sm text-muted">
@@ -388,15 +402,15 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                 <div className="mt-9 flex items-center justify-between border-t border-line pt-6">
                   <button
                     type="button"
-                    onClick={() => goTo(1)}
+                    onClick={() => goTo(0)}
                     className="text-sm text-muted hover:text-ink"
                   >
-                    {dict.flow.choose.back}
+                    {dict.flow.brands.changePhoto}
                   </button>
                   {chosenIds.length > 0 && (
                     <button
                       type="button"
-                      onClick={() => goTo(3)}
+                      onClick={() => goTo(2)}
                       className="rounded-full border border-ink px-6 py-3 text-sm font-medium transition-colors hover:bg-ink hover:text-paper"
                     >
                       {format(dict.flow.choose.seeResults, {
@@ -408,8 +422,8 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
               </section>
             )}
 
-            {/* ---------- 4 · Resultado ---------- */}
-            {step === 3 && session && (
+            {/* ---------- 3 · Resultado ---------- */}
+            {step === 2 && session && (
               <section>
                 <div className="flex flex-wrap items-baseline justify-between gap-3">
                   <h2 className="font-display text-2xl tracking-tight sm:text-3xl">
@@ -447,7 +461,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                 <div className="mt-9 flex items-center justify-between border-t border-line pt-6">
                   <button
                     type="button"
-                    onClick={() => goTo(2)}
+                    onClick={() => goTo(1)}
                     className="text-sm text-muted hover:text-ink"
                   >
                     {dict.flow.result.back}
@@ -455,7 +469,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                   {chosenFrames.length < MAX_COMPARE && (
                     <button
                       type="button"
-                      onClick={() => goTo(2)}
+                      onClick={() => goTo(1)}
                       className="rounded-full border border-ink px-6 py-3 text-sm font-medium transition-colors hover:bg-ink hover:text-paper"
                     >
                       {dict.flow.result.another}

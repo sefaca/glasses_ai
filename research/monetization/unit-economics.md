@@ -45,9 +45,9 @@ Un margen bruto excelente con CAC por encima de él no es un negocio rentable co
 | `AOV` | Ticket medio de la compra | € | **[?]** | B3 · red o retailer |
 | `c_comm` | Comisión sobre la venta | % | **[?]** | B3 · [affiliate-programs.md](affiliate-programs.md) GA-5 |
 | `p_pay` | Usuarios activos que compran créditos | % | **[?]** | Experimento E de [CLAUDE.md §32](../../CLAUDE.md) |
-| `ticket_credito` | Importe medio del pack | € | **[?]** | Precio a testear, no decidido |
+| `ticket_credito` | Importe medio del pack | € | **4,99 € / 9,99 €** | Valor **a testear** -> [D-029](../../docs/DECISION_LOG.md#d-029). No es un dato observado |
 | `coste_infra` | Infra variable por usuario activo | € | **[?]** | Medible solo con tráfico real |
-| `coste_pago` | Comisión de pasarela por transacción | € + % | **[?]** | Pricing oficial de Stripe, sin consultar |
+| `coste_pago` | Comisión de pasarela por transacción | € + % | **1,5 % + 0,25 €** (Stripe UE) `[T]` | La parte **fija** castiga los packs pequeños: 14 % del cobro a 1,99 €, 6,5 % a 4,99 € |
 | `CAC` | Coste de adquisición por usuario activo | € | **[?]** | B5 · social orgánico vs paid |
 
 Once variables. **Una acotada, diez desconocidas.** Esa proporción es el estado real del análisis económico hoy, y conviene tenerla delante antes de hacer cualquier proyección: cualquier cifra de contribución que se calcule ahora sería una opinión con formato de hoja de cálculo.

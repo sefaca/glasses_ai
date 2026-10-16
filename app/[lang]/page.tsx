@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageView } from "@/components/analytics/PageView";
+import { Wordmark } from "@/components/brand/Wordmark";
 import { DemoTriptych } from "@/components/landing/DemoTriptych";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
@@ -43,13 +44,8 @@ export default async function HomePage({
     <div className="min-h-dvh">
       <PageView name="landing_view" props={{ locale: lang }} />
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
-        {/* Sin nombre de marca: D-010 está aplazada y no se inventa uno. */}
-        <Link
-          href={localePath(lang)}
-          aria-label={dict.common.home}
-          className="text-accent"
-        >
-          <FrameGlyph shape="round" thickness={0.3} className="h-6 w-auto" />
+        <Link href={localePath(lang)} className="text-ink">
+          <Wordmark className="h-5 w-auto sm:h-6" />
         </Link>
         <nav className="flex items-center gap-5 text-sm text-muted sm:gap-6">
           <a href="#catalogo" className="hidden hover:text-ink sm:inline">
@@ -64,7 +60,7 @@ export default async function HomePage({
 
       <main>
         {/* ---------- Hero ---------- */}
-        <section className="relative overflow-hidden px-5 pt-10 pb-20 sm:px-8 sm:pt-20">
+        <section className="relative overflow-hidden px-5 pt-6 pb-10 sm:px-8 sm:pt-10">
           {/* Atmósfera cálida detrás del titular. El fondo plano delata plantilla. */}
           <div
             aria-hidden
@@ -75,7 +71,15 @@ export default async function HomePage({
             }}
           />
 
-          <div className="relative mx-auto max-w-6xl">
+          {/*
+            Dos columnas en pantalla ancha. Antes el titular ocupaba el alto
+            entero y la demostración empezaba justo donde termina la ventana,
+            así que lo primero que se veía era una frase y media imagen
+            cortada. El producto es visual: lo que tiene que entrarse de una
+            pasada es foto → gafas puestas, no el eslogan.
+          */}
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:gap-16">
+            <div>
             <p
               className="rule-label reveal text-[0.7rem] text-accent"
               style={{ animationDelay: "60ms" }}
@@ -84,7 +88,7 @@ export default async function HomePage({
             </p>
 
             <h1
-              className="reveal mt-5 max-w-3xl font-display text-[2.6rem] leading-[1.03] tracking-[-0.02em] text-balance sm:text-6xl lg:text-7xl"
+              className="reveal mt-4 max-w-2xl font-display text-[2.3rem] leading-[1.04] tracking-[-0.02em] text-balance sm:text-5xl lg:text-[3.4rem]"
               style={{ animationDelay: "140ms" }}
             >
               {dict.hero.title}{" "}
@@ -92,14 +96,14 @@ export default async function HomePage({
             </h1>
 
             <p
-              className="reveal mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg"
+              className="reveal mt-5 max-w-lg text-base leading-relaxed text-muted"
               style={{ animationDelay: "240ms" }}
             >
               {dict.hero.subtitle}
             </p>
 
             <div
-              className="reveal mt-9 flex flex-wrap items-center gap-3"
+              className="reveal mt-7 flex flex-wrap items-center gap-3"
               style={{ animationDelay: "320ms" }}
             >
               <Link
@@ -129,11 +133,14 @@ export default async function HomePage({
               {dict.hero.note}
             </p>
 
+            </div>
+
             {/*
               La demostración, no la descripción. Es lo que el usuario
-              recuerda de la página, y lo que pide §8.1.
+              recuerda de la página, y lo que pide §8.1. En ancho va al lado
+              del titular; en móvil, justo debajo.
             */}
-            <div className="mt-14 sm:mt-20 lg:max-w-3xl">
+            <div className="mt-2 lg:mt-0">
               <DemoTriptych dict={dict} />
             </div>
           </div>
@@ -142,22 +149,22 @@ export default async function HomePage({
         {/* ---------- Cómo funciona ---------- */}
         <section
           id="como-funciona"
-          className="border-t border-line px-5 py-20 sm:px-8"
+          className="border-t border-line px-5 py-12 sm:px-8 sm:py-14"
         >
           <div className="mx-auto max-w-6xl">
             <p className="rule-label text-[0.7rem] text-muted">
               {dict.steps.label}
             </p>
-            <ol className="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-8">
+            <ol className="mt-7 grid gap-7 sm:grid-cols-3 sm:gap-8">
               {dict.steps.items.map((step, i) => (
-                <li key={step.title} className="border-t border-line pt-5">
+                <li key={step.title} className="border-t border-line pt-4">
                   <span className="rule-label block text-[0.7rem] text-accent">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h2 className="mt-3 font-display text-2xl tracking-tight sm:text-[1.75rem]">
+                  <h2 className="mt-2 font-display text-xl tracking-tight sm:text-2xl">
                     {step.title}
                   </h2>
-                  <p className="mt-3 text-sm leading-relaxed text-muted">
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
                     {step.body}
                   </p>
                 </li>
@@ -169,7 +176,7 @@ export default async function HomePage({
         {/* ---------- Catálogo por forma ---------- */}
         <section
           id="catalogo"
-          className="border-t border-line bg-surface px-5 py-20 sm:px-8"
+          className="border-t border-line bg-surface px-5 py-14 sm:px-8 sm:py-16"
         >
           <div className="mx-auto max-w-6xl">
             <p className="rule-label text-[0.7rem] text-muted">
@@ -246,7 +253,7 @@ export default async function HomePage({
         )}
 
         {/* ---------- Privacidad ---------- */}
-        <section className="border-t border-line px-5 py-20 sm:px-8">
+        <section className="border-t border-line px-5 py-14 sm:px-8 sm:py-16">
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[22rem_1fr] lg:gap-16">
             <div>
               <p className="rule-label text-[0.7rem] text-muted">

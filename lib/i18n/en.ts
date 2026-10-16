@@ -96,7 +96,8 @@ export const en: Dictionary = {
   },
 
   flow: {
-    steps: ["Your photo", "Brands", "Choose", "Result"],
+    steps: ["Your photo", "Your six", "Result"],
+    filtersLabel: "Filter by brand or style",
     photo: {
       title: "Upload a photo and we'll tell you what to try.",
       subtitle: "The proportion analysis runs in your browser.",
@@ -140,6 +141,10 @@ export const en: Dictionary = {
 
   upload: {
     cta: "Upload a photo",
+    dropTitle: "Drag your photo here",
+    dropAction: "or click to choose one",
+    dropPaste: "You can also paste it with Ctrl+V",
+    dropActive: "Drop it",
     changePhoto: "Change the photo",
     formats: "JPG, PNG or WEBP",
     hints: [

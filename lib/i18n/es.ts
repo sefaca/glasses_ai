@@ -90,7 +90,8 @@ export const es: Dictionary = {
   },
 
   flow: {
-    steps: ["Tu foto", "Marcas", "Elegir", "Resultado"],
+    steps: ["Tu foto", "Tus seis", "Resultado"],
+    filtersLabel: "Filtrar por marca o estilo",
     photo: {
       title: "Sube una foto y te decimos qué probarte.",
       subtitle: "El análisis de proporciones se ejecuta en tu navegador.",
@@ -134,6 +135,10 @@ export const es: Dictionary = {
 
   upload: {
     cta: "Subir una foto",
+    dropTitle: "Arrastra aquí tu foto",
+    dropAction: "o pulsa para elegirla",
+    dropPaste: "También puedes pegarla con Ctrl+V",
+    dropActive: "Suéltala",
     changePhoto: "Cambiar la foto",
     formats: "JPG, PNG o WEBP",
     hints: [

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!--
+    Favicon: solo la montura, sin la palabra.
+
+    A 16 píxeles una palabra no se lee, así que el icono es el par de lentes
+    y nada más. Lleva fondo propio en lugar de ser transparente porque la
+    pestaña del navegador puede ser clara u oscura, y un trazo sin fondo
+    desaparece en una de las dos.
+
+    El trazo es grueso a propósito: a tamaño de favicon, las líneas finas se
+    comen los píxeles y queda una mancha.
+  -->
+  <rect width="64" height="64" rx="14" fill="#7e4420"/>
+  <g fill="none" stroke="#fdfbf8" stroke-width="5" stroke-linecap="round">
+    <circle cx="22" cy="33" r="11"/>
+    <circle cx="48" cy="33" r="11"/>
+    <path d="M33 31c2.6-2 5.4-2 8 0"/>
+    <path d="M11 29c-1.5-1-2.5-2.5-2.5-4"/>
+    <path d="M59 29c1.5-1 2.5-2.5 2.5-4"/>
+  </g>
+</svg>

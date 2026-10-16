@@ -54,6 +54,7 @@
 | [D-026](#d-026) | 2026-10-13 | Cinco idiomas a la vez, **contra la recomendación técnica** | DECISIÓN | OPEN |
 | [D-027](#d-027) | 2026-10-13 | Máximo de páginas sin esperar a verificar medidas | DECISIÓN | OPEN |
 | [D-028](#d-028) | 2026-10-13 | Registro antes que pago, y por código de correo | DECISIÓN | OPEN |
+| [D-029](#d-029) | 2026-10-16 | Precio de arranque: 2 gratis, packs de 4,99 €/10 y 9,99 €/25 | DECISIÓN | OPEN |
 
 ---
 
@@ -418,6 +419,33 @@
 - **El código compartido se queda** No como reliquia: el plan gratuito de Supabase limita mucho el envío de correos, y si falla, sin esa puerta nadie podría entrar, ni nosotros.
 - **Alternatives** (a) Contraseña, descartada: más fricción y una superficie de ataque que no queremos mantener; (b) enlace mágico, descartado por el problema del móvil; (c) OAuth con Google, descartado por §24 y porque añade un tercero que ve quién usa el producto; (d) montar Stripe ya, que es lo que el fundador pedía primero, descartado porque el precio saldría de una suposición.
 - **Lo que falta para cobrar, en orden** (1) contabilidad de uso por cuenta, que además arregla la deuda del rate limiting en memoria; (2) abrir la generación con una gratis y medir E-A a E-D; (3) entonces el precio, con un número que salga de lo observado. Mientras tanto no hay tabla de precios, y eso es deliberado.
+
+<a id="d-029"></a>
+## D-029 · Precio de arranque: 2 generaciones gratis, packs de 4,99 €/10 y 9,99 €/25
+
+- **Date** 2026-10-16 · **Type** DECISIÓN · **Status** OPEN
+- **Context** [D-028](#d-028) dejó el pago para «cuando haya datos de uso», y sigue sin haberlos. El fundador pide el número con el que arrancar, sacado de **cómo cobran los generativos que ya tienen clientes**. Esto **no cierra** el pricing: [CLAUDE.md §36](../CLAUDE.md) lo prohíbe sin validación.
+- **Evidence** `[D]` Páginas oficiales consultadas el 2026-10-16 → [pricing-comparables.md](../research/monetization/pricing-comparables.md). **VisuTry** $2,99/30 créditos (~$0,10/gen, 1 gratis, no caducan). **SpecFit** $5,99/3 renders (~$2,00/gen, **cero** gratis). Retrato: HeadshotGen $9,99/10, BetterPic $35/20, Aragon $35/40. `[?]` Doji, Midjourney y Fotor no publican precio utilizable y **no se estiman**.
+- **El hallazgo que cambia el encuadre** Entre los **dos** comparables directos del mundo hay un factor **20x** por generación con el mismo producto y el mismo modelo. **En esta categoría el precio no lo fija el coste: lo fijan el empaquetado y el canal.**
+- **Decision**
+  1. **2 generaciones gratis**: una anónima y otra al registrarse, **sin degradar calidad**.
+  2. **Dos packs**: **4,99 € / 10** (0,50 €/gen) y **9,99 € / 25** (0,40 €/gen), pago único.
+  3. Se venden **«generaciones»**, no créditos: una sola acción cara, ninguna razón para inventar moneda. **No caducan**, y se dice en el botón.
+  4. **Sin suscripción** en el arranque.
+- **Reason**
+  - **4,99 € es el suelo donde la pasarela deja de doler.** Con Stripe UE la comisión es el **14,0 %** del cobro a 1,99 €, el **9,9 %** a 2,99 € y el **6,5 %** a 4,99 €.
+  - **0,50 €/gen son 5x nuestro coste medido** `[X]` y quedan en el **suelo** del rango del sector, no por encima.
+  - **2 gratis y no 1**, contra el patrón del sector, porque **H-M2 no se puede demostrar con una sola generación**: una es «qué tal me quedan», dos es «cuál de las dos». Pedir dinero antes de haber mostrado la comparación es pedirlo antes de haber mostrado el producto. Coste: 0,20 € por usuario registrado.
+  - **Dos packs y no tres** → §24: un tercero añade una decisión al usuario y cero información al experimento.
+- **Esto deja sin efecto los números de [CLAUDE.md §16](../CLAUDE.md)** («10 por 2,99 €, 25 por 5,99 €»). A 2,99 €/10 la contribución cae a **1,18 €** frente a **2,80 €**: la mitad del margen por cobrar un 40 % menos, y por debajo de **todos** los comparables publicados salvo VisuTry, que vende a coste y lo sostiene con suscripción. Eran una suposición previa a mirar el mercado.
+- **Precio por mercado** El sector **no fija precios locales: localiza uno**. Decisión: **4,99 € / £4,99 / $5,99** como puntos de precio locales, no conversión. **El diferencial sale del impuesto, no de un recargo**: 4,99 € con IVA son 4,12 € netos y $5,99 son $5,99 netos porque allí el impuesto se añade en el checkout — a ~1,08 USD/EUR, **+35 % de neto en EE. UU. sin subir el precio**.
+- **Límite legal que acota lo que se puede hacer** El **Reglamento (UE) 2018/302** prohíbe condiciones distintas por residencia del cliente, precios incluidos, y los servicios electrónicos no audiovisuales están dentro `[D]`. Con **un solo sitio y un solo checkout**, como es nuestro caso, eso significa **un único precio para toda la UE**: no se puede cobrar más a un alemán que a un español. Solo varía el bruto por el IVA de cada país. Afecta de lleno a [D-026](#d-026). UK y EE. UU. quedan fuera. `[?]` **Pendiente de asesor**, no de producto: el matiz de sitios distintos por país y el umbral de VAT en Reino Unido.
+- **Impact** Contribución por cobro: **2,80 €** y **5,36 €**. **Umbral, no predicción:** la línea de créditos se paga a sí misma con **`p_pay >= 7,1 %`** = 0,20 € / 2,80 €. Por debajo de 7 %, el problema no es el precio: es que la generación no vale dinero para nadie.
+- **Alternatives** (a) Los 2,99 €/5,99 € de §16, descartados con los números de arriba; (b) copiar a SpecFit (~2 €/gen, cero gratis), descartado porque su precio vive de ser una app de iOS con medición de PD y no tenemos ni su canal ni su confianza; (c) copiar a VisuTry (~0,10 €/gen), descartado porque **vende a coste** y lo sostiene con una suscripción que aquí no queremos; (d) un pack único, descartado porque sin dos puntos no se observa elasticidad; (e) suscripción, descartada por [D-001](#d-001); (f) esperar a tener datos, que es lo correcto **para el precio definitivo** — esta entrada es el punto de partida del experimento, no su conclusión.
+- **Validates if** `paywall_viewed -> checkout_started` >= 10 % **y** `p_pay` >= 7,1 %.
+- **Falsified if** Caro: conversión del paywall < 10 %, o > 85 % elige siempre el pack pequeño. Barato: > 25 % agota el pack y recompra en 30 días, o > 40 % elige directamente el de 9,99 €, o conversión del paywall > 35 %.
+- **La señal que se va a confundir con un problema de precio** Si el clic saliente tras generar es alto y `p_pay` bajo, **el precio no está mal: el modelo está mal**. El dinero está en afiliación y los créditos son solo control de coste. Se toca GA-3, no el precio.
+- **Status note** OPEN. **Cero generaciones de personas ajenas al fundador** a esta fecha. Es el número con el que se arranca, elegido para no ser absurdo.
 
 ---
 
