@@ -1,4 +1,4 @@
-﻿import { de } from "./de";
+import { de } from "./de";
 import { en } from "./en";
 import { es } from "./es";
 import { it } from "./it";
@@ -6,16 +6,16 @@ import { pt } from "./pt";
 import type { Dictionary } from "./types";
 
 /**
- * Base de i18n â†’ CLAUDE.md Â§21.
+ * Base de i18n → CLAUDE.md §21.
  *
- * Cinco idiomas con **rutas localizadas y hreflang**, por decisiÃ³n explÃ­cita
- * del fundador el 2026-10-11 â†’ D-026. La recomendaciÃ³n tÃ©cnica era publicar
+ * Cinco idiomas con **rutas localizadas y hreflang**, por decisión explícita
+ * del fundador el 2026-10-11 → D-026. La recomendación técnica era publicar
  * uno y abrir el resto por un gate medible; queda escrita en el log con su
- * riesgo, y la decisiÃ³n es suya.
+ * riesgo, y la decisión es suya.
  *
- * Todos los idiomas llevan prefijo, el espaÃ±ol incluido. Es mÃ¡s feo que dejar
- * `es` en la raÃ­z, pero evita el caso que rompe el hreflang: una URL sin
- * prefijo que es a la vez Â«la homeÂ» y Â«la home espaÃ±olaÂ».
+ * Todos los idiomas llevan prefijo, el español incluido. Es más feo que dejar
+ * `es` en la raíz, pero evita el caso que rompe el hreflang: una URL sin
+ * prefijo que es a la vez «la home» y «la home española».
  */
 
 export const LOCALES = ["es", "en", "it", "pt", "de"] as const;
@@ -27,22 +27,22 @@ export type { Dictionary, LegalDoc, LegalSection } from "./types";
 const DICTIONARIES: Record<Locale, Dictionary> = { es, en, it, pt, de };
 
 /**
- * Etiqueta de cada idioma **en su propio idioma**: quien busca alemÃ¡n no lee
- * Â«AlemÃ¡nÂ», lee Â«DeutschÂ».
+ * Etiqueta de cada idioma **en su propio idioma**: quien busca alemán no lee
+ * «Alemán», lee «Deutsch».
  */
 export const LOCALE_NAMES: Record<Locale, string> = {
-  es: "EspaÃ±ol",
+  es: "Español",
   en: "English",
   it: "Italiano",
-  pt: "PortuguÃªs",
+  pt: "Português",
   de: "Deutsch",
 };
 
 /**
  * Valor de `hreflang` y de `<html lang>`.
  *
- * Hoy coincide con el cÃ³digo de ruta. Se mantiene como mapa aparte porque en
- * cuanto haya datos para separar `pt-BR` de `pt-PT`, o para aÃ±adir `es-MX`,
+ * Hoy coincide con el código de ruta. Se mantiene como mapa aparte porque en
+ * cuanto haya datos para separar `pt-BR` de `pt-PT`, o para añadir `es-MX`,
  * lo que cambia es esto y no las rutas.
  */
 export const LOCALE_HREFLANG: Record<Locale, string> = {
@@ -54,16 +54,16 @@ export const LOCALE_HREFLANG: Record<Locale, string> = {
 };
 
 /**
- * Idiomas que **pueden indexarse**. VacÃ­o significa que nada lo estÃ¡.
+ * Idiomas que **pueden indexarse**. Vacío significa que nada lo está.
  *
- * Esta lista es la palanca del gate G0 â†’ docs/GROWTH_SEO.md. Abrir el espaÃ±ol
- * es aÃ±adir `"es"` aquÃ­, y con eso cambian a la vez el `robots` de las
- * pÃ¡ginas, el `hreflang`, el `x-default`, el sitemap y el `robots.txt`.
+ * Esta lista es la palanca del gate G0 → docs/GROWTH_SEO.md. Abrir un idioma
+ * es añadirlo aquí, y con eso cambian a la vez el `robots` de las páginas, el
+ * `hreflang`, el `x-default`, el sitemap y el `robots.txt`.
  *
- * Existe porque hacerlo a mano sitio por sitio produce justo la contradicciÃ³n
- * que Google resuelve como le parece: un `hreflang` que apunta a pÃ¡ginas
- * `noindex`, o un `x-default` hacia una versiÃ³n no indexable. Si solo se abre
- * un idioma, las anotaciones tienen que hablar Ãºnicamente de ese.
+ * Existe porque hacerlo a mano sitio por sitio produce justo la contradicción
+ * que Google resuelve como le parece: un `hreflang` que apunta a páginas
+ * `noindex`, o un `x-default` hacia una versión no indexable. Si solo se abre
+ * un idioma, las anotaciones tienen que hablar únicamente de ese.
  */
 export const INDEXABLE_LOCALES: readonly Locale[] = ["es"];
 
@@ -77,12 +77,12 @@ export function anyIndexable(): boolean {
 }
 
 /**
- * Idioma al que apunta `x-default`: la versiÃ³n que se ofrece a quien no
+ * Idioma al que apunta `x-default`: la versión que se ofrece a quien no
  * encaja en ninguna otra.
  *
- * **Tiene que ser una pÃ¡gina indexable.** Mientras solo haya un idioma
- * abierto, es ese; cuando haya varios, el inglÃ©s por alcance. Apuntar al
- * inglÃ©s estando en `noindex` serÃ­a mandar a Google a una puerta cerrada.
+ * **Tiene que ser una página indexable.** Mientras solo haya un idioma
+ * abierto, es ese; cuando haya varios, el inglés por alcance. Apuntar al
+ * inglés estando en `noindex` sería mandar a Google a una puerta cerrada.
  */
 export function xDefaultLocale(): Locale {
   if (INDEXABLE_LOCALES.includes("en")) return "en";
@@ -98,18 +98,18 @@ export function isLocale(value: string): value is Locale {
 }
 
 /**
- * Ruta localizada. `localePath("de", "/probar")` â†’ `/de/probar`.
+ * Ruta localizada. `localePath("de", "/probar")` → `/de/probar`.
  *
- * Centralizado para que ningÃºn componente construya la URL a mano: un enlace
+ * Centralizado para que ningún componente construya la URL a mano: un enlace
  * que se deja el prefijo saca al usuario de su idioma sin avisar.
  */
 /**
  * Resuelve los marcadores `{nombre}` de una frase del diccionario.
  *
- * Existe porque el diccionario no puede contener funciones: no cruzarÃ­an la
- * frontera servidorâ†’cliente de React y el build falla. Un marcador sin valor
- * se deja tal cual en vez de imprimir `undefined`, que es mÃ¡s fÃ¡cil de ver en
- * una captura que un hueco vacÃ­o.
+ * Existe porque el diccionario no puede contener funciones: no cruzarían la
+ * frontera servidor→cliente de React y el build falla. Un marcador sin valor
+ * se deja tal cual en vez de imprimir `undefined`, que es más fácil de ver en
+ * una captura que un hueco vacío.
  */
 export function format(
   template: string,
