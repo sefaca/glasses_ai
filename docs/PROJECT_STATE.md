@@ -76,7 +76,7 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | **Registro por código de 6 dígitos** (Supabase Auth), sin contraseña ni redes sociales | **HECHO** — falta `SESSION_SECRET` en Vercel para encenderlo |
 | Contabilidad de uso y créditos | **pendiente** — es lo que falta para abrir la generación sin código |
 | **Precio de arranque fijado** (2 gratis, 4,99 €/10, 9,99 €/25) | **HECHO** → [D-029](DECISION_LOG.md#d-029). Es el número del experimento, no el definitivo |
-| Pasarela de pago | **no empezado** — decisión pendiente: Merchant of Record o Stripe |
+| Pasarela de pago | **elegida: Paddle** → [D-030](DECISION_LOG.md#d-030). Sin implementar; falta el alta del fundador |
 | Contabilidad de uso y topes de gasto | **pendiente** — bloquea abrir la generación gratis |
 | Supabase, rate limiting persistente | pendiente — la puerta es un apaño de alfa, no la solución |
 | **Proveedor real de try-on** | **bloqueado** — [D-016](DECISION_LOG.md#d-016) |

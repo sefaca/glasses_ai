@@ -142,13 +142,31 @@ umbral de registro de VAT en Reino Unido para un vendedor no establecido.
 | Mercado | Entrada | Grande | Mecánica |
 |---|---:|---:|---|
 | UE (es · it · pt · de) | **4,99 €** IVA incl. | 9,99 € | Un solo neto; el bruto lo mueve el IVA |
-| Reino Unido | **£4,99** IVA incl. | £9,99 | Punto de precio local |
-| EE. UU. | **$5,99** + impuesto | $11,99 | Punto local, **sin impuesto incluido** |
+| Reino Unido | **£5,99** IVA incl. | £11,99 | Punto de precio local |
+| EE. UU. | **$9,99** + impuesto | $19,99 | Punto local, **sin impuesto incluido** → [D-030](../../docs/DECISION_LOG.md#d-030) |
 
 **El diferencial sale del impuesto, no de un recargo.** 4,99 € con IVA son
 4,12 € netos; $5,99 son $5,99 netos, porque allí el *sales tax* se añade en el
 checkout. A ~1,08 USD/EUR eso es **~5,55 € netos: un +35 % sobre el neto
 español sin haber subido el precio**.
+
+## 7 bis. Pasarela elegida
+
+**Paddle**, Merchant of Record → [D-030](../../docs/DECISION_LOG.md#d-030).
+
+| | UE | Reino Unido | EE. UU. | Resuelve el IVA |
+|---|---|---|---|---|
+| Stripe | 1,5 % + 0,25 € | **2,5 % + 0,25 €** | 3,15 % + 0,25 € (+2 % conversión) | No |
+| Mollie | 1,8 % + 0,25 € | 3,25 % + 0,25 € | 3,25 % + 0,25 € | No |
+| **Paddle** | **5 % + $0,50** | igual | igual | **Sí** |
+
+Stripe es más barata y mejor producto, pero **ninguna pasarela quita el IVA de
+encima**: con Stripe o Mollie, el OSS europeo sigue siendo nuestro. Paddle
+vende él.
+
+Sobrecoste: **~0,39 € por venta de 4,99 €**. **El cruce está en ~100-150
+ventas/mes** — por debajo, lo que se ahorra en gestoría vale más; por encima,
+toca migrar a Stripe.
 
 ## 8. Gates propuestos
 

@@ -55,6 +55,7 @@
 | [D-027](#d-027) | 2026-10-13 | Máximo de páginas sin esperar a verificar medidas | DECISIÓN | OPEN |
 | [D-028](#d-028) | 2026-10-13 | Registro antes que pago, y por código de correo | DECISIÓN | OPEN |
 | [D-029](#d-029) | 2026-10-16 | Precio de arranque: 2 gratis, packs de 4,99 €/10 y 9,99 €/25 | DECISIÓN | OPEN |
+| [D-030](#d-030) | 2026-10-16 | Paddle como pasarela, y EE. UU. sube a $9,99 | DECISIÓN | OPEN |
 
 ---
 
@@ -446,6 +447,38 @@
 - **Falsified if** Caro: conversión del paywall < 10 %, o > 85 % elige siempre el pack pequeño. Barato: > 25 % agota el pack y recompra en 30 días, o > 40 % elige directamente el de 9,99 €, o conversión del paywall > 35 %.
 - **La señal que se va a confundir con un problema de precio** Si el clic saliente tras generar es alto y `p_pay` bajo, **el precio no está mal: el modelo está mal**. El dinero está en afiliación y los créditos son solo control de coste. Se toca GA-3, no el precio.
 - **Status note** OPEN. **Cero generaciones de personas ajenas al fundador** a esta fecha. Es el número con el que se arranca, elegido para no ser absurdo.
+
+<a id="d-030"></a>
+## D-030 · Paddle como pasarela, y EE. UU. sube a $9,99
+
+- **Date** 2026-10-16 · **Type** DECISIÓN · **Status** OPEN
+- **Context** [D-029](#d-029) dejó abierta la pasarela y proponía $7,99 para EE. UU. El fundador decide subirlo a **$9,99** y cerrar la pasarela. No reescribe D-029: la ajusta, y queda constancia de ambas.
+- **Evidence** `[D]` Tarifas consultadas en las páginas oficiales el 2026-10-16:
+  - **Stripe ES**: 1,5 % + 0,25 € (EEE), **2,5 % + 0,25 € (Reino Unido)**, 3,15 % + 0,25 € (internacional), **+2 % si hay conversión de divisa**. Stripe Tax desde 0,5 %/transacción.
+  - **Mollie ES**: 1,8 % + 0,25 € (consumidor EEE), **3,25 % + 0,25 € fuera del EEE**. Sin cuota fija.
+  - **Paddle**: **5 % + $0,50** por transacción, como Merchant of Record. Su propia web indica que productos por debajo de $10 pueden pedir tarifa a medida.
+- **Decision**
+  1. **Paddle**, Merchant of Record, para arrancar.
+  2. **EE. UU.: $9,99 / 10** y **$19,99 / 25**. Reino Unido y UE sin cambios.
+  3. **Pedir la tarifa a medida** que Paddle ofrece para productos de menos de $10, antes de lanzar.
+- **Por qué Paddle y no la más barata** Mollie y Stripe son **pasarelas**: ninguna quita el IVA de encima, así que con cualquiera de las dos el OSS europeo sigue siendo del fundador. Paddle vende él y asume IVA y *sales tax* mundiales.
+  - El sobrecoste es de **~0,39 € por venta de 4,99 €** frente a Stripe.
+  - **El cruce está en ~100-150 ventas/mes**: por debajo, lo que se ahorra en gestoría y declaraciones vale más; por encima, Paddle cuesta ~900 €/año y conviene migrar.
+  - **Mollie se descarta por poco**: cobra 3,25 % en Reino Unido donde Stripe tiene tarifa propia del 2,5 %, y tampoco resuelve el impuesto. Su ventaja real es **Bizum**, que importará si el producto acaba siendo muy español.
+  - **Redsys / TPV Virtual de banco, descartado**: no hay tarifa pública —se negocia por comercio y suele llevar cuota mensual—, está pensado para el mercado español, multidivisa depende del banco, y la integración cuesta días en lugar de horas. Tampoco resuelve el IVA. Se revisará si el producto acaba siendo español y con volumen.
+- **Economía por mercado, con Paddle** (coste 0,10 €/generación, ~1,08 USD/EUR, ~1,15 EUR/GBP)
+
+  | Mercado | Precio | Neto tras impuesto | Comisión | Contribución |
+  |---|---:|---:|---:|---:|
+  | UE | 4,99 € | 4,12 € | 0,71 € | **2,41 €** |
+  | Reino Unido | £5,99 | ~5,74 € | ~0,77 € | **~3,97 €** |
+  | EE. UU. | $9,99 | ~9,25 € | ~0,93 € | **~7,32 €** |
+
+  **EE. UU. aporta ~3x lo que la UE por la misma venta.** Parte es precio y parte es mecánica fiscal: allí el impuesto se añade en el checkout, así que $9,99 son $9,99 netos.
+- **Sigue siendo defendible** $9,99/10 son **$1,00 por generación**, exactamente lo que cobra HeadshotGen y la mitad que SpecFit. No estamos por encima del mercado estadounidense: estamos en él.
+- **Lo que no cambia** La UE mantiene **precio único** por el Reglamento (UE) 2018/302 → [D-029](#d-029). Reino Unido se queda en £5,99 porque su contribución ya es un 65 % mayor que la europea sin tocar nada.
+- **Alternatives** (a) Stripe, más barata y mejor producto, pero deja el OSS encima; es el destino al pasar el cruce de volumen; (b) Mollie, descartada arriba; (c) Redsys, descartada arriba; (d) mantener $7,99, descartado por decisión del fundador — y los comparables lo respaldan.
+- **Pendiente, y no es de producto** `[?]` Alta de Paddle como autónomo —verificación de identidad y cuenta bancaria a su nombre—, el epígrafe de IAE que cubra servicios digitales, y el tratamiento de la factura a Paddle. Todo ello a confirmar con gestor antes de emitir la primera.
 
 ---
 
