@@ -56,13 +56,21 @@ export function PhotoAnalyzer({ onAnalysis, dict }: PhotoAnalyzerProps) {
     };
   }, []);
 
-  // Revocar el blob al desmontar: es memoria viva en el navegador.
-  useEffect(
-    () => () => {
-      if (previewRef.current) URL.revokeObjectURL(previewRef.current);
-    },
-    [],
-  );
+  /*
+   * **No se revoca el blob al desmontar**, y es a propósito.
+   *
+   * Este componente se desmonta al avanzar de paso, pero la URL que creó
+   * sigue viva en el `FaceSession` que recibió la página: es la foto que se
+   * enseña mientras se genera y cuando algo falla. Revocarla aquí dejaba la
+   * imagen rota en la pantalla de resultados —se veía el icono de imagen
+   * ausente con el texto alternativo— y no había forma de recuperarla sin
+   * volver a subir la foto.
+   *
+   * La fuga está acotada: un blob por foto subida, liberado al cerrar la
+   * pestaña. Quien revoca es quien manda la foto a la basura —`setPreview`
+   * al reemplazarla, y la página al limpiar la sesión—, no quien deja de
+   * pintarla.
+   */
 
   const setPreview = useCallback((url: string | null) => {
     if (previewRef.current) URL.revokeObjectURL(previewRef.current);
