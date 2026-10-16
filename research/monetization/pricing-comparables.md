@@ -139,11 +139,11 @@ umbral de registro de VAT en Reino Unido para un vendedor no establecido.
 
 ### Propuesta
 
-| Mercado | Entrada | Grande | Mecánica |
-|---|---:|---:|---|
-| UE (es · it · pt · de) | **4,99 €** IVA incl. | 9,99 € | Un solo neto; el bruto lo mueve el IVA |
-| Reino Unido | **£5,99** IVA incl. | £11,99 | Punto de precio local |
-| EE. UU. | **$9,99** + impuesto | $19,99 | Punto local, **sin impuesto incluido** → [D-030](../../docs/DECISION_LOG.md#d-030) |
+| Mercado | Entrada | Grande | Premium | Mecánica |
+|---|---:|---:|---:|---|
+| UE (es · it · pt · de) | **4,99 €** IVA incl. | 9,99 € | 49,99 € | Un solo neto; el bruto lo mueve el IVA |
+| Reino Unido | **£5,99** IVA incl. | £11,99 | £59,99 | Punto de precio local |
+| EE. UU. | **$9,99** + impuesto | $19,99 | $99,99 | Punto local, **sin impuesto incluido** → [D-030](../../docs/DECISION_LOG.md#d-030) |
 
 **El diferencial sale del impuesto, no de un recargo.** 4,99 € con IVA son
 4,12 € netos; $5,99 son $5,99 netos, porque allí el *sales tax* se añade en el
@@ -167,6 +167,19 @@ vende él.
 Sobrecoste: **~0,39 € por venta de 4,99 €**. **El cruce está en ~100-150
 ventas/mes** — por debajo, lo que se ahorra en gestoría vale más; por encima,
 toca migrar a Stripe.
+
+## 7 ter. El tercer pack es un ancla
+
+150 generaciones a 49,99 € / £59,99 / $99,99 → [D-031](../../docs/DECISION_LOG.md#d-031).
+
+**No se mide por sus ventas.** Un precio alto hace que el de en medio parezca
+moderado, y eso funciona aunque no lo compre nadie. Lo que hay que medir es el
+**reparto entre el pack de entrada y el de 9,99 €**, y hay que medirlo desde el
+primer día: después no se reconstruye.
+
+Ojo con quién lo compra. 150 generaciones no son una cantidad de consumidor; si
+lo compra gente de verdad, probablemente sean ópticas, y eso es el negocio que
+[CLAUDE.md §6](../../CLAUDE.md) excluye.
 
 ## 8. Gates propuestos
 

@@ -56,6 +56,7 @@
 | [D-028](#d-028) | 2026-10-13 | Registro antes que pago, y por código de correo | DECISIÓN | OPEN |
 | [D-029](#d-029) | 2026-10-16 | Precio de arranque: 2 gratis, packs de 4,99 €/10 y 9,99 €/25 | DECISIÓN | OPEN |
 | [D-030](#d-030) | 2026-10-16 | Paddle como pasarela, y EE. UU. sube a $9,99 | DECISIÓN | OPEN |
+| [D-031](#d-031) | 2026-10-16 | Tercer pack caro, como ancla de precio | DECISIÓN | OPEN |
 
 ---
 
@@ -479,6 +480,36 @@
 - **Lo que no cambia** La UE mantiene **precio único** por el Reglamento (UE) 2018/302 → [D-029](#d-029). Reino Unido se queda en £5,99 porque su contribución ya es un 65 % mayor que la europea sin tocar nada.
 - **Alternatives** (a) Stripe, más barata y mejor producto, pero deja el OSS encima; es el destino al pasar el cruce de volumen; (b) Mollie, descartada arriba; (c) Redsys, descartada arriba; (d) mantener $7,99, descartado por decisión del fundador — y los comparables lo respaldan.
 - **Pendiente, y no es de producto** `[?]` Alta de Paddle como autónomo —verificación de identidad y cuenta bancaria a su nombre—, el epígrafe de IAE que cubra servicios digitales, y el tratamiento de la factura a Paddle. Todo ello a confirmar con gestor antes de emitir la primera.
+
+<a id="d-031"></a>
+## D-031 · Tercer pack caro, como ancla de precio
+
+- **Date** 2026-10-16 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El fundador pide un tercer pack «la ostia de caro» con muchos usos: **$99,99 en EE. UU. y el resto proporcional**. [D-029](#d-029) había decidido **dos** packs y no tres, con el argumento de [CLAUDE.md §24](../CLAUDE.md): un tercero añade una decisión al usuario y cero información al experimento. El fundador decide igualmente, y se ejecuta.
+- **Decision** Tercer escalón, **150 generaciones**:
+
+  | Mercado | Entrada | Grande | **Premium** |
+  |---|---:|---:|---:|
+  | UE | 4,99 € / 10 | 9,99 € / 25 | **49,99 € / 150** |
+  | Reino Unido | £5,99 / 10 | £11,99 / 25 | **£59,99 / 150** |
+  | EE. UU. | $9,99 / 10 | $19,99 / 25 | **$99,99 / 150** |
+
+  La curva de descuento se mantiene coherente: 0,50 → 0,40 → 0,33 €/generación (−20 %, −17 %).
+- **Para qué sirve de verdad, y conviene no engañarse** **No es una línea de ingresos: es un ancla.** Un tercer precio alto hace que el de 9,99 € parezca moderado, y ese efecto funciona **aunque no lo compre nadie**. Si se mide su éxito por unidades vendidas, se concluirá que fue un error cuando puede estar haciendo su trabajo.
+- **El riesgo que tiene, y es real** 150 generaciones **no son una cantidad de consumidor**. Quien se compra unas gafas prueba diez o veinte, no ciento cincuenta. Dos consecuencias:
+  1. Si el número se lee como absurdo, resta credibilidad al resto de la tabla en lugar de anclarla.
+  2. Si empieza a comprarlo gente de verdad, **probablemente sean ópticas**, y eso es un negocio distinto que [CLAUDE.md §6](../CLAUDE.md) excluye expresamente. Conviene mirar quién lo compra antes de celebrarlo.
+- **Economía** (Paddle 5 % + $0,50; coste 0,10 €/generación)
+
+  | | UE 49,99 € | EE. UU. $99,99 |
+  |---|---:|---:|
+  | Neto tras impuesto | 41,31 € | ~92,58 € |
+  | Comisión | ~2,96 € | ~5,09 € |
+  | Coste de 150 generaciones | 15,00 € | 15,00 € |
+  | **Contribución** | **~23,35 €** | **~72,49 €** |
+- **Alternatives** (a) Dos packs, que era [D-029](#d-029) y sigue siendo lo que recomienda §24; (b) un premium más pequeño, 75 generaciones a ~29,99 €, más creíble como cantidad de consumidor pero peor como ancla; (c) suscripción en ese escalón, descartada por [D-001](#d-001).
+- **Cómo se sabrá si el ancla funciona** No por sus ventas. Por el **reparto entre el pack de entrada y el de 9,99 €** antes y después de añadirlo: si el de 9,99 € gana cuota tras introducir el premium, el ancla está haciendo su trabajo. Esa comparación exige medir el reparto **desde el primer día**, porque después no se puede reconstruir.
+- **Status note** OPEN. Sin un solo dato de uso propio detrás, como el resto del pricing.
 
 ---
 
