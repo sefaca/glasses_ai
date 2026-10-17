@@ -34,6 +34,10 @@ export const EVENT_NAMES = [
   "compare_opened",
   "compare_frame_selected",
   "outbound_product_click",
+  // Los dos lados del muro de pago: cuántos lo ven y cuántos abren el pago.
+  // Sin el primero, la caída no se distingue de que nadie llegara hasta ahí.
+  "credit_paywall_viewed",
+  "checkout_started",
   "guide_view",
   "catalog_view",
 ] as const;

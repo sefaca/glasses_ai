@@ -317,6 +317,18 @@ export const de: Dictionary = {
       cancel: "Abbrechen",
       submit: "Weiter",
     },
+
+    packs: {
+      title: "Mehr Anproben holen",
+      body:
+        "Deine sind aufgebraucht. Wähl ein Paket und probier weiter Fassungen auf deinem Foto.",
+      generations: "{count} Anproben",
+      best: "Am häufigsten gewählt",
+      buy: "Holen",
+      note: "Der Endpreis kann je nach Land und Steuern abweichen.",
+      unavailable: "Kaufen ist noch nicht möglich. In ein paar Tagen geht es los.",
+      error: "Die Zahlung ließ sich nicht öffnen. Bitte noch einmal versuchen.",
+    },
   },
 
   auth: {

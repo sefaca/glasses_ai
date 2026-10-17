@@ -302,6 +302,18 @@ export const es: Dictionary = {
       cancel: "Cancelar",
       submit: "Entrar",
     },
+
+    packs: {
+      title: "Consigue más pruebas",
+      body:
+        "Has usado las tuyas. Elige un pack y sigue probando monturas sobre tu foto.",
+      generations: "{count} pruebas",
+      best: "El más elegido",
+      buy: "Conseguirlas",
+      note: "El precio final puede variar según tu país e impuestos.",
+      unavailable: "Todavía no se puede comprar. Volvemos en unos días.",
+      error: "No hemos podido abrir el pago. Vuelve a intentarlo.",
+    },
   },
 
   auth: {

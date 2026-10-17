@@ -305,6 +305,18 @@ export const en: Dictionary = {
       cancel: "Cancel",
       submit: "Enter",
     },
+
+    packs: {
+      title: "Get more try-ons",
+      body:
+        "You have used yours. Pick a pack and keep trying frames on your photo.",
+      generations: "{count} try-ons",
+      best: "Most popular",
+      buy: "Get them",
+      note: "The final price may vary with your country and taxes.",
+      unavailable: "Buying is not open yet. We will be back in a few days.",
+      error: "We could not open the payment. Please try again.",
+    },
   },
 
   auth: {

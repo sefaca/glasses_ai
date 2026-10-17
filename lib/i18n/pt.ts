@@ -311,6 +311,18 @@ export const pt: Dictionary = {
       cancel: "Cancelar",
       submit: "Entrar",
     },
+
+    packs: {
+      title: "Consiga mais provas",
+      body:
+        "Você usou as suas. Escolha um pacote e continue provando armações na sua foto.",
+      generations: "{count} provas",
+      best: "O mais escolhido",
+      buy: "Quero",
+      note: "O preço final pode variar conforme o seu país e impostos.",
+      unavailable: "Ainda não dá para comprar. Voltamos em poucos dias.",
+      error: "Não conseguimos abrir o pagamento. Tente de novo.",
+    },
   },
 
   auth: {

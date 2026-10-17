@@ -245,6 +245,24 @@ export interface Dictionary {
       cancel: string;
       submit: string;
     };
+
+    /**
+     * Precios. Se ven **solo** cuando alguien con cuenta gasta lo suyo.
+     *
+     * Lo que se pinta aquí es una referencia: la cifra que cobra Paddle
+     * depende del pais de quien paga -> D-030.
+     */
+    packs: {
+      title: string;
+      body: string;
+      /** Marcador: `{count}`. */
+      generations: string;
+      best: string;
+      buy: string;
+      note: string;
+      unavailable: string;
+      error: string;
+    };
   };
 
   /**

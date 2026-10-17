@@ -59,6 +59,7 @@
 | [D-031](#d-031) | 2026-10-16 | Tercer pack caro, como ancla de precio | DECISIÓN | OPEN |
 | [D-032](#d-032) | 2026-10-16 | Contabilidad de uso con tres topes, y falla cerrado | DECISIÓN | OPEN |
 | [D-033](#d-033) | 2026-10-16 | Registro con contraseña y Google, en vez de código por correo | DECISIÓN | OPEN |
+| [D-034](#d-034) | 2026-10-17 | Créditos comprados: una fila por compra, y la firma del aviso manda | DECISIÓN | OPEN |
 
 ---
 
@@ -548,6 +549,27 @@
 - **Lo que hace falta configurar, y no es código** Credenciales OAuth en Google Cloud, el proveedor Google activado en Supabase, y los orígenes permitidos en Authentication → URL Configuration. Con los ámbitos básicos de correo y perfil **no hace falta pasar la verificación de Google**.
 - **Riesgo asumido** Google ve quién usa el producto. Es el precio de no depender de nuestro correo, y por eso la contraseña se mantiene como alternativa para quien no quiera.
 - **Alternatives** (a) Mantener el código y montar SMTP, que es lo correcto a medio plazo y sigue pendiente para avisos de la lista de espera; (b) solo contraseña, que no resuelve el bloqueo porque el restablecimiento necesita correo; (c) enlace mágico, descartado ya en D-028 por el problema del móvil.
+
+<a id="d-034"></a>
+## D-034 · Créditos comprados: una fila por compra, y la firma del aviso manda
+
+- **Date** 2026-10-17 · **Type** DECISIÓN · **Status** OPEN
+- **Context** [D-032](#d-032) dejó la contabilidad de uso montada pero solo con generaciones gratuitas, y lo dijo: «no gestiona créditos comprados: eso llega con la pasarela». Con los tres precios ya creados en Paddle ([D-030](#d-030), [D-031](#d-031)), faltaba la pieza que convierte un pago en generaciones.
+- **Decision** Tabla `credits`, **una fila por compra y nunca un saldo**. El saldo se calcula: gratuitas más compradas, menos usadas. El aviso `transaction.completed` de Paddle es lo único que escribe en ella.
+- **Por qué una fila por compra y no un contador** Un contador se lee más rápido y es exactamente lo que no queremos: si una actualización se pierde o se aplica dos veces, alguien acaba con generaciones que no pagó o sin las que pagó, y **no hay forma de saber cuál de las dos cosas pasó**. Con el historial, la verdad siempre se puede reconstruir contra la liquidación de Paddle.
+- **Lo comprado y lo gratis van al mismo saco** A quien genera le da igual de dónde sale la generación, y separarlos obligaría a decidir cuál se gasta primero: una regla que habría que explicar y que no mejora nada.
+- **El tope global diario sigue mandando sobre lo comprado** Pagar no salta el límite de gasto del sitio. Lo que protege la factura no puede depender de que alguien haya pagado; si se llega al tope con compras legítimas, el problema es que el tope está bajo y se sube por entorno.
+- **Tres defensas en el aviso, y cada una tapa un agujero distinto**
+  1. **Firma antes que nada.** Un endpoint que acredita sin comprobar la firma es un formulario público para regalar generaciones: la URL se acaba sabiendo y el cuerpo es JSON que cualquiera redacta. Se verifica el HMAC sobre **el cuerpo en crudo** —parsear y volver a serializar cambia un espacio y rompe la firma— con una ventana de cinco minutos, para que capturar un aviso válido no sirva de nada mañana.
+  2. **`transaction_id` único en base.** Paddle reenvía mientras no reciba un 2xx, así que el mismo pago llega varias veces de forma rutinaria. Sin esa restricción, un reintento regalaría un pack.
+  3. **El código de respuesta es la señal de reintento.** 500 si falló la base —para que vuelva—, 200 si ya estaba hecho o si el aviso no nos toca. Devolver 500 a lo que no sabemos acreditar provocaría reintentos infinitos.
+- **El `user_id` sale de la cookie firmada, no del navegador** Viaja en el `custom_data` del checkout, pero lo pone el servidor en `/api/billing/config`. Si lo eligiera el cliente, cualquiera podría acreditar la cuenta de otro. Por eso el token de cliente de Paddle se sirve desde ahí y no desde una variable `NEXT_PUBLIC_`: no porque el token sea secreto —no lo es—, sino porque el identificador que lo acompaña sí tiene que serlo.
+- **Un pago que no sabemos acreditar no inventa una cifra** Sin `user_id`, o con un precio que no reconocemos, no se escribe nada y queda el registro en Paddle para resolverlo a mano. Preferimos que alguien reclame —y quede trazado— a sumar un número a ojo.
+- **La cantidad del precio en Paddle manda sobre nuestra copia** Así se puede crear un pack nuevo desde su panel sin desplegar. La copia local existe solo para pintar la tabla sin consultar a Paddle en cada carga.
+- **Paddle.js se carga solo al pulsar comprar** Un script de terceros en todas las páginas a cambio de una acción que hace una minoría: cargarlo siempre cobraría el coste de rendimiento al 100% del tráfico por el 1% que compra.
+- **Evidence** Firma, reintentos y `custom_data`: documentación de Paddle `[D]`. Que el muro convierta: **ninguna** — es la hipótesis que mide `credit_paywall_viewed → checkout_started`, los dos eventos añadidos con esto.
+- **Alternatives** (a) Contador de saldo, descartado arriba; (b) crear la transacción en el servidor con la clave de API en vez de abrir el checkout con un precio, más robusto frente a manipulación del cliente pero innecesario cuando lo único manipulable es el precio que uno mismo paga; (c) `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, descartado porque el identificador de usuario tiene que venir del servidor de todos modos, así que ya hay una llamada; (d) créditos en la propia tabla `generations` con cantidad negativa, descartado porque mezcla dos cosas con ciclos de vida y auditorías distintas.
+- **Impact** Cierra el camino completo: cupo agotado → precios → pago → generaciones acreditadas. Queda pendiente de la cuenta de Paddle el token de cliente y el dominio autorizado; hasta entonces el panel enseña precios y dice que todavía no se puede comprar, en vez de un botón que no abriría nada.
 
 ---
 

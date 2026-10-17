@@ -311,6 +311,18 @@ export const it: Dictionary = {
       cancel: "Annulla",
       submit: "Entra",
     },
+
+    packs: {
+      title: "Ottieni altre prove",
+      body:
+        "Hai usato le tue. Scegli un pacchetto e continua a provare montature sulla tua foto.",
+      generations: "{count} prove",
+      best: "Il più scelto",
+      buy: "Prendile",
+      note: "Il prezzo finale può variare in base al paese e alle imposte.",
+      unavailable: "Non si può ancora acquistare. Torniamo tra pochi giorni.",
+      error: "Non siamo riusciti ad aprire il pagamento. Riprova.",
+    },
   },
 
   auth: {

@@ -81,7 +81,7 @@ export function TryFlow({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const [pendingAccess, setPendingAccess] = useState<{
     frameId: string;
     retry: boolean;
-    reason: "no_code" | "free_used";
+    reason: "no_code" | "free_used" | "credits";
   } | null>(null);
 
   const profile = session?.profile ?? null;

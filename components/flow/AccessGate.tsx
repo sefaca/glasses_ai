@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { track } from "@/lib/analytics/client";
 import { signIn } from "@/lib/auth/client";
-import type { Dictionary, Locale } from "@/lib/i18n";
+import { openCheckout } from "@/lib/billing/checkout";
+import { sellablePacks } from "@/lib/billing/packs";
+import { format, type Dictionary, type Locale } from "@/lib/i18n";
 import { joinWaitlist, type LeadResult } from "@/lib/leads/client";
 import { saveAccessCode } from "@/lib/tryon/client";
 
@@ -22,10 +24,10 @@ import { saveAccessCode } from "@/lib/tryon/client";
  * no, crea la cuenta. Nadie debería tener que recordar si ya tenía una.
  */
 
-type Panel = "signin" | "waitlist" | "joined" | "shared";
+type Panel = "signin" | "waitlist" | "joined" | "shared" | "packs";
 
 interface Props {
-  reason: "no_code" | "free_used";
+  reason: "no_code" | "free_used" | "credits";
   retry: boolean;
   dict: Dictionary;
   lang: Locale;
@@ -41,7 +43,11 @@ export function AccessGate({
   onSubmit,
   onCancel,
 }: Props) {
-  const [panel, setPanel] = useState<Panel>("signin");
+  // Quien ya tiene cuenta no necesita el formulario: lo que le falta son
+  // créditos, y volver a enseñarle «regístrate» sería un callejón sin salida.
+  const [panel, setPanel] = useState<Panel>(
+    reason === "credits" ? "packs" : "signin",
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -416,7 +422,114 @@ export function AccessGate({
             </div>
           </form>
         )}
+
+        {/* ---------- Packs ---------- */}
+        {panel === "packs" && (
+          <Packs dict={dict} lang={lang} onCancel={onCancel} />
+        )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Los tres packs.
+ *
+ * Aparece en el único momento en que un precio no interrumpe nada: alguien
+ * con cuenta que ya ha visto dos monturas sobre su propia cara y quiere una
+ * tercera. Antes de eso no se enseña.
+ */
+function Packs({
+  dict,
+  lang,
+  onCancel,
+}: {
+  dict: Dictionary;
+  lang: Locale;
+  onCancel: () => void;
+}) {
+  const copy = dict.tryOn.packs;
+  const packs = sellablePacks();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Una vez por apertura. Es el denominador de la conversión a pago: sin él,
+  // «nadie compró» no se distingue de «nadie llegó a ver el precio».
+  useEffect(() => {
+    track("credit_paywall_viewed", { locale: lang });
+  }, [lang]);
+
+  // La cifra que se pinta es una referencia; la que se cobra la pone Paddle
+  // según el país. El inglés se muestra en dólares porque es el idioma por el
+  // que llega el tráfico de fuera de la UE.
+  const currency = lang === "en" ? "usd" : "eur";
+
+  async function buy(packId: string, priceId: string) {
+    if (busy) return;
+    setBusy(packId);
+    setError(null);
+    track("checkout_started", { step: packId, locale: lang });
+
+    const result = await openCheckout(priceId, lang);
+    setBusy(null);
+
+    if (result === "unconfigured") setError(copy.unavailable);
+    else if (result !== "opened") setError(copy.error);
+  }
+
+  return (
+    <div>
+      <h2 className="font-display text-xl tracking-tight">{copy.title}</h2>
+      <p className="mt-2 text-sm leading-relaxed text-muted">{copy.body}</p>
+
+      <ul className="mt-5 space-y-2">
+        {packs.map((pack) => (
+          <li key={pack.id}>
+            <button
+              type="button"
+              disabled={busy !== null}
+              onClick={() => buy(pack.id, pack.priceId!)}
+              className={`flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors disabled:opacity-40 ${
+                pack.featured
+                  ? "border-accent bg-accent/5"
+                  : "border-line hover:border-ink"
+              }`}
+            >
+              <span>
+                <span className="block text-sm font-medium">
+                  {format(copy.generations, { count: pack.generations })}
+                </span>
+                {pack.featured && (
+                  <span className="mt-0.5 block text-[0.7rem] text-accent">
+                    {copy.best}
+                  </span>
+                )}
+              </span>
+              <span className="font-display text-lg tracking-tight">
+                {pack.display[currency]}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-3 text-[0.7rem] leading-relaxed text-muted">
+        {copy.note}
+      </p>
+
+      {error && (
+        <p className="mt-3 text-xs text-ink" role="alert">
+          {error}
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={onCancel}
+        className="mt-5 w-full text-sm text-muted hover:text-ink"
+      >
+        {dict.tryOn.access.cancel}
+      </button>
     </div>
   );
 }

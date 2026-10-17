@@ -48,8 +48,9 @@ export type TryOnClientResult =
    *
    * - `no_code`: no hay forma de identificar a quien pide.
    * - `free_used`: gastó su gratis. Es el momento de registrarse.
+   * - `credits`: ya tiene cuenta y la gastó. Toca enseñar precios.
    */
-  | { status: "needs-access"; reason: "no_code" | "free_used" }
+  | { status: "needs-access"; reason: "no_code" | "free_used" | "credits" }
   | { status: "failed"; message: string };
 
 /**
@@ -142,6 +143,9 @@ export async function requestTryOn(
   }
   if (code === "free_exhausted") {
     return { status: "needs-access", reason: "free_used" };
+  }
+  if (code === "credits_needed") {
+    return { status: "needs-access", reason: "credits" };
   }
   return { status: "failed", message: messageFor(errors, code) };
 }

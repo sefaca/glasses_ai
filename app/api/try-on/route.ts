@@ -202,7 +202,11 @@ export async function POST(request: Request) {
       return quotaDenied("daily_cap", 503, freshAnon);
     }
     if (!verdict.allowed && !hasSharedCode) {
-      return quotaDenied(verdict.reason, 402, freshAnon);
+      // Quien ya tiene cuenta no puede resolverlo registrándose otra vez: lo
+      // que le falta son créditos. Distinguirlo aquí es lo que permite a la
+      // UI enseñar precios en vez de un formulario que no sirve de nada.
+      const code = subject.type === "user" ? "credits_needed" : verdict.reason;
+      return quotaDenied(code, 402, freshAnon);
     }
   }
 
