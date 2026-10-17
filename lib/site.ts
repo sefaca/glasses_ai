@@ -21,4 +21,4 @@ export function absoluteUrl(path: string): string {
  * idiomas y aparece en documentos legales: tenerla en un solo sitio evita
  * que una traducción se quede con una dirección vieja que ya nadie lee.
  */
-export const SUPPORT_EMAIL = "hola@lookfit.app";
+export const SUPPORT_EMAIL = "infolookfit@gmail.com";
