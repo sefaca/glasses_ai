@@ -316,6 +316,17 @@ export const es: Dictionary = {
     },
   },
 
+  checkout: {
+    title: "Termina tu compra",
+    body: "Abrimos la pasarela para que puedas terminar el pago.",
+    opening: "Abriendo la pasarela...",
+    missing: "No hay ningún pago pendiente en este enlace.",
+    unavailable:
+      "El pago no está disponible ahora mismo. Vuelve a intentarlo en un rato.",
+    error: "No hemos podido abrir la pasarela. Vuelve a intentarlo.",
+    back: "Volver a probar gafas",
+  },
+
   auth: {
     title: "Crea tu cuenta para probártelas",
     body: "Hasta aquí has llegado sin dar nada, y lo que has visto seguirá siendo gratis.",

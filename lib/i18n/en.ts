@@ -319,6 +319,17 @@ export const en: Dictionary = {
     },
   },
 
+  checkout: {
+    title: "Finish your purchase",
+    body: "We are opening the payment window so you can complete it.",
+    opening: "Opening the payment window...",
+    missing: "There is no pending payment on this link.",
+    unavailable:
+      "Payment is not available right now. Please try again shortly.",
+    error: "We could not open the payment window. Please try again.",
+    back: "Back to trying on glasses",
+  },
+
   auth: {
     title: "Create your account to try them on",
     body: "You got this far without giving us anything, and what you've seen stays free.",

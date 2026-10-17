@@ -25,9 +25,6 @@ export async function GET(request: Request) {
     ?.slice(SESSION_COOKIE.length + 1);
 
   const session = await readSession(cookie);
-  if (!session) {
-    return NextResponse.json({ status: "anonymous" }, { status: 401 });
-  }
 
   const token = process.env.PADDLE_CLIENT_TOKEN?.trim();
   if (!token) {
@@ -43,6 +40,14 @@ export async function GET(request: Request) {
       process.env.PADDLE_ENVIRONMENT?.trim() === "production"
         ? "production"
         : "sandbox",
-    userId: session.userId,
+    /**
+     * `null` sin sesión, y no un 401.
+     *
+     * Comprar un pack **sí** exige cuenta, y de eso se encarga quien llama.
+     * Pero retomar un pago a medias no: a esa página se llega desde un correo
+     * de Paddle, posiblemente en otro navegador, y la transacción ya lleva
+     * dentro a quién acreditar desde que se abrió el checkout.
+     */
+    userId: session?.userId ?? null,
   });
 }

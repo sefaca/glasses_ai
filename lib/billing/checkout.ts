@@ -18,7 +18,8 @@ interface PaddleGlobal {
   Initialize(options: { token: string }): void;
   Checkout: {
     open(options: {
-      items: Array<{ priceId: string; quantity: number }>;
+      items?: Array<{ priceId: string; quantity: number }>;
+      transactionId?: string;
       customData?: Record<string, string>;
       settings?: Record<string, unknown>;
     }): void;
@@ -37,7 +38,7 @@ interface Config {
   status: string;
   token?: string;
   environment?: string;
-  userId?: string;
+  userId?: string | null;
 }
 
 let loaded: Promise<PaddleGlobal | null> | null = null;
@@ -64,34 +65,74 @@ function loadScript(): Promise<PaddleGlobal | null> {
   return loaded;
 }
 
-export async function openCheckout(
-  priceId: string,
-  locale: string,
-): Promise<CheckoutResult> {
+/** Config + script, que es lo que necesitan las dos formas de abrir. */
+async function prepare(): Promise<
+  { ok: true; paddle: PaddleGlobal; config: Config } | { ok: false; reason: CheckoutResult }
+> {
   let config: Config;
   try {
     const response = await fetch("/api/billing/config");
-    if (response.status === 401) return "anonymous";
     config = await response.json();
   } catch {
-    return "error";
+    return { ok: false, reason: "error" };
   }
 
-  if (config.status !== "ok" || !config.token || !config.userId) {
-    return "unconfigured";
+  if (config.status !== "ok" || !config.token) {
+    return { ok: false, reason: "unconfigured" };
   }
 
   const paddle = await loadScript();
-  if (!paddle) return "error";
+  if (!paddle) return { ok: false, reason: "error" };
 
   try {
     paddle.Environment.set(config.environment ?? "sandbox");
     paddle.Initialize({ token: config.token });
-    paddle.Checkout.open({
+  } catch {
+    return { ok: false, reason: "error" };
+  }
+  return { ok: true, paddle, config };
+}
+
+/** Comprar un pack. Exige cuenta: hay que saber a quién acreditar. */
+export async function openCheckout(
+  priceId: string,
+  locale: string,
+): Promise<CheckoutResult> {
+  const ready = await prepare();
+  if (!ready.ok) return ready.reason;
+  if (!ready.config.userId) return "anonymous";
+
+  try {
+    ready.paddle.Checkout.open({
       items: [{ priceId, quantity: 1 }],
       // Viaja con el pago y vuelve en el aviso. Es lo que permite saber a
       // quién acreditar sin preguntarle el correo a nadie.
-      customData: { user_id: config.userId },
+      customData: { user_id: ready.config.userId },
+      settings: { displayMode: "overlay", locale },
+    });
+    return "opened";
+  } catch {
+    return "error";
+  }
+}
+
+/**
+ * Retomar un pago a medias, desde el correo de recuperación de Paddle.
+ *
+ * **No exige sesión**, a diferencia de comprar: se llega desde un correo y
+ * puede ser otro navegador. No hace falta, porque la transacción ya lleva
+ * dentro el `user_id` desde que se abrió el checkout la primera vez.
+ */
+export async function openTransaction(
+  transactionId: string,
+  locale: string,
+): Promise<CheckoutResult> {
+  const ready = await prepare();
+  if (!ready.ok) return ready.reason;
+
+  try {
+    ready.paddle.Checkout.open({
+      transactionId,
       settings: { displayMode: "overlay", locale },
     });
     return "opened";

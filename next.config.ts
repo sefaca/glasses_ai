@@ -25,6 +25,19 @@ const nextConfig: NextConfig = {
         destination: "/es",
         permanent: false,
       },
+      {
+        /**
+         * El enlace de pago que guarda Paddle **no puede llevar idioma**: es
+         * uno solo para todo el mundo y lo pega en correos que escribe él.
+         * Aquí se le da una URL estable y se resuelve el idioma dentro.
+         *
+         * Next conserva la query, que es justo lo que importa: el `_ptxn`
+         * con la transacción a medias viaja intacto hasta la página.
+         */
+        source: "/checkout",
+        destination: "/es/checkout",
+        permanent: false,
+      },
     ];
   },
   turbopack: {

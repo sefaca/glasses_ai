@@ -331,6 +331,17 @@ export const de: Dictionary = {
     },
   },
 
+  checkout: {
+    title: "Kauf abschließen",
+    body: "Wir öffnen die Zahlung, damit du sie abschließen kannst.",
+    opening: "Zahlung wird geöffnet ...",
+    missing: "Zu diesem Link gibt es keine offene Zahlung.",
+    unavailable:
+      "Die Zahlung ist gerade nicht verfügbar. Versuch es gleich noch einmal.",
+    error: "Die Zahlung ließ sich nicht öffnen. Bitte noch einmal versuchen.",
+    back: "Zurück zum Brillen anprobieren",
+  },
+
   auth: {
     title: "Leg dein Konto an, um sie anzuprobieren",
     body: "Bis hierher bist du gekommen, ohne etwas zu geben, und was du gesehen hast, bleibt kostenlos.",

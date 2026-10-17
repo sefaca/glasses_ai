@@ -325,6 +325,17 @@ export const it: Dictionary = {
     },
   },
 
+  checkout: {
+    title: "Completa l'acquisto",
+    body: "Stiamo aprendo il pagamento per permetterti di completarlo.",
+    opening: "Apertura del pagamento...",
+    missing: "Non c'è nessun pagamento in sospeso in questo link.",
+    unavailable:
+      "Il pagamento non è disponibile in questo momento. Riprova tra poco.",
+    error: "Non siamo riusciti ad aprire il pagamento. Riprova.",
+    back: "Torna a provare occhiali",
+  },
+
   auth: {
     title: "Crea il tuo account per provarli",
     body: "Fin qui sei arrivato senza dare nulla, e quello che hai visto resta gratis.",

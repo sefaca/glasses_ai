@@ -266,6 +266,20 @@ export interface Dictionary {
   };
 
   /**
+   * Retomar un pago a medias, desde el correo de Paddle. Página de tránsito:
+   * no se indexa y no tiene más contenido que el estado de la apertura.
+   */
+  checkout: {
+    title: string;
+    body: string;
+    opening: string;
+    missing: string;
+    unavailable: string;
+    error: string;
+    back: string;
+  };
+
+  /**
    * Registro por código de seis dígitos.
    *
    * Registrarse y entrar son el mismo gesto a propósito: nadie debería tener

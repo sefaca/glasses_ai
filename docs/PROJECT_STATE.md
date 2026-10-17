@@ -76,6 +76,7 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | **Registro con contraseña y Google** (Supabase Auth, PKCE con el intercambio en el servidor) | **HECHO y en producción** → [D-033](DECISION_LOG.md#d-033). Sustituye al código de 6 dígitos: el correo de Supabase no entrega fuera del equipo |
 | **Créditos comprados** (tabla `credits`, una fila por compra; aviso de Paddle con firma verificada) | **HECHO en código** → [D-034](DECISION_LOG.md#d-034). Falta ejecutar la migración 0003 y, en Paddle, el token de cliente y autorizar `lookfit.app` |
 | **Muro de precios** con los tres packs, solo al agotar el cupo teniendo cuenta | **HECHO** — sin token de Paddle enseña los precios y dice que aún no se puede comprar, en vez de un botón muerto |
+| `/checkout`, destino del *default payment link* de Paddle | **HECHO** — retoma un pago a medias desde el correo de recuperación. Sin idioma en la URL, porque Paddle solo admite una |
 | **Precio de arranque fijado** (2 gratis, 4,99 €/10, 9,99 €/25) | **HECHO** → [D-029](DECISION_LOG.md#d-029). Es el número del experimento, no el definitivo |
 | Pasarela de pago | **Paddle, cuenta creada y los tres precios dados de alta** → [D-030](DECISION_LOG.md#d-030), [D-031](DECISION_LOG.md#d-031). Pendiente: verificación de la cuenta y la tarifa a medida para los packs de menos de 10 $ |
 | **Contabilidad de uso con tres topes** (sesión, cuenta, global diario) | **HECHO** → [D-032](DECISION_LOG.md#d-032). Falla cerrado. Migración 0002 ejecutada `[X]` |
