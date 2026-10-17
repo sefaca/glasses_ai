@@ -39,7 +39,13 @@ export function readMemoryCounts(subject: Subject): UsageCounts {
   const day = currentDay();
   if (today.day !== day) today = { day, total: 0 };
 
-  return { subject: counts.get(key(subject)) ?? 0, today: today.total };
+  // En local no se compra nada: el checkout va contra el sandbox de Paddle
+  // y los créditos solo existen con Supabase detrás.
+  return {
+    subject: counts.get(key(subject)) ?? 0,
+    today: today.total,
+    purchased: 0,
+  };
 }
 
 export function recordMemoryGeneration(subject: Subject): void {

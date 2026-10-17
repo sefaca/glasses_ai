@@ -32,14 +32,14 @@ export const PACKS: readonly Pack[] = [
   {
     id: "p10",
     generations: 10,
-    priceId: null,
+    priceId: "pri_01m558waqsdqxes19svm241pfn",
     display: { eur: "4,99 €", gbp: "£5.99", usd: "$9.99" },
     featured: false,
   },
   {
     id: "p25",
     generations: 25,
-    priceId: null,
+    priceId: "pri_01m558t13pmtf0p40nf7ysk9ft",
     display: { eur: "9,99 €", gbp: "£11.99", usd: "$19.99" },
     featured: true,
   },

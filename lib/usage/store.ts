@@ -72,7 +72,7 @@ export async function readCounts(subject: Subject): Promise<CountsResult> {
   const since = new Date();
   since.setUTCHours(0, 0, 0, 0);
 
-  const [subjectCount, todayCount] = await Promise.all([
+  const [subjectCount, todayCount, purchased] = await Promise.all([
     countRows(
       conf.url,
       conf.key,
@@ -83,10 +83,45 @@ export async function readCounts(subject: Subject): Promise<CountsResult> {
       conf.key,
       `select=id&created_at=gte.${encodeURIComponent(since.toISOString())}`,
     ),
+    // Solo las cuentas compran: una sesión anónima nunca tiene créditos.
+    subject.type === "user"
+      ? sumPurchased(conf.url, conf.key, subject.id)
+      : Promise.resolve(0),
   ]);
 
-  if (subjectCount === null || todayCount === null) return { ok: false };
-  return { ok: true, counts: { subject: subjectCount, today: todayCount } };
+  if (subjectCount === null || todayCount === null || purchased === null) {
+    return { ok: false };
+  }
+  return {
+    ok: true,
+    counts: { subject: subjectCount, today: todayCount, purchased },
+  };
+}
+
+/**
+ * Suma las generaciones compradas por una cuenta.
+ *
+ * Se traen las filas en vez de pedirle la suma a PostgREST porque una persona
+ * tendrá un puñado de compras, no miles, y evita montar una vista o una
+ * función solo para esto.
+ */
+async function sumPurchased(
+  url: string,
+  key: string,
+  userId: string,
+): Promise<number | null> {
+  try {
+    const response = await fetch(
+      `${url}/rest/v1/credits?select=generations&user_id=eq.${encodeURIComponent(userId)}`,
+      { headers: headers(key) },
+    );
+    if (!response.ok) return null;
+
+    const rows = (await response.json()) as Array<{ generations?: number }>;
+    return rows.reduce((total, row) => total + (row.generations ?? 0), 0);
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -121,5 +156,50 @@ export async function recordGeneration(input: {
     // sin contar regala una, que es mejor que negársela a quien ya pagó el
     // tiempo de espera. Se registra para poder verlo.
     console.error("[usage] no se pudo anotar la generacion");
+  }
+}
+
+/**
+ * Anota una compra.
+ *
+ * Devuelve `duplicate` cuando Paddle reenvía un aviso que ya habíamos
+ * procesado: la restricción única sobre `transaction_id` lo rechaza y aquí se
+ * traduce a «ya estaba», que **no es un error**. Paddle reintenta hasta
+ * recibir un 200, así que esto pasa de forma rutinaria y tratarlo como fallo
+ * provocaría reintentos infinitos.
+ */
+export async function recordPurchase(input: {
+  userId: string;
+  generations: number;
+  transactionId: string;
+  priceId: string | null;
+  amountCents: number | null;
+  currency: string | null;
+}): Promise<"ok" | "duplicate" | "error"> {
+  const conf = config();
+  if (!conf) return "error";
+
+  try {
+    const response = await fetch(`${conf.url}/rest/v1/credits`, {
+      method: "POST",
+      headers: headers(conf.key, { Prefer: "return=minimal" }),
+      body: JSON.stringify({
+        user_id: input.userId,
+        generations: input.generations,
+        transaction_id: input.transactionId,
+        price_id: input.priceId,
+        amount_cents: input.amountCents,
+        currency: input.currency,
+      }),
+    });
+
+    if (response.ok) return "ok";
+    // 409: choca con la restricción única. Es el reenvío de un aviso.
+    if (response.status === 409) return "duplicate";
+
+    console.error("[credits] supabase", response.status);
+    return "error";
+  } catch {
+    return "error";
   }
 }

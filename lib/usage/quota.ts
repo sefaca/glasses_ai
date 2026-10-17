@@ -41,7 +41,7 @@ export function dailyCap(): number {
 }
 
 export type QuotaDecision =
-  | { allowed: true; remainingFree: number }
+  | { allowed: true; remaining: number }
   /** Agotó lo suyo. Puede registrarse o, cuando exista, comprar. */
   | { allowed: false; reason: "free_exhausted" }
   /** El sitio llegó a su tope del día. No es culpa suya. */
@@ -54,6 +54,8 @@ export interface UsageCounts {
   subject: number;
   /** Generaciones que lleva el sitio entero hoy. */
   today: number;
+  /** Generaciones compradas. Cero para una sesión anónima. */
+  purchased: number;
 }
 
 /**
@@ -70,10 +72,12 @@ export function decide(
 ): QuotaDecision {
   if (counts.today >= cap) return { allowed: false, reason: "daily_cap" };
 
-  const allowance = FREE_ALLOWANCE[subject.type];
+  // Lo gratuito y lo comprado van al mismo saco: a quien genera le da igual
+  // de dónde sale, y separarlo obligaría a decidir cuál se gasta primero.
+  const allowance = FREE_ALLOWANCE[subject.type] + counts.purchased;
   if (counts.subject >= allowance) {
     return { allowed: false, reason: "free_exhausted" };
   }
 
-  return { allowed: true, remainingFree: allowance - counts.subject - 1 };
+  return { allowed: true, remaining: allowance - counts.subject - 1 };
 }
