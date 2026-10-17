@@ -85,7 +85,11 @@ async function prepare(): Promise<
   if (!paddle) return { ok: false, reason: "error" };
 
   try {
-    paddle.Environment.set(config.environment ?? "sandbox");
+    // Solo se cambia el entorno para ir a sandbox. Producción es el valor
+    // por defecto de Paddle.js y es lo único que documentan: pasarle
+    // "production" explícitamente no está en su API, y no merece la pena
+    // averiguar por las malas si lo ignora o revienta en la pasarela real.
+    if (config.environment === "sandbox") paddle.Environment.set("sandbox");
     paddle.Initialize({ token: config.token });
   } catch {
     return { ok: false, reason: "error" };
