@@ -90,8 +90,10 @@ export const en: Dictionary = {
   },
   footer: {
     tagline: "Independent eyewear discovery. Validation phase.",
+    pricing: "Pricing",
     privacy: "Privacy",
     terms: "Terms",
+    refunds: "Refunds",
     cookies: "Cookies",
   },
 
@@ -381,7 +383,77 @@ export const en: Dictionary = {
     },
   },
 
+  pricing: {
+    title: "Pricing",
+    intro:
+      "Start free. If you stay, buy a pack of try-ons when you need one: no subscription, no expiry.",
+    free: {
+      title: "Free, no card",
+      body:
+        "One try-on without signing up and another when you create your account. Enough to see two frames on your own face before deciding anything.",
+    },
+    packsTitle: "Try-on packs",
+    generations: "{count} try-ons",
+    best: "Most popular",
+    note:
+      "Prices include tax. The exact amount depends on your country and is shown before you pay.",
+    cta: "Try it free",
+    points: [
+      "Generations don't expire.",
+      "No subscription: you pay once and that's it.",
+      "If a try-on fails, it doesn't use credit.",
+    ],
+    refunds: "Read the refund policy",
+  },
   legal: {
+    refunds: {
+      label: "Refunds",
+      title: "Refund policy",
+      intro: [
+        "Packs are digital content: generations are added to your account as soon as the payment is confirmed.",
+        "The sale is made by Paddle.com Market Ltd as the merchant of record. They appear on your invoice and they process the refund.",
+      ],
+      sections: [
+        {
+          heading: "Fourteen days, if you haven't used any",
+          paragraphs: [
+            "If you haven't used a single generation from the pack, we refund the full amount within 14 days of the purchase. You don't need to explain why.",
+          ],
+        },
+        {
+          heading: "If you've used some",
+          paragraphs: [
+            "Within those same 14 days we refund the part matching the generations you have left.",
+            "After that window, write to us anyway: if something hasn't worked the way we promise, we'll sort it out.",
+          ],
+        },
+        {
+          heading: "A failed try-on doesn't use credit",
+          paragraphs: [
+            "If a generation fails, it isn't deducted from your balance. There's nothing to claim, because it never gets charged.",
+          ],
+        },
+        {
+          heading: "How to ask",
+          paragraphs: [
+            "Write to {email} from the address you bought with, quoting the order number on your invoice. We reply within five business days at most.",
+            "You can also contact Paddle support directly; their details are on the invoice you received.",
+          ],
+        },
+        {
+          heading: "Right of withdrawal",
+          paragraphs: [
+            "By buying, you agree that the generations become available immediately, which means giving up the right of withdrawal over the ones you've already used. Whatever you haven't used is still covered by the 14 days described above.",
+          ],
+        },
+        {
+          heading: "Status of this document",
+          paragraphs: [
+            "Pending professional legal review.",
+          ],
+        },
+      ],
+    },
     pendingReview: "Status of this document",
     privacy: {
       label: "Privacy",
@@ -435,7 +507,7 @@ export const en: Dictionary = {
       label: "Terms",
       title: "Terms of use",
       intro: [
-        "The site is in its validation phase. There's no service to contract, no payments are accepted and no user data is processed.",
+        "The site is in its early phase. Basic use is free and, if you want more try-ons, you can buy a pack of generations.",
       ],
       sections: [
         {
@@ -455,6 +527,13 @@ export const en: Dictionary = {
           heading: "Third-party brands",
           paragraphs: [
             "Any brands and models shown belong to their owners. Mentioning them implies no agreement, sponsorship or association, and we don't present anyone as a partner without an agreement.",
+          ],
+        },
+        {
+          heading: "What is sold, and who sells it",
+          paragraphs: [
+            "Basic use is free. If you want more try-ons you can buy a pack of generations: digital content, no subscription, added to your account once the payment completes, and it doesn't expire.",
+            "The sale is made by Paddle.com Market Ltd as the merchant of record. They appear on your invoice and handle the payment, taxes and refunds. The conditions are in our refund policy.",
           ],
         },
         {

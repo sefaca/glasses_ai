@@ -77,6 +77,7 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | **Créditos comprados** (tabla `credits`, una fila por compra; aviso de Paddle con firma verificada) | **HECHO en código** → [D-034](DECISION_LOG.md#d-034). Falta ejecutar la migración 0003 y, en Paddle, el token de cliente y autorizar `lookfit.app` |
 | **Muro de precios** con los tres packs, solo al agotar el cupo teniendo cuenta | **HECHO** — sin token de Paddle enseña los precios y dice que aún no se puede comprar, en vez de un botón muerto |
 | `/checkout`, destino del *default payment link* de Paddle | **HECHO** — retoma un pago a medias desde el correo de recuperación. Sin idioma en la URL, porque Paddle solo admite una |
+| **Página de precios pública** y **política de reembolso** en 5 idiomas | **HECHO** → [D-035](DECISION_LOG.md#d-035). Las cuatro URLs que Paddle exige para verificar. Reembolso pendiente de revisión jurídica |
 | **Precio de arranque fijado** (2 gratis, 4,99 €/10, 9,99 €/25) | **HECHO** → [D-029](DECISION_LOG.md#d-029). Es el número del experimento, no el definitivo |
 | Pasarela de pago | **Paddle, cuenta creada y los tres precios dados de alta** → [D-030](DECISION_LOG.md#d-030), [D-031](DECISION_LOG.md#d-031). Pendiente: verificación de la cuenta y la tarifa a medida para los packs de menos de 10 $ |
 | **Contabilidad de uso con tres topes** (sesión, cuenta, global diario) | **HECHO** → [D-032](DECISION_LOG.md#d-032). Falla cerrado. Migración 0002 ejecutada `[X]` |

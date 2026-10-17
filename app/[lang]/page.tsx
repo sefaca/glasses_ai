@@ -281,7 +281,10 @@ export default async function HomePage({
       <footer className="border-t border-line px-5 py-10 sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-muted">{dict.footer.tagline}</p>
-          <nav className="flex gap-6 text-xs text-muted">
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted">
+            <Link href={localePath(lang, "/precios")} className="hover:text-ink">
+              {dict.footer.pricing}
+            </Link>
             <Link
               href={localePath(lang, "/legal/privacy")}
               className="hover:text-ink"
@@ -293,6 +296,12 @@ export default async function HomePage({
               className="hover:text-ink"
             >
               {dict.footer.terms}
+            </Link>
+            <Link
+              href={localePath(lang, "/legal/refunds")}
+              className="hover:text-ink"
+            >
+              {dict.footer.refunds}
             </Link>
             <Link
               href={localePath(lang, "/legal/cookies")}

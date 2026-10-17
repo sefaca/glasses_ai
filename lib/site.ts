@@ -13,3 +13,12 @@ export const SITE_URL = (
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+/**
+ * Dirección de contacto pública.
+ *
+ * Vive aquí y no en los diccionarios porque es la misma en los cinco
+ * idiomas y aparece en documentos legales: tenerla en un solo sitio evita
+ * que una traducción se quede con una dirección vieja que ya nadie lee.
+ */
+export const SUPPORT_EMAIL = "hola@lookfit.app";

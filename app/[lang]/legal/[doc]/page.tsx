@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FrameGlyph } from "@/components/ui/FrameGlyph";
-import { LOCALES, getDictionary, isLocale, localePath } from "@/lib/i18n";
+import { LOCALES, format, getDictionary, isLocale, localePath } from "@/lib/i18n";
+import { SUPPORT_EMAIL } from "@/lib/site";
 import { localizedMetadata } from "@/lib/i18n/metadata";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -24,7 +25,7 @@ import type { Dictionary } from "@/lib/i18n";
  * convierte en revisado: en alemán hace falta además Impressum.
  */
 
-const DOCS = ["privacy", "terms", "cookies"] as const;
+const DOCS = ["privacy", "terms", "cookies", "refunds"] as const;
 type DocKey = (typeof DOCS)[number];
 
 function isDoc(value: string): value is DocKey {
@@ -89,12 +90,17 @@ export default async function LegalPage({
             {content.title}
           </h1>
 
+          {/*
+            `{email}` se resuelve aquí y no en el diccionario: la dirección
+            es la misma en los cinco idiomas, y repetirla en cada traducción
+            garantiza que un cambio deje cuatro copias viejas.
+          */}
           {content.intro.map((paragraph) => (
             <p
               key={paragraph}
               className="mt-4 text-sm leading-relaxed text-muted"
             >
-              {paragraph}
+              {format(paragraph, { email: SUPPORT_EMAIL })}
             </p>
           ))}
 
@@ -108,7 +114,7 @@ export default async function LegalPage({
                   key={paragraph}
                   className="mt-4 text-sm leading-relaxed text-muted"
                 >
-                  {paragraph}
+                  {format(paragraph, { email: SUPPORT_EMAIL })}
                 </p>
               ))}
               {section.items && (

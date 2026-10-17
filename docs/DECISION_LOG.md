@@ -60,6 +60,7 @@
 | [D-032](#d-032) | 2026-10-16 | Contabilidad de uso con tres topes, y falla cerrado | DECISIÓN | OPEN |
 | [D-033](#d-033) | 2026-10-16 | Registro con contraseña y Google, en vez de código por correo | DECISIÓN | OPEN |
 | [D-034](#d-034) | 2026-10-17 | Créditos comprados: una fila por compra, y la firma del aviso manda | DECISIÓN | OPEN |
+| [D-035](#d-035) | 2026-10-18 | Política de reembolso: 14 días, y proporcional si ya gastaste | DECISIÓN | OPEN |
 
 ---
 
@@ -570,6 +571,21 @@
 - **Evidence** Firma, reintentos y `custom_data`: documentación de Paddle `[D]`. Que el muro convierta: **ninguna** — es la hipótesis que mide `credit_paywall_viewed → checkout_started`, los dos eventos añadidos con esto.
 - **Alternatives** (a) Contador de saldo, descartado arriba; (b) crear la transacción en el servidor con la clave de API en vez de abrir el checkout con un precio, más robusto frente a manipulación del cliente pero innecesario cuando lo único manipulable es el precio que uno mismo paga; (c) `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, descartado porque el identificador de usuario tiene que venir del servidor de todos modos, así que ya hay una llamada; (d) créditos en la propia tabla `generations` con cantidad negativa, descartado porque mezcla dos cosas con ciclos de vida y auditorías distintas.
 - **Impact** Cierra el camino completo: cupo agotado → precios → pago → generaciones acreditadas. Queda pendiente de la cuenta de Paddle el token de cliente y el dominio autorizado; hasta entonces el panel enseña precios y dice que todavía no se puede comprar, en vez de un botón que no abriría nada.
+
+<a id="d-035"></a>
+## D-035 · Política de reembolso: 14 días, y proporcional si ya gastaste
+
+- **Date** 2026-10-18 · **Type** DECISIÓN · **Status** OPEN
+- **Context** Paddle no verifica una cuenta sin cuatro URLs públicas: página de precios, condiciones, privacidad y **política de reembolso**. Las tres primeras existían; la cuarta no, y las condiciones además decían «no se aceptan pagos», que dejó de ser cierto con [D-034](#d-034).
+- **Decision** Reembolso **íntegro dentro de 14 días si no se ha gastado ninguna generación**, y **proporcional a las que queden** si ya se gastó alguna. Pasado el plazo, caso por caso. Una generación fallida no descuenta saldo, que ya era cierto en el código y ahora está escrito.
+- **Por qué proporcional y no «nada una vez abierto»** Lo segundo es defendible jurídicamente —contenido digital consumido— y es mala idea comercialmente: el producto se compra **sin saber si el resultado va a gustar**, y quien pruebe dos generaciones y vea que no le sirve no debería quedarse con 23 pagadas. Lo que cuestan esas devoluciones es menos que lo que cuesta una reseña de alguien que se sintió atrapado. Y es barato de calcular porque el saldo ya se lleva como historial, no como contador.
+- **Riesgo asumido** Alguien puede gastar una generación, pedir el reembolso del resto y repetirlo. Con packs de 4,99 € el fraude no sale a cuenta, y Paddle corta al defraudador antes que nosotros. **No se añade antifraude hasta que haya un caso real.**
+- **Las condiciones ahora describen la venta** Qué se vende (contenido digital, sin suscripción, sin caducidad) y **quién vende**: Paddle.com Market Ltd como vendedor registrado, que es quien figura en la factura. Decirlo importa: el cliente ve en su extracto un nombre que no es el nuestro.
+- **Una página de precios pública, además del muro** El muro de [D-034](#d-034) solo lo ve quien ya probó. Paddle exige una URL de precios legible sin registrarse, y es lo razonable: hoy no hay forma de saber qué cuesta esto sin subir una foto antes.
+- **La dirección de contacto vive en `lib/site.ts`** No en los diccionarios. Es la misma en los cinco idiomas y aparece en un documento legal: repetirla por traducción garantiza que un cambio deje cuatro copias viejas.
+- **Evidence** Requisitos de verificación: formulario de Paddle `[D]`, visto el 2026-10-18. Que estas condiciones conviertan o cuesten dinero: **ninguna** — no hay ventas todavía.
+- **Alternatives** (a) Sin reembolso una vez entregadas las generaciones, descartado arriba; (b) 30 días en vez de 14, descartado porque 14 es el plazo legal de referencia en la UE y alargarlo sin datos es regalar opcionalidad; (c) reembolso solo en crédito, descartado porque devolver dinero es el único gesto que no parece una trampa; (d) esperar a tener gestor para redactarlo, descartado porque bloquea la verificación y el documento ya dice que está pendiente de revisión.
+- **Impact** Desbloquea el formulario de verificación de Paddle, que es lo único que queda entre el código y poder cobrar. **Sigue pendiente de revisión jurídica profesional**, y el propio documento lo dice en su último apartado.
 
 ---
 

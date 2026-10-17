@@ -93,8 +93,10 @@ export const de: Dictionary = {
   },
   footer: {
     tagline: "Unabhängige Brillensuche. Validierungsphase.",
+    pricing: "Preise",
     privacy: "Datenschutz",
     terms: "Nutzungsbedingungen",
+    refunds: "Erstattungen",
     cookies: "Cookies",
   },
 
@@ -393,7 +395,77 @@ export const de: Dictionary = {
     },
   },
 
+  pricing: {
+    title: "Preise",
+    intro:
+      "Fang kostenlos an. Wenn es dir gefällt, kaufst du ein Paket Anproben, wenn du eins brauchst: ohne Abo und ohne Verfallsdatum.",
+    free: {
+      title: "Kostenlos, ohne Karte",
+      body:
+        "Eine Anprobe ohne Anmeldung und eine weitere, sobald du ein Konto anlegst. Genug, um zwei Fassungen auf dem eigenen Gesicht zu sehen, bevor du dich entscheidest.",
+    },
+    packsTitle: "Pakete an Anproben",
+    generations: "{count} Anproben",
+    best: "Am häufigsten gewählt",
+    note:
+      "Preise inklusive Steuern. Der genaue Betrag hängt von deinem Land ab und wird vor der Zahlung angezeigt.",
+    cta: "Kostenlos ausprobieren",
+    points: [
+      "Generierungen verfallen nicht.",
+      "Kein Abo: einmal zahlen, fertig.",
+      "Schlägt eine Anprobe fehl, kostet sie kein Guthaben.",
+    ],
+    refunds: "Erstattungsrichtlinie lesen",
+  },
   legal: {
+    refunds: {
+      label: "Erstattungen",
+      title: "Erstattungsrichtlinie",
+      intro: [
+        "Pakete sind digitale Inhalte: Die Generierungen landen auf deinem Konto, sobald die Zahlung bestätigt ist.",
+        "Verkauft wird über Paddle.com Market Ltd als eingetragener Händler. Paddle steht auf deiner Rechnung und führt die Erstattung aus.",
+      ],
+      sections: [
+        {
+          heading: "Vierzehn Tage, wenn du keine verbraucht hast",
+          paragraphs: [
+            "Wenn du keine einzige Generierung aus dem Paket genutzt hast, erstatten wir den vollen Betrag innerhalb von 14 Tagen nach dem Kauf. Eine Begründung brauchst du nicht.",
+          ],
+        },
+        {
+          heading: "Wenn du schon welche verbraucht hast",
+          paragraphs: [
+            "Innerhalb derselben 14 Tage erstatten wir den Anteil, der deinen übrigen Generierungen entspricht.",
+            "Nach Ablauf der Frist schreib uns trotzdem: Wenn etwas nicht so funktioniert hat, wie wir es versprechen, lösen wir das.",
+          ],
+        },
+        {
+          heading: "Eine fehlgeschlagene Anprobe kostet kein Guthaben",
+          paragraphs: [
+            "Schlägt eine Generierung fehl, wird sie nicht von deinem Guthaben abgezogen. Du musst nichts reklamieren, weil sie gar nicht erst berechnet wird.",
+          ],
+        },
+        {
+          heading: "Wie du sie anforderst",
+          paragraphs: [
+            "Schreib an {email} von der Adresse, mit der du gekauft hast, und nenn die Bestellnummer auf deiner Rechnung. Wir antworten in höchstens fünf Werktagen.",
+            "Du kannst dich auch direkt an den Paddle-Support wenden; die Kontaktdaten stehen auf der Rechnung.",
+          ],
+        },
+        {
+          heading: "Widerrufsrecht",
+          paragraphs: [
+            "Mit dem Kauf stimmst du zu, dass die Generierungen sofort verfügbar sind. Damit verzichtest du auf das Widerrufsrecht für die bereits verbrauchten. Was du nicht genutzt hast, fällt weiter unter die oben beschriebenen 14 Tage.",
+          ],
+        },
+        {
+          heading: "Stand dieses Dokuments",
+          paragraphs: [
+            "Noch nicht juristisch geprüft.",
+          ],
+        },
+      ],
+    },
     pendingReview: "Stand dieses Dokuments",
     privacy: {
       label: "Datenschutz",
@@ -467,6 +539,13 @@ export const de: Dictionary = {
           heading: "Marken Dritter",
           paragraphs: [
             "Gezeigte Marken und Modelle gehören ihren Inhabern. Ihre Nennung bedeutet keine Vereinbarung, kein Sponsoring und keine Verbindung, und wir stellen niemanden als Partner dar, mit dem wir keine Vereinbarung haben.",
+          ],
+        },
+        {
+          heading: "Was verkauft wird, und wer verkauft",
+          paragraphs: [
+            "Die Grundnutzung ist kostenlos. Wer mehr Anproben möchte, kann ein Paket an Generierungen kaufen: digitale Inhalte, kein Abo, nach abgeschlossener Zahlung dem Konto gutgeschrieben und ohne Verfallsdatum.",
+            "Verkauft wird über Paddle.com Market Ltd als eingetragener Händler. Paddle steht auf deiner Rechnung und kümmert sich um Zahlung, Steuern und Erstattungen. Die Bedingungen stehen in unserer Erstattungsrichtlinie.",
           ],
         },
         {

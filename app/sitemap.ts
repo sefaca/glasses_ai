@@ -68,9 +68,11 @@ function catalogRoutes(): SitemapRoute[] {
 
 const ROUTES: SitemapRoute[] = [
   { path: "/", priority: 1, locales: LOCALES },
+  { path: "/precios", priority: 0.5, locales: LOCALES },
   { path: "/legal/privacy", priority: 0.3, locales: LOCALES },
   { path: "/legal/terms", priority: 0.3, locales: LOCALES },
   { path: "/legal/cookies", priority: 0.3, locales: LOCALES },
+  { path: "/legal/refunds", priority: 0.3, locales: LOCALES },
   { path: "/guias", priority: 0.6, locales: ["es"] },
   ...GUIDES.map((guide) => ({
     path: `/guias/${guide.slug}`,

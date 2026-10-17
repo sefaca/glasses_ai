@@ -76,9 +76,11 @@ export interface Dictionary {
   };
   footer: {
     tagline: string;
+    pricing: string;
     privacy: string;
     terms: string;
     cookies: string;
+    refunds: string;
   };
 
   /** Pantalla `/probar`: los cuatro pasos. */
@@ -346,6 +348,30 @@ export interface Dictionary {
     privacy: LegalDoc;
     terms: LegalDoc;
     cookies: LegalDoc;
+    /** Obligatoria para vender: Paddle la exige y la comprueba. */
+    refunds: LegalDoc;
     pendingReview: string;
+  };
+
+  /**
+   * Página de precios pública.
+   *
+   * No es el muro que sale al agotar el cupo: esa aparece dentro del flujo y
+   * solo a quien ya ha probado. Esta es la que se puede enlazar y leer sin
+   * haber subido ninguna foto.
+   */
+  pricing: {
+    title: string;
+    intro: string;
+    free: { title: string; body: string };
+    packsTitle: string;
+    /** Marcador: `{count}`. */
+    generations: string;
+    best: string;
+    note: string;
+    cta: string;
+    /** Lo que conviene saber antes de pagar. Tres, no quince. */
+    points: string[];
+    refunds: string;
   };
 }

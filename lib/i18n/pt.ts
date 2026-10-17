@@ -93,8 +93,10 @@ export const pt: Dictionary = {
   },
   footer: {
     tagline: "Descoberta independente de óculos. Fase de validação.",
+    pricing: "Preços",
     privacy: "Privacidade",
     terms: "Termos",
+    refunds: "Reembolsos",
     cookies: "Cookies",
   },
 
@@ -387,7 +389,77 @@ export const pt: Dictionary = {
     },
   },
 
+  pricing: {
+    title: "Preços",
+    intro:
+      "Comece grátis. Se gostar, compra um pacote de provas quando precisar: sem assinatura e sem prazo de validade.",
+    free: {
+      title: "Grátis, sem cartão",
+      body:
+        "Uma prova sem se cadastrar e mais uma ao criar sua conta. Suficiente para ver duas armações no seu próprio rosto antes de decidir.",
+    },
+    packsTitle: "Pacotes de provas",
+    generations: "{count} provas",
+    best: "O mais escolhido",
+    note:
+      "Preços com impostos incluídos. O valor exato depende do seu país e aparece antes do pagamento.",
+    cta: "Testar grátis",
+    points: [
+      "As gerações não expiram.",
+      "Sem assinatura: você paga uma vez e pronto.",
+      "Se uma prova falha, não gasta saldo.",
+    ],
+    refunds: "Leia a política de reembolso",
+  },
   legal: {
+    refunds: {
+      label: "Reembolsos",
+      title: "Política de reembolso",
+      intro: [
+        "Os pacotes são conteúdo digital: as gerações entram na sua conta assim que o pagamento é confirmado.",
+        "A venda é feita pela Paddle.com Market Ltd como vendedor registrado. É quem consta na sua fatura e quem executa a devolução.",
+      ],
+      sections: [
+        {
+          heading: "Catorze dias, se você não gastou nenhuma",
+          paragraphs: [
+            "Se você não usou nenhuma geração do pacote, devolvemos o valor integral dentro de 14 dias da compra. Não precisa explicar o motivo.",
+          ],
+        },
+        {
+          heading: "Se já gastou alguma",
+          paragraphs: [
+            "Dentro desses mesmos 14 dias devolvemos a parte proporcional às gerações que sobraram.",
+            "Passado o prazo, escreva mesmo assim: se algo não funcionou como prometemos, a gente resolve.",
+          ],
+        },
+        {
+          heading: "Uma prova que falha não gasta saldo",
+          paragraphs: [
+            "Se uma geração falha, ela não é descontada do seu saldo. Não há o que reclamar, porque nem chega a ser cobrada.",
+          ],
+        },
+        {
+          heading: "Como pedir",
+          paragraphs: [
+            "Escreva para {email} do e-mail com que você comprou, informando o número do pedido na sua fatura. Respondemos em no máximo cinco dias úteis.",
+            "Você também pode falar direto com o suporte da Paddle; os dados estão na fatura que recebeu.",
+          ],
+        },
+        {
+          heading: "Direito de arrependimento",
+          paragraphs: [
+            "Ao comprar, você aceita que as gerações fiquem disponíveis de imediato, o que implica abrir mão do direito de arrependimento sobre as que já usou. O que não usou segue coberto pelos 14 dias descritos acima.",
+          ],
+        },
+        {
+          heading: "Situação deste documento",
+          paragraphs: [
+            "Pendente de revisão jurídica profissional.",
+          ],
+        },
+      ],
+    },
     pendingReview: "Situação deste documento",
     privacy: {
       label: "Privacidade",
@@ -461,6 +533,13 @@ export const pt: Dictionary = {
           heading: "Marcas de terceiros",
           paragraphs: [
             "As marcas e modelos que aparecerem pertencem aos seus titulares. A menção não implica acordo, patrocínio ou associação, e não apresentamos como parceiro ninguém com quem não tenhamos um acordo.",
+          ],
+        },
+        {
+          heading: "O que é vendido e quem vende",
+          paragraphs: [
+            "O uso básico é gratuito. Quem quiser mais provas pode comprar um pacote de gerações: conteúdo digital, sem assinatura, adicionado à sua conta ao concluir o pagamento e sem prazo de validade.",
+            "A venda é feita pela Paddle.com Market Ltd como vendedor registrado. É quem consta na sua fatura e quem cuida da cobrança, dos impostos e dos reembolsos. As condições estão na nossa política de reembolso.",
           ],
         },
         {

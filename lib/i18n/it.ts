@@ -93,8 +93,10 @@ export const it: Dictionary = {
   },
   footer: {
     tagline: "Scoperta indipendente di occhiali. Fase di validazione.",
+    pricing: "Prezzi",
     privacy: "Privacy",
     terms: "Termini",
+    refunds: "Rimborsi",
     cookies: "Cookie",
   },
 
@@ -387,7 +389,77 @@ export const it: Dictionary = {
     },
   },
 
+  pricing: {
+    title: "Prezzi",
+    intro:
+      "Inizia gratis. Se ti trovi bene, compri un pacchetto di prove quando ti serve: senza abbonamento e senza scadenza.",
+    free: {
+      title: "Gratis, senza carta",
+      body:
+        "Una prova senza registrarti e un'altra creando il tuo account. Basta per vedere due montature sul tuo viso prima di decidere.",
+    },
+    packsTitle: "Pacchetti di prove",
+    generations: "{count} prove",
+    best: "Il più scelto",
+    note:
+      "Prezzi con imposte incluse. L'importo esatto dipende dal tuo paese e lo vedi prima di pagare.",
+    cta: "Prova gratis",
+    points: [
+      "Le generazioni non scadono.",
+      "Nessun abbonamento: paghi una volta e basta.",
+      "Se una prova fallisce, non consuma credito.",
+    ],
+    refunds: "Leggi la politica di rimborso",
+  },
   legal: {
+    refunds: {
+      label: "Rimborsi",
+      title: "Politica di rimborso",
+      intro: [
+        "I pacchetti sono contenuto digitale: le generazioni vengono aggiunte al tuo account appena il pagamento è confermato.",
+        "La vendita è effettuata da Paddle.com Market Ltd come venditore registrato. È chi figura sulla tua fattura e chi esegue il rimborso.",
+      ],
+      sections: [
+        {
+          heading: "Quattordici giorni, se non ne hai usata nessuna",
+          paragraphs: [
+            "Se non hai usato nessuna generazione del pacchetto, rimborsiamo l'intero importo entro 14 giorni dall'acquisto. Non devi spiegare il motivo.",
+          ],
+        },
+        {
+          heading: "Se ne hai già usata qualcuna",
+          paragraphs: [
+            "Entro quegli stessi 14 giorni rimborsiamo la parte corrispondente alle generazioni che ti restano.",
+            "Passato il termine, scrivici lo stesso: se qualcosa non ha funzionato come promettiamo, lo risolviamo.",
+          ],
+        },
+        {
+          heading: "Una prova fallita non consuma credito",
+          paragraphs: [
+            "Se una generazione fallisce, non viene scalata dal tuo saldo. Non devi reclamare nulla, perché non viene addebitata.",
+          ],
+        },
+        {
+          heading: "Come richiederlo",
+          paragraphs: [
+            "Scrivi a {email} dall'indirizzo con cui hai acquistato, indicando il numero d'ordine della fattura. Rispondiamo entro cinque giorni lavorativi al massimo.",
+            "Puoi anche contattare direttamente l'assistenza di Paddle: i recapiti sono sulla fattura che hai ricevuto.",
+          ],
+        },
+        {
+          heading: "Diritto di recesso",
+          paragraphs: [
+            "Acquistando accetti che le generazioni siano disponibili subito, il che comporta la rinuncia al diritto di recesso su quelle già consumate. Quelle non usate restano coperte dai 14 giorni descritti sopra.",
+          ],
+        },
+        {
+          heading: "Stato di questo documento",
+          paragraphs: [
+            "In attesa di revisione legale professionale.",
+          ],
+        },
+      ],
+    },
     pendingReview: "Stato di questo documento",
     privacy: {
       label: "Privacy",
@@ -441,7 +513,7 @@ export const it: Dictionary = {
       label: "Termini",
       title: "Condizioni d'uso",
       intro: [
-        "Il sito è in fase di validazione. Non c'è un servizio da sottoscrivere, non si accettano pagamenti e non si trattano dati degli utenti.",
+        "Il sito è in una fase iniziale. L'uso di base è gratuito e, se vuoi altre prove, puoi acquistare un pacchetto di generazioni.",
       ],
       sections: [
         {
@@ -461,6 +533,13 @@ export const it: Dictionary = {
           heading: "Marchi di terzi",
           paragraphs: [
             "I marchi e i modelli che compaiono appartengono ai rispettivi titolari. La loro menzione non implica accordo, sponsorizzazione o associazione, e non presentiamo come partner nessuno con cui non abbiamo un accordo.",
+          ],
+        },
+        {
+          heading: "Che cosa si vende e chi vende",
+          paragraphs: [
+            "L'uso di base è gratuito. Chi vuole altre prove può acquistare un pacchetto di generazioni: contenuto digitale, senza abbonamento, aggiunto al tuo account al completamento del pagamento e senza scadenza.",
+            "La vendita è effettuata da Paddle.com Market Ltd come venditore registrato. È chi figura sulla tua fattura e gestisce incasso, imposte e rimborsi. Le condizioni sono nella nostra politica di rimborso.",
           ],
         },
         {
