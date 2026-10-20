@@ -27,6 +27,17 @@ const nextConfig: NextConfig = {
       },
       {
         /**
+         * `oversized` se renombró a `grandes` -> D-036: en España se busca
+         * «gafas de sol grandes» y «oversized» no se usa. La página no
+         * llegó a indexarse, así que esto no recupera posiciones; está por
+         * si el enlace viejo anda en algún sitio.
+         */
+        source: "/es/gafas-de-sol/oversized",
+        destination: "/es/gafas-de-sol/grandes",
+        permanent: true,
+      },
+      {
+        /**
          * El enlace de pago que guarda Paddle **no puede llevar idioma**: es
          * uno solo para todo el mundo y lo pega en correos que escribe él.
          * Aquí se le da una URL estable y se resuelve el idioma dentro.

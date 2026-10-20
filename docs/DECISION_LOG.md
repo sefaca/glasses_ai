@@ -61,6 +61,7 @@
 | [D-033](#d-033) | 2026-10-16 | Registro con contraseña y Google, en vez de código por correo | DECISIÓN | OPEN |
 | [D-034](#d-034) | 2026-10-17 | Créditos comprados: una fila por compra, y la firma del aviso manda | DECISIÓN | OPEN |
 | [D-035](#d-035) | 2026-10-18 | Política de reembolso: 14 días, y proporcional si ya gastaste | DECISIÓN | OPEN |
+| [D-036](#d-036) | 2026-10-19 | Arquitectura de páginas ES por evidencia de Trends, y orden de mercados | DECISIÓN | OPEN |
 
 ---
 
@@ -586,6 +587,25 @@
 - **Evidence** Requisitos de verificación: formulario de Paddle `[D]`, visto el 2026-10-18. Que estas condiciones conviertan o cuesten dinero: **ninguna** — no hay ventas todavía.
 - **Alternatives** (a) Sin reembolso una vez entregadas las generaciones, descartado arriba; (b) 30 días en vez de 14, descartado porque 14 es el plazo legal de referencia en la UE y alargarlo sin datos es regalar opcionalidad; (c) reembolso solo en crédito, descartado porque devolver dinero es el único gesto que no parece una trampa; (d) esperar a tener gestor para redactarlo, descartado porque bloquea la verificación y el documento ya dice que está pendiente de revisión.
 - **Impact** Desbloquea el formulario de verificación de Paddle, que es lo único que queda entre el código y poder cobrar. **Sigue pendiente de revisión jurídica profesional**, y el propio documento lo dice en su último apartado.
+
+<a id="d-036"></a>
+## D-036 · Arquitectura de páginas ES guiada por evidencia, y orden de mercados
+
+- **Date** 2026-10-19 · **Type** DECISIÓN · **Status** OPEN
+- **Context** El fundador pide «posicionarnos por miles de palabras clave» y saber qué se busca en España frente a Estados Unidos y Reino Unido. No hay Keyword Planner ni herramienta de pago, y el 2026-10-18 se decidió no comprar datos por ahora. Se midió lo que sí se puede medir gratis: interés relativo en Google Trends y páginas vistas reales de Wikipedia → [research/seo/market-search-demand-es-us-uk.md](../research/seo/market-search-demand-es-us-uk.md).
+- **Decision**
+  1. **Reorientar antes que crear.** `oversized` pasa a `grandes` con redirección 301; `cat-eye` gana «ojo de gato» en el nombre; `ovaladas` queda pendiente de `noindex` hasta tener ≥4 monturas.
+  2. **Páginas nuevas P1**: `gafas-de-sol/de-pasta`, `guias/talla-de-gafas`, `guias/aviador-o-wayfarer`.
+  3. **Escala solo por entidad con datos verificados.** Una ficha de modelo es indexable únicamente con sus cinco medidas `verified`. Sin matrices de forma × género × cara.
+  4. **Segundo mercado: inglés**, una sola versión para US y Reino Unido, sujeta a tres condiciones simultáneas: embudo demostrado en español, revisor nativo con nombre y un retailer de destino verificado.
+- **El hallazgo que más cambia** En España se busca **«gafas de sol grandes» (13,2)** y **«de pasta» (21,0, al nivel de «redondas»)**; «oversized» es ≈0. Teníamos una página apuntando a un término que aquí no se usa. **El vocabulario español no es la traducción del inglés**, y los slugs tienen que salir de lo que se busca, no de la etiqueta interna de la forma.
+- **El hallazgo que más incomoda** «Probar gafas online» y «probador de gafas» quedan en ≈0,1 en España, frente a 12-21 de las formas. **El probador virtual no se busca aquí.** No invalida el producto —es lo que encuentran al llegar— pero sí invalida esperar tráfico de esa keyword, y por tanto reduce el peso de las páginas del cluster de try-on.
+- **Por qué «miles de keywords» se entrega con 70-90 páginas y no con miles** Google juzga el contenido escalado por su valor para el usuario y **no por cómo se produjo** —«no matter how it's created» `[D]`—. Una página buena posiciona para muchas variantes; mil páginas delgadas arrastran al dominio entero. El techo honesto con medidas verificadas son 70-90 páginas; sin ellas, 45-55. **Las medidas no son una tarea de datos aburrida: son la puerta de la escala**, y además entran en el prompt de generación.
+- **Evidence** `[X]` Google Trends 2026-10-18, relativo y no volumen. `[X]` Wikipedia Pageviews 2026-10-19 sobre fuente `[D]`: Hawkers 12.381 vistas en español frente a 176 en inglés (70×), Oakley 6.235 frente a 98.115. Las dos fuentes coinciden, que es lo que da confianza. Volumen absoluto, CPC y SERP reales siguen `[?]`.
+- **Dos trampas metodológicas documentadas** (a) En Wikipedia, **un título mal elegido se parece exactamente a poca demanda**: Oakley daba 913 hasta descubrir que su artículo se llama «Oakley, Inc.». (b) Se intentó derivar estacionalidad de Wikipedia y **no funciona**: el artículo español es ruido (350-470 visitas/mes). Queda escrito para no repetirlo.
+- **Alternatives** (a) Mantener los slugs y sumar páginas encima, descartado porque varios apuntan a términos sin demanda; (b) abrir el inglés ya, descartado por falta de retailer y de revisor; (c) fichas de modelo masivas sin medidas, descartado: serían exactamente las páginas vacías que prohíbe CLAUDE.md §0; (d) páginas por comunidad autónoma, descartado porque la demanda es homogénea (59 a 100 entre regiones) y solo las marcas tienen sesgo.
+- **Falsified if** A las 12 semanas, `de-pasta`, `redondas` y `wayfarer` están por debajo de 10 impresiones por consulta; o la revisión del 2026-11-24 muestra más del 30 % en «Rastreada, actualmente sin indexar» después de enriquecer.
+- **Impact** Reorienta la captación: el tráfico vendrá de forma, marca y talla, no del probador. Prioriza ampliar **Hawkers** —segunda marca en España y la única con programa de afiliación localizado— por encima de Oakley, que pesa en inglés y aquí no.
 
 ---
 

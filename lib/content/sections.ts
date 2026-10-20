@@ -100,7 +100,10 @@ export const SHAPE_SLUGS: Record<FrameShape, Record<Locale, string>> = {
     de: "geometrische",
   },
   oversized: {
-    es: "oversized",
+    // En España se buscan «gafas de sol grandes»; «oversized» no se usa
+    // -> D-036. El slug sigue al término del mercado, no a la etiqueta
+    // interna de la forma, que en el código sigue llamándose `oversized`.
+    es: "grandes",
     en: "oversized",
     it: "oversize",
     pt: "oversized",

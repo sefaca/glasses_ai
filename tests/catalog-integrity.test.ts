@@ -42,6 +42,26 @@ describe("identidad", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
   });
 
+  it("ninguna marca repite modelo: un id distinto esconde la misma montura", () => {
+    // Pasó de verdad: al ampliar el catálogo entraron Holbrook, Frogskins y
+    // la Persol 714 que ya estaban, con otro `id`. Las dos pruebas de arriba
+    // no lo vieron porque solo miran identificadores. Lo que delata la
+    // duplicación es la pareja marca + modelo.
+    //
+    // Los colorways del mismo modelo son legítimos y por eso se distinguen
+    // por nombre: «Clubmaster» y «Clubmaster Havana» conviven, dos
+    // «Holbrook» no.
+    const seen = new Map<string, string>();
+    for (const frame of FRAMES) {
+      const key = `${frame.brandId}/${frame.model.toLowerCase()}`;
+      const previous = seen.get(key);
+      expect(previous, `${frame.id} repite el modelo de ${previous}`).toBe(
+        undefined,
+      );
+      seen.set(key, frame.id);
+    }
+  });
+
   it("los slugs son seguros en una URL", () => {
     for (const frame of FRAMES) {
       expect(frame.slug, frame.id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);

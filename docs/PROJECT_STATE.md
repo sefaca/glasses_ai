@@ -66,7 +66,9 @@ Flujo que define el producto: foto → análisis → 6 recomendaciones explicada
 | **Español indexable** `[X]` 2026-10-13, 33 URLs | **HECHO** → [D-027](DECISION_LOG.md#d-027). Los otros 4 idiomas, cerrados |
 | 125 páginas de catálogo (9 formas + 14 marcas + 2 hubs) × 5 idiomas | **HECHO** → [D-027](DECISION_LOG.md#d-027) |
 | Verificar medidas: 54 de 69 monturas sin ninguna, 15 orientativas | **pendiente** — las medidas no son solo tabla: entran en el prompt (`Proportions: …mm`) y acotan las proporciones de la imagen generada. Plantilla en [research/catalog/](../research/catalog/medidas-pendientes.md) |
-| Catálogo: **69 monturas y 34 marcas** (eran 23 y 14) | **HECHO** 2026-10-18 — mínimo de 6 monturas en cada forma; cat-eye y oversized dejan de ser páginas de una sola ficha |
+| Catálogo: **66 monturas y 34 marcas** (eran 23 y 14) | **HECHO** 2026-10-19 — tres duplicados retirados (Holbrook, Frogskins, Persol 714 entraron dos veces con otro `id`). Test nuevo: ninguna marca repite modelo. **0 con medidas `verified`, 15 `indicative`** |
+| **Demanda ES/US/UK medida** (Trends relativo + Wikipedia medido) y arquitectura de páginas | **HECHO** 2026-10-19 `[X]` → [D-036](DECISION_LOG.md#d-036). `oversized` renombrado a `grandes`. Volumen absoluto sigue `[?]` |
+| Tracker semanal de posiciones | **a media potencia** — `GSC_SA_KEY` sin definir desde que se montó: el snapshot solo trae competidores, y 10 de sus URLs devuelven 403 |
 | Sistema de growth/SEO (agente + tracker semanal) | **HECHO** → [GROWTH_SEO.md](GROWTH_SEO.md) |
 | Dominio `lookfit.app` sirviendo en producción, con certificado | **HECHO** `[X]` verificado 2026-10-13 → [D-024](DECISION_LOG.md#d-024) |
 | Puerta de acceso `ACCESS_CODE` en la ruta de generación | **HECHO y activa en producción** `[X]` 2026-10-13: `401 access_denied` sin código y con código incorrecto → [D-025](DECISION_LOG.md#d-025) |

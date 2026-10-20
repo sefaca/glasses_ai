@@ -16,7 +16,8 @@
       "gafas de sol aviador",
       "gafas de sol redondas",
       "gafas de sol cuadradas",
-      "gafas de sol rectangulares"
+      "gafas de sol rectangulares",
+      "gafas de sol grandes"
     ],
     "es_modelo_talla": [
       "rb3025",
@@ -41,10 +42,21 @@
       "qué gafas me favorecen"
     ],
     "es_medidas": [
-      "números de las gafas",
+      "talla de gafas",
+      "calibre gafas",
+      "medidas gafas",
       "medidas de las gafas",
-      "ancho de gafas",
-      "talla de gafas"
+      "ancho de gafas"
+    ],
+    "es_material": [
+      "gafas de sol de pasta",
+      "gafas de sol polarizadas"
+    ],
+    "es_marca": [
+      "hawkers gafas de sol",
+      "meller gafas de sol",
+      "ray ban wayfarer",
+      "oakley gafas de sol"
     ]
   },
   "keywordsPlanned": {
@@ -82,36 +94,129 @@
     ]
   },
   "competitors": [
-    { "name": "VisuTry P ES try-on", "url": "https://www.visutry.com/es/try-on/glasses" },
-    { "name": "VisuTry P ES forma de cara", "url": "https://www.visutry.com/es/glasses-for-face-shape" },
-    { "name": "VisuTry P ES marca Oakley", "url": "https://www.visutry.com/es/brand/oakley" },
-    { "name": "VisuTry P EN try-on", "url": "https://www.visutry.com/en/try-on/glasses" },
-    { "name": "VisuTry P DE try-on", "url": "https://www.visutry.com/de/try-on/glasses" },
-    { "name": "VisuTry P PT try-on", "url": "https://www.visutry.com/pt/try-on/glasses" },
-    { "name": "VisuTry sitemap core", "url": "https://www.visutry.com/sitemaps/core.xml" },
-    { "name": "TRIPWIRE VisuTry IT (404 esperado)", "url": "https://www.visutry.com/it" },
-    { "name": "SpecFit P", "url": "https://specfit.app/" },
-    { "name": "VirtualGlassesTryOn P", "url": "https://virtualglassestryon.ai/" },
-    { "name": "Afflelou ES C", "url": "https://www.afflelou.es/gafas-de-sol" },
-    { "name": "MultiOpticas ES C", "url": "https://www.multiopticas.com/gafas-de-sol" },
-    { "name": "General Optica ES C", "url": "https://www.generaloptica.es/" },
-    { "name": "Opticalia ES C", "url": "https://www.opticalia.com/" },
-    { "name": "Vision Express UK C try-on", "url": "https://www.visionexpress.com/sunglasses/virtual-try-on" },
-    { "name": "Warby Parker US C", "url": "https://www.warbyparker.com/sunglasses" },
-    { "name": "FramesDirect EN guia cara redonda", "url": "https://www.framesdirect.com/knowledge-center/best-sunglasses-for-round-faces" },
-    { "name": "Fotor generativo", "url": "https://www.fotor.com/features/virtual-try-on-glasses/" },
-    { "name": "Visiofactory Ray-Ban fitting", "url": "https://www.visiofactory.com/en/sunglasses/ray-ban/virtual-fitting/" },
-    { "name": "Amazon IT virtual try-on C", "url": "https://www.amazon.it/virtualtryon" },
-    { "name": "SmartBuyGlasses IT C", "url": "https://www.smartbuyglasses.it/occhiali-da-sole" },
-    { "name": "Occhiali24 IT C", "url": "https://www.occhiali24.it/" },
-    { "name": "Mister Spex IT C", "url": "https://www.misterspex.it/" },
-    { "name": "Mister Spex DE C pilotenbrillen", "url": "https://www.misterspex.de/sonnenbrillen/pilotenbrillen" },
-    { "name": "Fielmann DE C", "url": "https://www.fielmann.de/sonnenbrillen/" },
-    { "name": "Otto DE C", "url": "https://www.otto.de/herren/accessoires/brillen/sonnenbrillen/" },
-    { "name": "insMind DE generativo", "url": "https://www.insmind.com/de-de/bild-werkzeuge/virtuelle-brillenanprobe" },
-    { "name": "Chilli Beans BR C", "url": "https://www.chillibeans.com.br/" },
-    { "name": "Oticas Carol BR C", "url": "https://www.oticascarol.com.br/" },
-    { "name": "Oticas Diniz BR C", "url": "https://www.oticasdiniz.com.br/" },
-    { "name": "Mercado Livre BR aviador", "url": "https://lista.mercadolivre.com.br/oculos-aviador-feminino" }
+    {
+      "name": "VisuTry P ES try-on",
+      "url": "https://www.visutry.com/es/try-on/glasses"
+    },
+    {
+      "name": "VisuTry P ES forma de cara",
+      "url": "https://www.visutry.com/es/glasses-for-face-shape"
+    },
+    {
+      "name": "VisuTry P ES marca Oakley",
+      "url": "https://www.visutry.com/es/brand/oakley"
+    },
+    {
+      "name": "VisuTry P EN try-on",
+      "url": "https://www.visutry.com/en/try-on/glasses"
+    },
+    {
+      "name": "VisuTry P DE try-on",
+      "url": "https://www.visutry.com/de/try-on/glasses"
+    },
+    {
+      "name": "VisuTry P PT try-on",
+      "url": "https://www.visutry.com/pt/try-on/glasses"
+    },
+    {
+      "name": "VisuTry sitemap core",
+      "url": "https://www.visutry.com/sitemaps/core.xml"
+    },
+    {
+      "name": "TRIPWIRE VisuTry IT (404 esperado)",
+      "url": "https://www.visutry.com/it"
+    },
+    {
+      "name": "SpecFit P",
+      "url": "https://specfit.app/"
+    },
+    {
+      "name": "VirtualGlassesTryOn P",
+      "url": "https://virtualglassestryon.ai/"
+    },
+    {
+      "name": "Afflelou ES C",
+      "url": "https://www.afflelou.es/gafas-de-sol"
+    },
+    {
+      "name": "MultiOpticas ES C",
+      "url": "https://www.multiopticas.com/gafas-de-sol"
+    },
+    {
+      "name": "General Optica ES C",
+      "url": "https://www.generaloptica.es/"
+    },
+    {
+      "name": "Opticalia ES C",
+      "url": "https://www.opticalia.com/"
+    },
+    {
+      "name": "Vision Express UK C try-on",
+      "url": "https://www.visionexpress.com/sunglasses/virtual-try-on"
+    },
+    {
+      "name": "Warby Parker US C",
+      "url": "https://www.warbyparker.com/sunglasses"
+    },
+    {
+      "name": "FramesDirect EN guia cara redonda",
+      "url": "https://www.framesdirect.com/knowledge-center/best-sunglasses-for-round-faces"
+    },
+    {
+      "name": "Fotor generativo",
+      "url": "https://www.fotor.com/features/virtual-try-on-glasses/"
+    },
+    {
+      "name": "Visiofactory Ray-Ban fitting",
+      "url": "https://www.visiofactory.com/en/sunglasses/ray-ban/virtual-fitting/"
+    },
+    {
+      "name": "Amazon IT virtual try-on C",
+      "url": "https://www.amazon.it/virtualtryon"
+    },
+    {
+      "name": "SmartBuyGlasses IT C",
+      "url": "https://www.smartbuyglasses.it/occhiali-da-sole"
+    },
+    {
+      "name": "Occhiali24 IT C",
+      "url": "https://www.occhiali24.it/"
+    },
+    {
+      "name": "Mister Spex IT C",
+      "url": "https://www.misterspex.it/"
+    },
+    {
+      "name": "Mister Spex DE C pilotenbrillen",
+      "url": "https://www.misterspex.de/sonnenbrillen/pilotenbrillen"
+    },
+    {
+      "name": "Fielmann DE C",
+      "url": "https://www.fielmann.de/sonnenbrillen/"
+    },
+    {
+      "name": "Otto DE C",
+      "url": "https://www.otto.de/herren/accessoires/brillen/sonnenbrillen/"
+    },
+    {
+      "name": "insMind DE generativo",
+      "url": "https://www.insmind.com/de-de/bild-werkzeuge/virtuelle-brillenanprobe"
+    },
+    {
+      "name": "Chilli Beans BR C",
+      "url": "https://www.chillibeans.com.br/"
+    },
+    {
+      "name": "Oticas Carol BR C",
+      "url": "https://www.oticascarol.com.br/"
+    },
+    {
+      "name": "Oticas Diniz BR C",
+      "url": "https://www.oticasdiniz.com.br/"
+    },
+    {
+      "name": "Mercado Livre BR aviador",
+      "url": "https://lista.mercadolivre.com.br/oculos-aviador-feminino"
+    }
   ]
 }

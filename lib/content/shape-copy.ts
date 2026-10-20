@@ -42,10 +42,10 @@ export const SHAPE_PAGE_NAME: Record<Locale, Record<FrameShape, string>> = {
     round: "Gafas de sol redondas",
     oval: "Gafas de sol ovaladas",
     aviator: "Gafas de sol aviador",
-    "cat-eye": "Gafas de sol cat-eye",
+    "cat-eye": "Gafas de sol cat-eye (ojo de gato)",
     wayfarer: "Gafas de sol wayfarer",
     geometric: "Gafas de sol geométricas",
-    oversized: "Gafas de sol oversized",
+    oversized: "Gafas de sol grandes (oversize)",
   },
   en: {
     rectangular: "Rectangular sunglasses",
